@@ -1,27 +1,38 @@
-import Link from 'next/link';
+'use client';
 
-const LINKS = {
-  서비스: [
-    { label: '식품 마켓', href: '/market' },
-    { label: '푸드 미디어', href: '/media' },
-    { label: '커뮤니티', href: '/community' },
-    { label: '대시보드', href: '/dashboard' },
-  ],
-  정보: [
-    { label: '서비스 소개', href: '/#modules' },
-    { label: '핵심 가치', href: '/#why' },
-    { label: '이용약관', href: '/terms' },
-    { label: '개인정보처리방침', href: '/privacy' },
-  ],
-  계정: [
-    { label: '회원가입', href: '/auth/signup' },
-    { label: '로그인', href: '/auth/login' },
-    { label: '상품 등록', href: '/market/sell' },
-    { label: '영상 올리기', href: '/media/upload' },
-  ],
-};
+import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
+
+const SERVICE_LINKS = [
+  { label: '식품 마켓', href: '/market' },
+  { label: '푸드 미디어', href: '/media' },
+  { label: '커뮤니티', href: '/community' },
+  { label: '대시보드', href: '/dashboard' },
+];
+
+const INFO_LINKS = [
+  { label: '서비스 소개', href: '/#modules' },
+  { label: '핵심 가치', href: '/#why' },
+  { label: '이용약관', href: '/terms' },
+  { label: '개인정보처리방침', href: '/privacy' },
+];
 
 export default function Footer() {
+  const user = useAuthStore((s) => s.user);
+
+  const accountLinks = user
+    ? [
+        { label: '마이페이지', href: '/dashboard' },
+        { label: '상품 등록', href: '/market/sell' },
+        { label: '영상 올리기', href: '/media/upload' },
+      ]
+    : [
+        { label: '회원가입', href: '/auth/signup' },
+        { label: '로그인', href: '/auth/login' },
+        { label: '상품 등록', href: '/market/sell' },
+        { label: '영상 올리기', href: '/media/upload' },
+      ];
+
   return (
     <footer className="bg-[#0a0a0a] border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto px-6">
@@ -65,7 +76,7 @@ export default function Footer() {
           </div>
 
           {/* 링크 컬럼들 */}
-          {Object.entries(LINKS).map(([title, items]) => (
+          {([['서비스', SERVICE_LINKS], ['정보', INFO_LINKS], ['계정', accountLinks]] as [string, { label: string; href: string }[]][]).map(([title, items]) => (
             <div key={title} className="flex flex-col gap-3">
               <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">{title}</p>
               <ul className="flex flex-col gap-2">

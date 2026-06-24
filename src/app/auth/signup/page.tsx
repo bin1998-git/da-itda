@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 
 function formatPhone(value: string) {
@@ -12,12 +14,21 @@ function formatPhone(value: string) {
 }
 
 export default function SignupPage() {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const [form, setForm] = useState({
     fullName: '', birthDate: '', email: '', phone: '', password: '', passwordConfirm: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && user) router.replace('/dashboard');
+  }, [user, isLoading, router]);
+
+  if (isLoading || user) return null;
 
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = key === 'phone' ? formatPhone(e.target.value) : e.target.value;

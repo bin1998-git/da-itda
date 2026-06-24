@@ -103,6 +103,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -185,7 +186,9 @@ export default function Navbar() {
           <div className="w-px h-5 bg-white/10 mx-0.5" />
 
           {/* 로그인 상태 */}
-          {user ? (
+          {isLoading ? (
+            <div className="w-24 h-8 rounded-xl bg-white/5 animate-pulse" />
+          ) : user ? (
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen((v) => !v)}

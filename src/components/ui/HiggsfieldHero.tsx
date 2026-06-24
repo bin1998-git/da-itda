@@ -1,8 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
 
 export default function HiggsfieldHero() {
+  const user = useAuthStore((s) => s.user);
+  const isLoading = useAuthStore((s) => s.isLoading);
+
+  const ctaHref = user ? '/dashboard' : '/auth/signup';
+  const ctaLabel = isLoading ? '잠시만요...' : user ? '대시보드로 이동' : '무료로 시작하기';
+
   return (
     <section className="relative w-full min-h-screen overflow-hidden flex flex-col">
       {/* 배경 */}
@@ -56,10 +63,10 @@ export default function HiggsfieldHero() {
         {/* CTA */}
         <div className="flex flex-col sm:flex-row gap-3 mb-12">
           <Link
-            href="/auth/signup"
+            href={ctaHref}
             className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-black text-sm font-bold hover:bg-white/90 transition-all shadow-xl shadow-white/10"
           >
-            무료로 시작하기
+            {ctaLabel}
             <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

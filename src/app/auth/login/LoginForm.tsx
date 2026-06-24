@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const user = useAuthStore((s) => s.user);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,9 +18,15 @@ export default function LoginForm() {
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isLoading && user) router.replace('/dashboard');
+  }, [user, isLoading, router]);
+
+  useEffect(() => {
     const err = searchParams.get('error');
     if (err) setError(err);
   }, [searchParams]);
+
+  if (isLoading || user) return null;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
