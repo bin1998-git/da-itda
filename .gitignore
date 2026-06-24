@@ -46,3 +46,6 @@ verify_signup.mjs
 *.tsbuildinfo
 next-env.d.ts
 screenshot*.png
+
+# claude local settings (개인 훅 설정)
+.claude/settings.local.json

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HiggsfieldHero from '@/components/ui/HiggsfieldHero';
+import Footer from '@/components/ui/Footer';
 
 const VALUES = [
   {
@@ -79,25 +80,7 @@ export default function Home() {
     <main className="flex flex-col min-h-screen bg-[#0a0a0a]">
 
       {/* ── Hero 섹션 ── */}
-      <HiggsfieldHero
-        title="다잇다"
-        subtitle="맛있는 모든 것을 하나로 — 식품 마켓부터 레시피 영상, 푸드 커뮤니티까지"
-      >
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <Link
-            href="/auth/signup"
-            className="px-8 py-3.5 rounded-full bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition-all duration-200 shadow-lg shadow-amber-500/20 min-w-[160px] text-center"
-          >
-            무료로 시작하기
-          </Link>
-          <a
-            href="#modules"
-            className="px-8 py-3.5 rounded-full border border-white/20 text-white text-sm hover:bg-white/8 transition-all duration-200 min-w-[160px] text-center"
-          >
-            서비스 둘러보기
-          </a>
-        </div>
-      </HiggsfieldHero>
+      <HiggsfieldHero />
 
       {/* ── 핵심 가치 섹션 ── */}
       <section id="why" className="py-28 px-6">
@@ -221,16 +204,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 푸터 ── */}
-      <footer className="py-10 px-6 border-t border-white/5">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-white font-bold text-lg tracking-tight">다잇다</span>
-            <span className="text-white/20 text-sm">— Connect Everything</span>
-          </div>
-          <p className="text-white/20 text-xs">© 2026 Da-itda. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
 
     </main>
   );
