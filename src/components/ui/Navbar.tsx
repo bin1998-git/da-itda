@@ -20,6 +20,9 @@ export default function Navbar() {
         다잇다
       </Link>
       <div className="flex items-center gap-4">
+        <Link href="/market" className="text-white/50 text-sm hover:text-white transition hidden sm:block">
+          마켓
+        </Link>
         {user ? (
           <>
             <div className="flex items-center gap-3">
