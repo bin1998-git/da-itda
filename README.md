@@ -88,12 +88,29 @@ npm run dev
 - [2026-06-24] Phase 1: DB 스키마 설계 (profiles, modules, higgsfield_assets), RLS 적용
 - [2026-06-24] Phase 2: 회원가입·로그인·로그아웃 구현, PKCE 이메일 인증 콜백, 대시보드
 - [2026-06-24] Phase 3: 404 페이지 구현
+- [2026-06-24] Phase 4: Google OAuth 소셜 로그인 연동 완료
+- [2026-06-24] Phase 5: 카카오 OAuth 소셜 로그인 연동 완료 (profile_nickname, profile_image 동의항목)
+- [2026-06-24] Phase 6: Navbar 프로필 사진 연동 (Google/카카오 avatar_url 자동 표시)
+
+---
+
+## 🔐 소셜 로그인
+
+| Provider | 상태 | 비고 |
+|----------|------|------|
+| 이메일/비밀번호 | ✅ 완료 | PKCE 이메일 인증 |
+| Google | ✅ 완료 | 프로필 사진·이름 연동 |
+| 카카오 | ✅ 완료 | 닉네임·프로필 사진 연동 (이메일 무료 미지원) |
+| Apple | ⏸️ 보류 | 개발자 계정 $99/년 필요 |
 
 ---
 
 ## 🚀 다음에 진행해야 할 액션 플랜
 
-- [ ] Phase 4: 미디어 모듈 활성화 + Higgsfield 영상 업로드/관리 UI
-- [ ] Phase 5: 커뮤니티 모듈 (게시판, 댓글)
-- [ ] Phase 6: 커머스 모듈 (상품/예약)
+- [ ] Phase 7: 대시보드 UI 고도화 (모듈 선택 화면, 사용자 정보 표시)
+- [ ] Phase 8: 메인 홈 페이지 리디자인 (Higgsfield Hero 영상 연동)
+- [ ] Phase 9: 미디어 모듈 (Higgsfield 영상 업로드/관리 UI)
+- [ ] Phase 10: 커뮤니티 모듈 (게시판, 댓글)
+- [ ] Phase 11: 커머스 모듈 (상품/예약)
 - [ ] 배포 환경 구성 (Vercel + 환경변수 설정)
+- [ ] GitHub App 연결 → README 자동 업데이트 루틴 정상화
