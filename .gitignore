@@ -33,6 +33,12 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# supabase temp
+supabase/.temp/
+
+# test scripts
+verify_signup.mjs
+
 # vercel
 .vercel
 
