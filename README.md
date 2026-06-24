@@ -25,21 +25,26 @@
 src/
 ├── app/
 │   ├── auth/
-│   │   ├── callback/      # 이메일 인증 콜백 (PKCE 코드 교환)
-│   │   ├── login/         # 로그인 페이지
-│   │   └── signup/        # 회원가입 페이지
-│   ├── dashboard/         # 메인 대시보드 (로그인 필요)
-│   ├── not-found.tsx      # 404 페이지
-│   ├── layout.tsx         # 전역 레이아웃 (AuthProvider, Navbar)
-│   └── page.tsx           # 메인 홈 (Higgsfield Hero)
+│   │   ├── callback/
+│   │   │   └── exchange/
+│   │   │       ├── page.tsx          # Suspense 래퍼
+│   │   │       └── ExchangeHandler.tsx  # PKCE 코드 교환 (Client)
+│   │   ├── login/
+│   │   │   ├── page.tsx              # Suspense 래퍼
+│   │   │   └── LoginForm.tsx         # 로그인 폼 (Client)
+│   │   └── signup/                   # 회원가입 페이지
+│   ├── dashboard/                    # 메인 대시보드 (로그인 필요)
+│   ├── not-found.tsx                 # 404 페이지
+│   ├── layout.tsx                    # 전역 레이아웃 (AuthProvider, Navbar)
+│   └── page.tsx                      # 홈 페이지 (Server Component, 풀 리디자인)
 ├── components/ui/
-│   ├── AuthProvider.tsx   # 세션 자동 감지 및 전역 상태 동기화
-│   ├── HiggsfieldHero.tsx # 영상 Hero 섹션 모듈 (재사용 가능)
-│   └── Navbar.tsx         # 로그인 상태 반영 네비게이션
+│   ├── AuthProvider.tsx              # 세션 자동 감지 및 전역 상태 동기화
+│   ├── HiggsfieldHero.tsx            # animated Hero 섹션 (CSS 그라디언트 + orb)
+│   └── Navbar.tsx                    # 로그인 상태 반영 네비게이션
 ├── lib/
-│   └── supabase.ts        # Supabase 클라이언트 싱글톤
+│   └── supabase.ts                   # Supabase 클라이언트 싱글톤
 └── store/
-    └── authStore.ts       # Zustand 유저 상태 관리
+    └── authStore.ts                  # Zustand 유저 상태 관리
 ```
 
 ---
@@ -84,13 +89,17 @@ npm run dev
 
 ## 🛠️ 현재까지 완료된 작업 이력
 
-- [2026-06-24] Phase 0: Next.js 프로젝트 초기화, Supabase·Zustand 설치, GitHub 연동
-- [2026-06-24] Phase 1: DB 스키마 설계 (profiles, modules, higgsfield_assets), RLS 적용
-- [2026-06-24] Phase 2: 회원가입·로그인·로그아웃 구현, PKCE 이메일 인증 콜백, 대시보드
-- [2026-06-24] Phase 3: 404 페이지 구현
-- [2026-06-24] Phase 4: Google OAuth 소셜 로그인 연동 완료
-- [2026-06-24] Phase 5: 카카오 OAuth 소셜 로그인 연동 완료 (profile_nickname, profile_image 동의항목)
-- [2026-06-24] Phase 6: Navbar 프로필 사진 연동 (Google/카카오 avatar_url 자동 표시)
+| Phase | 내용 | 날짜 |
+|-------|------|------|
+| 0 | Next.js 프로젝트 초기화, Supabase·Zustand 설치, GitHub 연동 | 2026-06-24 |
+| 1 | DB 스키마 설계 (profiles, modules, higgsfield_assets), RLS 적용 | 2026-06-24 |
+| 2 | 회원가입·로그인·로그아웃, PKCE 이메일 인증 콜백, 대시보드 | 2026-06-24 |
+| 3 | HiggsfieldHero 컴포넌트, 404 페이지 | 2026-06-24 |
+| 4 | Google OAuth 소셜 로그인 연동 | 2026-06-24 |
+| 5 | 카카오 OAuth 소셜 로그인 연동 (닉네임/프로필 사진) | 2026-06-24 |
+| 6 | Navbar 프로필 사진 연동 (소셜 avatar + 이니셜 폴백) | 2026-06-24 |
+| 7 | 대시보드 UI — 시간대별 인사말, 스탯 카드, 모듈 카드 | 2026-06-24 |
+| **8** | **홈 페이지 풀 리디자인 — animated Hero, 가치 섹션, 모듈 카드, CTA, 푸터** | **2026-06-24** |
 
 ---
 
@@ -107,10 +116,11 @@ npm run dev
 
 ## 🚀 다음에 진행해야 할 액션 플랜
 
-- [ ] Phase 7: 대시보드 UI 고도화 (모듈 선택 화면, 사용자 정보 표시)
-- [ ] Phase 8: 메인 홈 페이지 리디자인 (Higgsfield Hero 영상 연동)
-- [ ] Phase 9: 미디어 모듈 (Higgsfield 영상 업로드/관리 UI)
-- [ ] Phase 10: 커뮤니티 모듈 (게시판, 댓글)
-- [ ] Phase 11: 커머스 모듈 (상품/예약)
-- [ ] 배포 환경 구성 (Vercel + 환경변수 설정)
-- [ ] GitHub App 연결 → README 자동 업데이트 루틴 정상화
+- [ ] **Phase 9: 식품 마켓 (Commerce)**
+  - 상품 목록 페이지 (`/market`)
+  - 상품 상세 페이지 (`/market/[id]`)
+  - 판매자 등록 플로우
+  - 장바구니 / 결제 (포트원 or Stripe)
+- [ ] Phase 10: 푸드 미디어 (Higgsfield 영상 업로드/재생)
+- [ ] Phase 11: 커뮤니티 (게시판, 댓글, 좋아요)
+- [ ] Phase 12: Vercel 배포 (환경변수, 도메인, Supabase redirect URL)
