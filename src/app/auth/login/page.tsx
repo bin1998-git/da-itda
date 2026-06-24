@@ -31,10 +31,21 @@ export default function LoginPage() {
 
   const handleSocial = async (provider: 'google' | 'kakao' | 'apple') => {
     setSocialLoading(provider);
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
+    if (provider === 'kakao') {
+      await supabase.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          scopes: 'profile_nickname profile_image',
+          queryParams: { scope: 'profile_nickname profile_image' },
+        },
+      });
+    } else {
+      await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/dashboard` },
+      });
+    }
   };
 
   return (
