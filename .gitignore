@@ -45,3 +45,4 @@ verify_signup.mjs
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+screenshot*.png
