@@ -52,6 +52,7 @@ export default function CartPage() {
     name: '', phone: '', address: '', detail: '',
   });
   const [shippingError, setShippingError] = useState('');
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
   // localStorage 저장 쿠폰 + sessionStorage 적용 쿠폰 복원
   useEffect(() => {
@@ -358,7 +359,35 @@ export default function CartPage() {
 
             {/* 배송 정보 섹션 */}
             <div id="shipping-section" className="rounded-2xl border border-white/8 bg-white/3 p-5 flex flex-col gap-4">
-              <p className="text-white/50 text-sm font-medium">배송 정보</p>
+              <div className="flex items-center justify-between">
+                <p className="text-white/50 text-sm font-medium">배송 정보</p>
+                <button
+                  type="button"
+                  disabled={loadingProfile}
+                  onClick={async () => {
+                    if (!user) return;
+                    setLoadingProfile(true);
+                    const { data } = await supabase
+                      .from('profiles')
+                      .select('full_name, phone, address, address_detail')
+                      .eq('id', user.id)
+                      .single();
+                    if (data) {
+                      setShipping({
+                        name:    data.full_name     || '',
+                        phone:   data.phone         || '',
+                        address: data.address       || '',
+                        detail:  data.address_detail || '',
+                      });
+                      setShippingError('');
+                    }
+                    setLoadingProfile(false);
+                  }}
+                  className="text-xs text-amber-400/60 hover:text-amber-400 transition disabled:opacity-40"
+                >
+                  {loadingProfile ? '불러오는 중...' : '저장된 주소 불러오기'}
+                </button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-white/35 text-xs mb-1.5 block">받는 분 이름 *</label>

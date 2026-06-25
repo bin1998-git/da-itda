@@ -60,7 +60,7 @@ export default function DashboardPage() {
   const [tabLoading, setTabLoading] = useState(false);
 
   // profile
-  const [profile, setProfile] = useState({ full_name: '', username: '', avatar_url: '', phone: '' });
+  const [profile, setProfile] = useState({ full_name: '', username: '', avatar_url: '', phone: '', address: '', address_detail: '' });
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [isSeller, setIsSeller] = useState(false);
@@ -106,13 +106,15 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
 
-    supabase.from('profiles').select('full_name, username, avatar_url, phone').eq('id', user.id).single()
+    supabase.from('profiles').select('full_name, username, avatar_url, phone, address, address_detail').eq('id', user.id).single()
       .then(({ data }) => {
         if (data) setProfile({
-          full_name:  data.full_name  || user.user_metadata?.full_name || '',
-          username:   data.username   || '',
-          avatar_url: data.avatar_url || user.user_metadata?.avatar_url || '',
-          phone:      data.phone      || '',
+          full_name:      data.full_name      || user.user_metadata?.full_name || '',
+          username:       data.username       || '',
+          avatar_url:     data.avatar_url     || user.user_metadata?.avatar_url || '',
+          phone:          data.phone          || '',
+          address:        data.address        || '',
+          address_detail: data.address_detail || '',
         });
       });
 
@@ -199,10 +201,12 @@ export default function DashboardPage() {
     setSaving(true);
     setSaveMsg(null);
     const { error } = await supabase.from('profiles').update({
-      full_name:  profile.full_name,
-      username:   profile.username,
-      avatar_url: profile.avatar_url,
-      phone:      profile.phone,
+      full_name:      profile.full_name,
+      username:       profile.username,
+      avatar_url:     profile.avatar_url,
+      phone:          profile.phone,
+      address:        profile.address || null,
+      address_detail: profile.address_detail || null,
     }).eq('id', user.id);
     setSaveMsg(error
       ? { ok: false, text: '저장 실패: ' + error.message }
@@ -445,10 +449,12 @@ export default function DashboardPage() {
 
             {/* 폼 필드 */}
             {([
-              { key: 'full_name',  label: '이름',               placeholder: '홍길동',                 type: 'text' },
-              { key: 'username',   label: '닉네임',              placeholder: 'gildong_hong',           type: 'text' },
-              { key: 'avatar_url', label: '프로필 사진 URL',     placeholder: 'https://example.com/...', type: 'url'  },
-              { key: 'phone',      label: '전화번호',             placeholder: '010-0000-0000',          type: 'tel'  },
+              { key: 'full_name',      label: '이름',             placeholder: '홍길동',                  type: 'text' },
+              { key: 'username',       label: '닉네임',            placeholder: 'gildong_hong',            type: 'text' },
+              { key: 'avatar_url',     label: '프로필 사진 URL',   placeholder: 'https://example.com/...', type: 'url'  },
+              { key: 'phone',          label: '전화번호',           placeholder: '010-0000-0000',           type: 'tel'  },
+              { key: 'address',        label: '기본 주소',          placeholder: '서울특별시 강남구 테헤란로 123', type: 'text' },
+              { key: 'address_detail', label: '상세 주소',          placeholder: '101동 202호',             type: 'text' },
             ] as { key: keyof typeof profile; label: string; placeholder: string; type: string }[]).map(({ key, label, placeholder, type }) => (
               <div key={key} className="flex flex-col gap-2">
                 <label className="text-white/45 text-sm">{label}</label>

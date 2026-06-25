@@ -25,6 +25,7 @@ interface Order {
   shipping_phone: string | null;
   shipping_address: string | null;
   shipping_detail: string | null;
+  tracking_number: string | null;
   created_at: string;
   items: OrderItem[];
 }
@@ -38,10 +39,62 @@ interface ShippingForm {
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   paid:      { label: '결제완료',  cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
+  preparing: { label: '배송준비',  cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
   shipping:  { label: '배송중',    cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-  delivered: { label: '배송완료',  cls: 'bg-white/8 text-white/40 border-white/10' },
+  delivered: { label: '배송완료',  cls: 'bg-white/8 text-white/50 border-white/10' },
   cancelled: { label: '취소됨',   cls: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
 };
+
+const STEPS = [
+  { key: 'paid',      label: '결제완료' },
+  { key: 'preparing', label: '배송준비' },
+  { key: 'shipping',  label: '배송중' },
+  { key: 'delivered', label: '배송완료' },
+];
+const STEP_INDEX: Record<string, number> = {
+  paid: 0, preparing: 1, shipping: 2, delivered: 3,
+};
+
+function StatusStepper({ status, trackingNumber }: { status: string; trackingNumber: string | null }) {
+  if (status === 'cancelled') return null;
+  const current = STEP_INDEX[status] ?? 0;
+  return (
+    <div className="px-5 py-4 border-b border-white/6">
+      <div className="flex items-center gap-0">
+        {STEPS.map((step, i) => {
+          const done = i <= current;
+          const active = i === current;
+          return (
+            <div key={step.key} className="flex items-center flex-1 last:flex-none">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                  done
+                    ? active
+                      ? 'bg-amber-500 border-amber-500 text-black'
+                      : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                    : 'bg-white/4 border-white/10 text-white/20'
+                }`}>
+                  {i < current ? '✓' : i + 1}
+                </div>
+                <span className={`text-[10px] whitespace-nowrap ${
+                  active ? 'text-amber-400 font-semibold' : done ? 'text-emerald-400/70' : 'text-white/20'
+                }`}>{step.label}</span>
+              </div>
+              {i < STEPS.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-1 mb-4 rounded-full ${i < current ? 'bg-emerald-500/40' : 'bg-white/8'}`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {trackingNumber && status === 'shipping' && (
+        <p className="text-xs text-white/30 mt-3">
+          운송장 번호: <span className="font-mono text-white/50">{trackingNumber}</span>
+        </p>
+      )}
+    </div>
+  );
+}
 
 const fmt = (d: string) =>
   new Date(d).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
@@ -65,7 +118,7 @@ export default function OrdersPage() {
   const load = async (uid: string) => {
     const { data: orderRows } = await supabase
       .from('orders')
-      .select('id, status, total_amount, discount_amount, coupon_code, shipping_name, shipping_phone, shipping_address, shipping_detail, created_at')
+      .select('id, status, total_amount, discount_amount, coupon_code, shipping_name, shipping_phone, shipping_address, shipping_detail, tracking_number, created_at')
       .eq('user_id', uid)
       .order('created_at', { ascending: false });
 
@@ -179,6 +232,9 @@ export default function OrdersPage() {
                     </div>
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${st.cls}`}>{st.label}</span>
                   </div>
+
+                  {/* 배송 상태 스텝퍼 */}
+                  <StatusStepper status={order.status} trackingNumber={order.tracking_number} />
 
                   {/* 상품 목록 */}
                   <div className="px-5 py-4 flex flex-col gap-3 border-b border-white/6">
