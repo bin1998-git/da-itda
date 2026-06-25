@@ -34,27 +34,16 @@ export default async function CommunityPage({
 
   const { data: posts, count, error } = await db
     .from('posts')
-    .select('id, title, category, views, created_at, user_id', { count: 'exact' })
+    .select('id, title, category, views, created_at, user_id, comments(count), post_likes(count)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to);
 
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
 
-  // 현재 페이지 게시글 댓글 수 & 좋아요 수
-  const postIds = (posts ?? []).map((p) => p.id);
-  const [{ data: commentCounts }, { data: likeCounts }] = await Promise.all([
-    db.from('comments').select('post_id').in('post_id', postIds),
-    db.from('post_likes').select('post_id').in('post_id', postIds),
-  ]);
-
-  const commentMap = (commentCounts ?? []).reduce<Record<string, number>>((acc, r) => {
-    acc[r.post_id] = (acc[r.post_id] ?? 0) + 1;
-    return acc;
-  }, {});
-  const likeMap = (likeCounts ?? []).reduce<Record<string, number>>((acc, r) => {
-    acc[r.post_id] = (acc[r.post_id] ?? 0) + 1;
-    return acc;
-  }, {});
+  type PostRow = NonNullable<typeof posts>[number] & {
+    comments: { count: number }[];
+    post_likes: { count: number }[];
+  };
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] pt-20">
@@ -95,8 +84,10 @@ export default async function CommunityPage({
         ) : (
           <>
             <div className="flex flex-col divide-y divide-white/5">
-              {posts.map((post) => {
+              {(posts as PostRow[]).map((post) => {
                 const cat = CATEGORIES[post.category] ?? CATEGORIES.general;
+                const likeCount = post.post_likes?.[0]?.count ?? 0;
+                const commentCount = post.comments?.[0]?.count ?? 0;
                 return (
                   <Link
                     key={post.id}
@@ -115,16 +106,16 @@ export default async function CommunityPage({
                       <span>{timeAgo(post.created_at)}</span>
                       <span>·</span>
                       <span>조회 {post.views}</span>
-                      {(likeMap[post.id] ?? 0) > 0 && (
+                      {likeCount > 0 && (
                         <>
                           <span>·</span>
-                          <span>❤️ {likeMap[post.id]}</span>
+                          <span>❤️ {likeCount}</span>
                         </>
                       )}
-                      {(commentMap[post.id] ?? 0) > 0 && (
+                      {commentCount > 0 && (
                         <>
                           <span>·</span>
-                          <span>💬 {commentMap[post.id]}</span>
+                          <span>💬 {commentCount}</span>
                         </>
                       )}
                     </div>

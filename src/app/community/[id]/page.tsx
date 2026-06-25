@@ -29,6 +29,7 @@ export default async function CommunityDetailPage({
 
   if (!post) notFound();
 
+  // @ts-ignore – custom RPC not in generated types
   db.rpc('increment_post_views', { post_id: id }).then(() => {});
 
   const cat = CATEGORIES[post.category] ?? CATEGORIES.general;
