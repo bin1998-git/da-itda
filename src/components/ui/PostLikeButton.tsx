@@ -33,6 +33,17 @@ export default function PostLikeButton({
       await supabase.from('post_likes').insert({ user_id: user.id, post_id: postId });
       setLiked(true);
       setCount((c) => c + 1);
+      // 게시글 작성자에게 알림 (본인 제외)
+      const { data: post } = await supabase.from('posts').select('user_id, title').eq('id', postId).single();
+      if (post && post.user_id !== user.id) {
+        await supabase.from('notifications').insert({
+          user_id: post.user_id,
+          type: 'like_post',
+          title: '게시글에 좋아요가 달렸습니다',
+          body: post.title,
+          link: `/community/${postId}`,
+        });
+      }
     }
     setLoading(false);
   };

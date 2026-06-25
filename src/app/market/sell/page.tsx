@@ -97,6 +97,12 @@ export default function SellPage() {
           <p className="text-white/40 text-sm mb-8">마켓에서 확인해보세요.</p>
           <div className="flex flex-col gap-3">
             <button
+              onClick={() => router.push('/market/manage')}
+              className="px-6 py-3 rounded-full bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
+            >
+              내 상품 관리하기
+            </button>
+            <button
               onClick={() => { setTitle(''); setDesc(''); setPrice(''); setStock(''); setImageUrl(''); setStep('register-product'); }}
               className="px-6 py-3 rounded-full border border-white/15 text-white text-sm hover:bg-white/8 transition"
             >
@@ -104,7 +110,7 @@ export default function SellPage() {
             </button>
             <button
               onClick={() => router.push('/market')}
-              className="px-6 py-3 rounded-full bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
+              className="px-6 py-3 rounded-full border border-white/15 text-white/60 text-sm hover:bg-white/8 transition"
             >
               마켓 보러가기
             </button>

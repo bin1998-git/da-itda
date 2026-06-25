@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import NotificationBell from '@/components/ui/NotificationBell';
 
 const NAV_LINKS = [
   {
@@ -182,6 +183,9 @@ export default function Navbar() {
             <CartIcon />
           </Link>
 
+          {/* 알림 */}
+          <NotificationBell />
+
           {/* 구분선 */}
           <div className="w-px h-5 bg-white/10 mx-0.5" />
 
@@ -226,12 +230,22 @@ export default function Navbar() {
                     마이페이지
                   </Link>
                   <Link
-                    href="/market/sell"
+                    href="/market/manage"
                     onClick={() => setUserMenuOpen(false)}
                     className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
                   >
                     <CartIcon />
                     판매자 센터
+                  </Link>
+                  <Link
+                    href="/orders"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
+                  >
+                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    주문 내역
                   </Link>
                   <div className="my-1 border-t border-white/6" />
                   <button

@@ -172,10 +172,46 @@ export default function CartPage() {
 
     if (coupon) {
       await supabase.rpc('apply_coupon', { p_coupon_id: coupon.id });
-      // 사용한 쿠폰을 보유 목록에서 제거
       const updated = mySaved.filter((s) => s.code !== coupon.code);
       setMySaved(updated);
       localStorage.setItem('saved_coupons', JSON.stringify(updated));
+    }
+
+    // 주문 생성
+    const { data: order } = await supabase
+      .from('orders')
+      .insert({
+        user_id: user.id,
+        status: 'paid',
+        total_amount: total,
+        discount_amount: discount,
+        coupon_code: coupon?.code ?? null,
+      })
+      .select('id')
+      .single();
+
+    if (order) {
+      const orderItems = items
+        .filter((i) => i.products)
+        .map((i) => ({
+          order_id: order.id,
+          product_id: i.products!.id,
+          title: i.products!.title,
+          price: i.products!.price,
+          quantity: i.quantity,
+          image_url: i.products!.images?.[0] ?? null,
+        }));
+      if (orderItems.length > 0) {
+        await supabase.from('order_items').insert(orderItems);
+      }
+      // 주문 완료 알림
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        type: 'order',
+        title: `주문이 완료됐습니다 (${total.toLocaleString('ko-KR')}원)`,
+        body: `${items.length}개 상품`,
+        link: '/orders',
+      });
     }
 
     await supabase.from('cart_items').delete().eq('user_id', user.id);
@@ -220,17 +256,24 @@ export default function CartPage() {
           <span className="text-6xl block mb-6">🎉</span>
           <h2 className="text-2xl font-bold text-white mb-2">주문이 완료됐습니다!</h2>
           <p className="text-white/40 text-sm mb-8">결제가 정상 처리됐습니다. 이용해주셔서 감사합니다.</p>
-          <div className="flex gap-3 justify-center">
-            <Link href="/market"
-              className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
+          <div className="flex flex-col gap-3">
+            <Link href="/orders"
+              className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition text-center"
             >
-              계속 쇼핑하기
+              주문 내역 확인
             </Link>
-            <Link href="/dashboard"
-              className="px-6 py-3 rounded-xl border border-white/15 text-white/70 text-sm hover:bg-white/5 transition"
-            >
-              마이페이지
-            </Link>
+            <div className="flex gap-3 justify-center">
+              <Link href="/market"
+                className="px-6 py-3 rounded-xl border border-white/15 text-white/70 text-sm hover:bg-white/5 transition"
+              >
+                계속 쇼핑하기
+              </Link>
+              <Link href="/dashboard"
+                className="px-6 py-3 rounded-xl border border-white/15 text-white/70 text-sm hover:bg-white/5 transition"
+              >
+                마이페이지
+              </Link>
+            </div>
           </div>
         </div>
       </main>

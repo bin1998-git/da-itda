@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 
-type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes';
+type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist';
 type LikesSubTab = 'media' | 'posts';
 
 interface Post {
@@ -26,6 +26,10 @@ interface LikedPost {
   post_id: string;
   post: { id: string; title: string; category: string; created_at: string } | null;
 }
+interface WishlistProduct {
+  product_id: string;
+  products: { id: string; title: string; price: number; images: string[]; category: string } | null;
+}
 
 const CAT: Record<string, { label: string; cls: string }> = {
   question: { label: '질문',   cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
@@ -35,11 +39,12 @@ const CAT: Record<string, { label: string; cls: string }> = {
 };
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'overview', label: '개요' },
-  { id: 'profile',  label: '프로필 수정' },
-  { id: 'posts',    label: '내 게시글' },
-  { id: 'media',    label: '내 영상' },
-  { id: 'likes',    label: '찜 목록' },
+  { id: 'overview',  label: '개요' },
+  { id: 'profile',   label: '프로필 수정' },
+  { id: 'posts',     label: '내 게시글' },
+  { id: 'media',     label: '내 영상' },
+  { id: 'likes',     label: '찜 목록' },
+  { id: 'wishlist',  label: '위시리스트' },
 ];
 
 const fmt = (d: string) =>
@@ -72,6 +77,7 @@ export default function DashboardPage() {
   const [myMedia,    setMyMedia]    = useState<MediaPost[]>([]);
   const [likedMedia, setLikedMedia] = useState<LikedMedia[]>([]);
   const [likedPosts, setLikedPosts] = useState<LikedPost[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistProduct[]>([]);
 
   // auth guard
   useEffect(() => {
@@ -173,6 +179,18 @@ export default function DashboardPage() {
         if (pl.data) setLikedPosts(pl.data.map((d: any) => ({ post_id: d.post_id, post: d.posts })));
         setTabLoading(false);
       });
+    }
+
+    if (tab === 'wishlist') {
+      setTabLoading(true);
+      supabase.from('product_likes')
+        .select('product_id, products(id, title, price, images, category)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setWishlist(data.map((d: any) => ({ product_id: d.product_id, products: d.products })));
+          setTabLoading(false);
+        });
     }
   }, [tab, user, enrichPosts, enrichMedia]);
 
@@ -290,8 +308,11 @@ export default function DashboardPage() {
                   { label: '푸드 미디어', href: '/media',    icon: '🎬', c: 'hover:border-rose-500/40' },
                   { label: '커뮤니티',   href: '/community', icon: '💬', c: 'hover:border-emerald-500/40' },
                   { label: '장바구니',   href: '/cart',      icon: '🛍️', c: 'hover:border-violet-500/40' },
-                ].map(({ label, href, icon, c }) => (
+                  { label: '주문 내역',  href: '/orders',    icon: '📦', c: 'hover:border-blue-500/40' },
+                  { label: '위시리스트', href: '#',          icon: '❤️', c: 'hover:border-rose-500/40', onClick: () => setTab('wishlist') },
+                ].map(({ label, href, icon, c, onClick }) => (
                   <Link key={label} href={href}
+                    onClick={onClick}
                     className={`flex items-center gap-3 p-4 rounded-xl border border-white/8 bg-white/3 transition ${c}`}
                   >
                     <span className="text-xl">{icon}</span>
@@ -368,16 +389,23 @@ export default function DashboardPage() {
 
             {/* 판매자 센터 CTA */}
             {isSeller ? (
-              <Link href="/market/sell"
-                className="flex items-center gap-4 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/8 transition"
-              >
-                <span className="text-3xl">🏪</span>
-                <div>
-                  <p className="text-amber-400 font-semibold text-sm">판매자 센터</p>
-                  <p className="text-white/40 text-xs mt-0.5">내 상품 관리 및 새 상품 등록</p>
-                </div>
-                <span className="ml-auto text-amber-400/50 text-sm">→</span>
-              </Link>
+              <div className="flex gap-3">
+                <Link href="/market/manage"
+                  className="flex-1 flex items-center gap-4 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/8 transition"
+                >
+                  <span className="text-3xl">🏪</span>
+                  <div>
+                    <p className="text-amber-400 font-semibold text-sm">내 상품 관리</p>
+                    <p className="text-white/40 text-xs mt-0.5">상품 수정·삭제·공개 관리</p>
+                  </div>
+                  <span className="ml-auto text-amber-400/50 text-sm">→</span>
+                </Link>
+                <Link href="/market/sell"
+                  className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-white/8 bg-white/2 hover:bg-white/4 transition text-sm text-white/50 hover:text-white whitespace-nowrap"
+                >
+                  + 새 상품
+                </Link>
+              </div>
             ) : (
               <Link href="/market/sell"
                 className="flex items-center gap-4 p-5 rounded-2xl border border-white/8 bg-white/2 hover:bg-white/4 transition"
@@ -628,6 +656,50 @@ export default function DashboardPage() {
                   })}
                 </div>
               )
+            )}
+          </div>
+        )}
+
+        {/* ────────────── 위시리스트 탭 ────────────── */}
+        {tab === 'wishlist' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">위시리스트 (찜한 상품)</p>
+              <Link href="/market"
+                className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/45 hover:text-white hover:bg-white/8 transition"
+              >
+                마켓 보러가기
+              </Link>
+            </div>
+
+            {tabLoading ? (
+              <div className="flex justify-center py-16">
+                <div className="w-5 h-5 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+              </div>
+            ) : wishlist.length === 0 ? (
+              <div className="rounded-xl border border-white/6 bg-white/2 p-12 text-center">
+                <p className="text-white/30 text-sm">찜한 상품이 없습니다.</p>
+                <Link href="/market" className="mt-2 inline-block text-amber-400/60 hover:text-amber-400 text-xs transition">마켓 구경하기 →</Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {wishlist.filter((w) => w.products).map(({ product_id, products }) => (
+                  <Link key={product_id} href={`/market/${products!.id}`}
+                    className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition group"
+                  >
+                    <div className="aspect-square bg-white/5 flex items-center justify-center overflow-hidden">
+                      {products!.images?.[0]
+                        ? <img src={products!.images[0]} alt={products!.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                        : <span className="text-4xl">📦</span>
+                      }
+                    </div>
+                    <div className="p-4">
+                      <p className="text-white/65 text-sm font-medium truncate">{products!.title}</p>
+                      <p className="text-amber-400 font-bold text-sm mt-1">{products!.price.toLocaleString('ko-KR')}원</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
         )}

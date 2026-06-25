@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabaseServer';
 import AddToCartButton from '@/components/ui/AddToCartButton';
+import WishlistButton from '@/components/ui/WishlistButton';
 import { Product } from '@/types/market';
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -84,8 +85,11 @@ export default async function ProductDetailPage({
               </span>
             </div>
 
-            {/* 장바구니 버튼 */}
-            <AddToCartButton productId={p.id} stock={p.stock} />
+            {/* 장바구니 + 위시리스트 버튼 */}
+            <div className="flex flex-col gap-2">
+              <AddToCartButton productId={p.id} stock={p.stock} />
+              <WishlistButton productId={p.id} />
+            </div>
 
             {/* 판매자 정보 */}
             {p.sellers?.store_name && (
