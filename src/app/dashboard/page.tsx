@@ -59,6 +59,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const isAdmin = useAuthStore((s) => s.isAdmin);
 
   const [tab, setTab] = useState<Tab>('overview');
   const [likesSubTab, setLikesSubTab] = useState<LikesSubTab>('media');
@@ -292,7 +293,7 @@ export default function DashboardPage() {
       {/* ── 탭 네비 ── */}
       <div className="border-b border-white/[0.06] sticky top-[60px] z-20 bg-[#0a0a0a]/95 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex overflow-x-auto no-scrollbar">
-          {TABS.map(({ id, label }) => (
+          {TABS.filter(({ id }) => !isAdmin || (id !== 'likes' && id !== 'wishlist')).map(({ id, label }) => (
             <button key={id} onClick={() => { setTab(id); setPostsPage(1); setMediaPage(1); }}
               className={`px-5 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                 tab === id ? 'text-amber-400 border-amber-400' : 'text-white/40 border-transparent hover:text-white/70'
@@ -315,13 +316,14 @@ export default function DashboardPage() {
               <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-4">빠른 이동</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: '식품 마켓',  href: '/market',    icon: '🛒', c: 'hover:border-amber-500/40' },
-                  { label: '푸드 미디어', href: '/media',    icon: '🎬', c: 'hover:border-rose-500/40' },
-                  { label: '커뮤니티',   href: '/community', icon: '💬', c: 'hover:border-emerald-500/40' },
-                  { label: '장바구니',   href: '/cart',      icon: '🛍️', c: 'hover:border-violet-500/40' },
-                  { label: '주문 내역',  href: '/orders',    icon: '📦', c: 'hover:border-blue-500/40' },
-                  { label: '위시리스트', href: '#',          icon: '❤️', c: 'hover:border-rose-500/40', onClick: () => setTab('wishlist') },
-                ].map(({ label, href, icon, c, onClick }) => (
+                  { label: '식품 마켓',  href: '/market',    icon: '🛒', c: 'hover:border-amber-500/40', adminOnly: false },
+                  { label: '푸드 미디어', href: '/media',    icon: '🎬', c: 'hover:border-rose-500/40', adminOnly: false },
+                  { label: '커뮤니티',   href: '/community', icon: '💬', c: 'hover:border-emerald-500/40', adminOnly: false },
+                  { label: '장바구니',   href: '/cart',      icon: '🛍️', c: 'hover:border-violet-500/40', adminOnly: false },
+                  { label: '주문 내역',  href: '/orders',    icon: '📦', c: 'hover:border-blue-500/40', adminOnly: false },
+                  { label: '위시리스트', href: '#',          icon: '❤️', c: 'hover:border-rose-500/40', onClick: () => setTab('wishlist'), adminOnly: false },
+                ].filter(({ label }) => !isAdmin || (label !== '장바구니' && label !== '주문 내역' && label !== '위시리스트'))
+                .map(({ label, href, icon, c, onClick }) => (
                   <Link key={label} href={href}
                     onClick={onClick}
                     className={`flex items-center gap-3 p-4 rounded-xl border border-white/8 bg-white/3 transition ${c}`}
