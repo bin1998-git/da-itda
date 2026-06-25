@@ -47,6 +47,12 @@ export default function CartPage() {
   const [purchased, setPurchased]   = useState(false);
   const [purchasing, setPurchasing] = useState(false);
 
+  // 배송 정보
+  const [shipping, setShipping] = useState({
+    name: '', phone: '', address: '', detail: '',
+  });
+  const [shippingError, setShippingError] = useState('');
+
   // localStorage 저장 쿠폰 + sessionStorage 적용 쿠폰 복원
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('saved_coupons') ?? '[]') as SavedCoupon[];
@@ -168,6 +174,14 @@ export default function CartPage() {
 
   const handlePurchase = async () => {
     if (!user) return;
+
+    // 배송 정보 검증
+    if (!shipping.name.trim() || !shipping.phone.trim() || !shipping.address.trim()) {
+      setShippingError('이름, 전화번호, 주소를 모두 입력해주세요.');
+      document.getElementById('shipping-section')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    setShippingError('');
     setPurchasing(true);
 
     if (coupon) {
@@ -186,6 +200,10 @@ export default function CartPage() {
         total_amount: total,
         discount_amount: discount,
         coupon_code: coupon?.code ?? null,
+        shipping_name: shipping.name.trim(),
+        shipping_phone: shipping.phone.trim(),
+        shipping_address: shipping.address.trim(),
+        shipping_detail: shipping.detail.trim() || null,
       })
       .select('id')
       .single();
@@ -337,6 +355,56 @@ export default function CartPage() {
                 </div>
               );
             })}
+
+            {/* 배송 정보 섹션 */}
+            <div id="shipping-section" className="rounded-2xl border border-white/8 bg-white/3 p-5 flex flex-col gap-4">
+              <p className="text-white/50 text-sm font-medium">배송 정보</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-white/35 text-xs mb-1.5 block">받는 분 이름 *</label>
+                  <input
+                    type="text"
+                    value={shipping.name}
+                    onChange={(e) => { setShipping((s) => ({ ...s, name: e.target.value })); setShippingError(''); }}
+                    placeholder="홍길동"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-white/35 text-xs mb-1.5 block">전화번호 *</label>
+                  <input
+                    type="tel"
+                    value={shipping.phone}
+                    onChange={(e) => { setShipping((s) => ({ ...s, phone: e.target.value })); setShippingError(''); }}
+                    placeholder="010-0000-0000"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-white/35 text-xs mb-1.5 block">주소 *</label>
+                  <input
+                    type="text"
+                    value={shipping.address}
+                    onChange={(e) => { setShipping((s) => ({ ...s, address: e.target.value })); setShippingError(''); }}
+                    placeholder="서울특별시 강남구 테헤란로 123"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-white/35 text-xs mb-1.5 block">상세 주소</label>
+                  <input
+                    type="text"
+                    value={shipping.detail}
+                    onChange={(e) => setShipping((s) => ({ ...s, detail: e.target.value }))}
+                    placeholder="101동 202호"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                  />
+                </div>
+              </div>
+              {shippingError && (
+                <p className="text-rose-400 text-xs">{shippingError}</p>
+              )}
+            </div>
 
             {/* 쿠폰 섹션 */}
             <div className="rounded-2xl border border-white/8 bg-white/3 p-5 flex flex-col gap-3">
