@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
+import Pagination from '@/components/ui/Pagination';
 import { MediaPost } from '@/types/media';
+
+const PAGE_SIZE = 12;
 
 function formatViews(n: number) {
   if (n >= 10000) return `${(n / 10000).toFixed(1)}만`;
@@ -58,15 +61,25 @@ function MediaCard({ post }: { post: MediaPost }) {
   );
 }
 
-export default async function MediaPage() {
-  const db = supabaseServer();
+export default async function MediaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageStr } = await searchParams;
+  const page = Math.max(1, Number(pageStr) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+  const to   = from + PAGE_SIZE - 1;
+  const db   = supabaseServer();
 
-  const { data, error } = await db
+  const { data, count, error } = await db
     .from('media_posts')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   const posts = (data ?? []) as MediaPost[];
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] pt-20">
@@ -79,7 +92,7 @@ export default async function MediaPage() {
               <p className="text-rose-400 text-xs font-semibold tracking-widest uppercase mb-1">푸드 미디어</p>
               <h1 className="text-3xl font-bold text-white">레시피 영상</h1>
               <p className="text-white/40 text-sm mt-1">
-                {error ? '서비스 준비 중' : `${posts.length}개의 레시피 영상`}
+                {error ? '서비스 준비 중' : `${count ?? 0}개의 레시피 영상`}
               </p>
             </div>
             <Link
@@ -107,11 +120,18 @@ export default async function MediaPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {posts.map((post) => (
-              <MediaCard key={post.id} post={post} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {posts.map((post) => (
+                <MediaCard key={post.id} post={post} />
+              ))}
+            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              getHref={(p) => `/media?page=${p}`}
+            />
+          </>
         )}
       </div>
     </main>

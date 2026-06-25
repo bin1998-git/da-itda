@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
 import CategoryFilter from '@/components/ui/CategoryFilter';
+import Pagination from '@/components/ui/Pagination';
 import { Product } from '@/types/market';
+
+const PAGE_SIZE = 12;
 
 const CATEGORY_EMOJI: Record<string, string> = {
   food: '🥩', kitchen: '🍳', snack: '🍪', drink: '🧃',
@@ -47,23 +50,28 @@ function ProductCard({ product }: { product: Product }) {
 export default async function MarketPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; page?: string }>;
 }) {
-  const { category } = await searchParams;
-  const db = supabaseServer();
+  const { category, page: pageStr } = await searchParams;
+  const page = Math.max(1, Number(pageStr) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+  const to   = from + PAGE_SIZE - 1;
+  const db   = supabaseServer();
 
   let query = db
     .from('products')
-    .select('*, sellers(store_name)')
+    .select('*, sellers(store_name)', { count: 'exact' })
     .eq('is_active', true)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   if (category && category !== 'all') {
     query = query.eq('category', category);
   }
 
-  const { data: products, error } = await query;
+  const { data: products, count, error } = await query;
   const items = (products ?? []) as Product[];
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] pt-20">
@@ -76,7 +84,7 @@ export default async function MarketPage({
               <p className="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-1">식품 마켓</p>
               <h1 className="text-3xl font-bold text-white">신선식품 · 주방용품</h1>
               <p className="text-white/40 text-sm mt-1">
-                {error ? '서비스 준비 중입니다' : `총 ${items.length}개 상품`}
+                {error ? '서비스 준비 중입니다' : `총 ${count ?? 0}개 상품`}
               </p>
             </div>
             <Link
@@ -115,11 +123,18 @@ export default async function MarketPage({
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {items.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {items.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              getHref={(p) => `/market?${new URLSearchParams({ ...(category && category !== 'all' ? { category } : {}), page: String(p) }).toString()}`}
+            />
+          </>
         )}
       </div>
     </main>

@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import AddressInput from '@/components/ui/AddressInput';
+import Pagination from '@/components/ui/Pagination';
+
+const PAGE_SIZE = 5;
 
 interface OrderItem {
   id: string;
@@ -115,6 +118,7 @@ export default function OrdersPage() {
 
   // 취소 확인 중인 주문
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const load = async (uid: string) => {
     const { data: orderRows } = await supabase
@@ -214,9 +218,13 @@ export default function OrdersPage() {
               마켓 구경하기 →
             </Link>
           </div>
-        ) : (
+        ) : (() => {
+          const totalPages = Math.ceil(orders.length / PAGE_SIZE);
+          const paged = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+          return (
+          <>
           <div className="flex flex-col gap-5">
-            {orders.map((order) => {
+            {paged.map((order) => {
               const st = STATUS[order.status] ?? STATUS.paid;
               const canModify = order.status === 'paid';
               const isCancelling = cancellingId === order.id;
@@ -403,7 +411,10 @@ export default function OrdersPage() {
               );
             })}
           </div>
-        )}
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+          </>
+          );
+        })()}
       </div>
     </main>
   );

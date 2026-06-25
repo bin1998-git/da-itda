@@ -6,6 +6,10 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import AddressInput from '@/components/ui/AddressInput';
+import Pagination from '@/components/ui/Pagination';
+
+const POSTS_PER_PAGE = 10;
+const MEDIA_PER_PAGE = 10;
 
 type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist';
 type LikesSubTab = 'media' | 'posts';
@@ -59,6 +63,8 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<Tab>('overview');
   const [likesSubTab, setLikesSubTab] = useState<LikesSubTab>('media');
   const [tabLoading, setTabLoading] = useState(false);
+  const [postsPage, setPostsPage] = useState(1);
+  const [mediaPage, setMediaPage] = useState(1);
 
   // profile
   const [profile, setProfile] = useState({ full_name: '', username: '', avatar_url: '', phone: '', address: '', address_detail: '' });
@@ -287,7 +293,7 @@ export default function DashboardPage() {
       <div className="border-b border-white/[0.06] sticky top-[60px] z-20 bg-[#0a0a0a]/95 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex overflow-x-auto no-scrollbar">
           {TABS.map(({ id, label }) => (
-            <button key={id} onClick={() => setTab(id)}
+            <button key={id} onClick={() => { setTab(id); setPostsPage(1); setMediaPage(1); }}
               className={`px-5 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                 tab === id ? 'text-amber-400 border-amber-400' : 'text-white/40 border-transparent hover:text-white/70'
               }`}
@@ -529,29 +535,36 @@ export default function DashboardPage() {
                 <p className="text-white/30 text-sm">작성한 게시글이 없습니다.</p>
                 <Link href="/community/write" className="mt-2 inline-block text-amber-400/60 hover:text-amber-400 text-xs transition">첫 글 작성하기 →</Link>
               </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {myPosts.map((p) => {
-                  const cat = CAT[p.category] ?? CAT.general;
-                  return (
-                    <div key={p.id} className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 group">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${cat.cls}`}>{cat.label}</span>
-                      <Link href={`/community/${p.id}`} className="flex-1 min-w-0">
-                        <p className="text-white/65 text-sm truncate group-hover:text-white transition">{p.title}</p>
-                        <p className="text-white/25 text-xs mt-0.5">
-                          👁 {p.views} · ❤️ {p.like_count} · 💬 {p.comment_count} · {fmt(p.created_at)}
-                        </p>
-                      </Link>
-                      <button onClick={() => deletePost(p.id)}
-                        className="text-white/15 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            ) : (() => {
+              const totalPostsPages = Math.ceil(myPosts.length / POSTS_PER_PAGE);
+              const pagedPosts = myPosts.slice((postsPage - 1) * POSTS_PER_PAGE, postsPage * POSTS_PER_PAGE);
+              return (
+                <>
+                  <div className="flex flex-col gap-2">
+                    {pagedPosts.map((p) => {
+                      const cat = CAT[p.category] ?? CAT.general;
+                      return (
+                        <div key={p.id} className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 group">
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${cat.cls}`}>{cat.label}</span>
+                          <Link href={`/community/${p.id}`} className="flex-1 min-w-0">
+                            <p className="text-white/65 text-sm truncate group-hover:text-white transition">{p.title}</p>
+                            <p className="text-white/25 text-xs mt-0.5">
+                              👁 {p.views} · ❤️ {p.like_count} · 💬 {p.comment_count} · {fmt(p.created_at)}
+                            </p>
+                          </Link>
+                          <button onClick={() => deletePost(p.id)}
+                            className="text-white/15 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Pagination currentPage={postsPage} totalPages={totalPostsPages} onPageChange={setPostsPage} />
+                </>
+              );
+            })()}
           </div>
         )}
 
@@ -576,37 +589,44 @@ export default function DashboardPage() {
                 <p className="text-white/30 text-sm">업로드한 영상이 없습니다.</p>
                 <Link href="/media/upload" className="mt-2 inline-block text-rose-400/60 hover:text-rose-400 text-xs transition">첫 영상 올리기 →</Link>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {myMedia.map((m) => (
-                  <Link key={m.id} href={`/media/${m.id}`}
-                    className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition group"
-                  >
-                    <div className="aspect-video bg-white/5 flex items-center justify-center overflow-hidden">
-                      {m.thumbnail_url
-                        ? <img src={m.thumbnail_url} alt={m.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
-                        : <span className="text-4xl">🎬</span>
-                      }
-                    </div>
-                    <div className="p-4">
-                      <p className="text-white/65 text-sm font-medium truncate">{m.title}</p>
-                      <div className="flex items-center gap-3 mt-1 text-white/30 text-xs">
-                        <span>👁 {m.views}</span>
-                        <span>❤️ {m.like_count}</span>
-                        <span className="ml-auto">{fmt(m.created_at)}</span>
-                      </div>
-                      {m.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {m.tags.slice(0, 3).map((t) => (
-                            <span key={t} className="text-[10px] text-white/25 bg-white/5 rounded-full px-2 py-0.5">#{t}</span>
-                          ))}
+            ) : (() => {
+              const totalMediaPages = Math.ceil(myMedia.length / MEDIA_PER_PAGE);
+              const pagedMedia = myMedia.slice((mediaPage - 1) * MEDIA_PER_PAGE, mediaPage * MEDIA_PER_PAGE);
+              return (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pagedMedia.map((m) => (
+                      <Link key={m.id} href={`/media/${m.id}`}
+                        className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition group"
+                      >
+                        <div className="aspect-video bg-white/5 flex items-center justify-center overflow-hidden">
+                          {m.thumbnail_url
+                            ? <img src={m.thumbnail_url} alt={m.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                            : <span className="text-4xl">🎬</span>
+                          }
                         </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+                        <div className="p-4">
+                          <p className="text-white/65 text-sm font-medium truncate">{m.title}</p>
+                          <div className="flex items-center gap-3 mt-1 text-white/30 text-xs">
+                            <span>👁 {m.views}</span>
+                            <span>❤️ {m.like_count}</span>
+                            <span className="ml-auto">{fmt(m.created_at)}</span>
+                          </div>
+                          {m.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {m.tags.slice(0, 3).map((t) => (
+                                <span key={t} className="text-[10px] text-white/25 bg-white/5 rounded-full px-2 py-0.5">#{t}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <Pagination currentPage={mediaPage} totalPages={totalMediaPages} onPageChange={setMediaPage} />
+                </>
+              );
+            })()}
           </div>
         )}
 

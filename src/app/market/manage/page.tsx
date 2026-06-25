@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import { Category } from '@/types/market';
+import Pagination from '@/components/ui/Pagination';
+
+const PAGE_SIZE = 10;
 
 interface Product {
   id: string;
@@ -50,6 +53,7 @@ export default function ManagePage() {
   const [loading, setLoading] = useState(true);
   const [isSeller, setIsSeller] = useState<boolean | null>(null);
 
+  const [page, setPage] = useState(1);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<EditForm>({
     title: '', description: '', price: '', stock: '', category: 'food', imageUrl: '',
@@ -180,9 +184,13 @@ export default function ManagePage() {
               첫 상품 등록하기 →
             </Link>
           </div>
-        ) : (
+        ) : (() => {
+          const totalPages = Math.ceil(products.length / PAGE_SIZE);
+          const paged = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+          return (
+          <>
           <div className="flex flex-col gap-3">
-            {products.map((p) => (
+            {paged.map((p) => (
               <div key={p.id}
                 className={`rounded-2xl border bg-white/2 overflow-hidden transition ${
                   p.is_active ? 'border-white/8' : 'border-white/4 opacity-60'
@@ -335,7 +343,10 @@ export default function ManagePage() {
               </div>
             ))}
           </div>
-        )}
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+          </>
+          );
+        })()}
       </div>
     </main>
   );
