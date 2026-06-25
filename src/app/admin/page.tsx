@@ -11,6 +11,7 @@ interface Stats {
   pendingInquiries: number;
   totalInquiries: number;
   totalUsers: number;
+  pendingReports: number;
 }
 
 interface RecentInquiry {
@@ -32,7 +33,7 @@ export default function AdminPage() {
   const user = useAuthStore((s) => s.user);
   const isLoading = useAuthStore((s) => s.isLoading);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<Stats>({ totalNotices: 0, pendingInquiries: 0, totalInquiries: 0, totalUsers: 0 });
+  const [stats, setStats] = useState<Stats>({ totalNotices: 0, pendingInquiries: 0, totalInquiries: 0, totalUsers: 0, pendingReports: 0 });
   const [recentInquiries, setRecentInquiries] = useState<RecentInquiry[]>([]);
 
   useEffect(() => {
@@ -53,12 +54,14 @@ export default function AdminPage() {
         supabase.from('inquiries').select('*', { count: 'exact', head: true }),
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('inquiries').select('id, title, category, created_at').eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
-      ]).then(([notices, pending, total, users, recent]) => {
+        supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      ]).then(([notices, pending, total, users, recent, pendingReports]) => {
         setStats({
           totalNotices: notices.count ?? 0,
           pendingInquiries: pending.count ?? 0,
           totalInquiries: total.count ?? 0,
           totalUsers: users.count ?? 0,
+          pendingReports: pendingReports.count ?? 0,
         });
         setRecentInquiries((recent.data ?? []) as RecentInquiry[]);
         setLoading(false);
@@ -94,7 +97,7 @@ export default function AdminPage() {
           {[
             { label: '공지사항', value: stats.totalNotices, accent: 'text-violet-400', bg: 'bg-violet-500/8' },
             { label: '미답변 문의', value: stats.pendingInquiries, accent: 'text-amber-400', bg: 'bg-amber-500/8', highlight: stats.pendingInquiries > 0 },
-            { label: '전체 문의', value: stats.totalInquiries, accent: 'text-sky-400', bg: 'bg-sky-500/8' },
+            { label: '미처리 신고', value: stats.pendingReports, accent: 'text-rose-400', bg: 'bg-rose-500/8', highlight: stats.pendingReports > 0 },
             { label: '가입 회원', value: stats.totalUsers, accent: 'text-emerald-400', bg: 'bg-emerald-500/8' },
           ].map((s) => (
             <div key={s.label}
@@ -135,6 +138,23 @@ export default function AdminPage() {
                   문의 목록 확인 및 답변 등록
                   {stats.pendingInquiries > 0 && (
                     <span className="ml-2 text-amber-400 font-semibold">미답변 {stats.pendingInquiries}건</span>
+                  )}
+                </p>
+              </div>
+            </Link>
+            <Link
+              href="/admin/reports"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-white/8 bg-white/3 hover:border-rose-500/30 hover:bg-rose-500/5 transition"
+            >
+              <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center text-2xl shrink-0 group-hover:bg-rose-500/20 transition">
+                🚩
+              </div>
+              <div>
+                <p className="text-white font-semibold">신고 관리</p>
+                <p className="text-white/35 text-sm mt-0.5">
+                  신고 콘텐츠 검토 및 처리
+                  {stats.pendingReports > 0 && (
+                    <span className="ml-2 text-rose-400 font-semibold">미처리 {stats.pendingReports}건</span>
                   )}
                 </p>
               </div>

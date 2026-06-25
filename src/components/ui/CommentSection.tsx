@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import ReportButton from '@/components/ui/ReportButton';
 
 interface Comment {
   id: string;
@@ -30,6 +31,7 @@ export default function CommentSection({
   initialComments: Comment[];
 }) {
   const user = useAuthStore((s) => s.user);
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const router = useRouter();
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [content, setContent] = useState('');
@@ -84,14 +86,17 @@ export default function CommentSection({
             <div key={c.id} className="py-3 border-b border-white/5 flex flex-col gap-1">
               <div className="flex items-center justify-between">
                 <span className="text-white/50 text-xs">{timeAgo(c.created_at)}</span>
-                {user?.id === c.user_id && (
-                  <button
-                    onClick={() => remove(c.id)}
-                    className="text-white/20 text-xs hover:text-rose-400 transition"
-                  >
-                    삭제
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  <ReportButton targetType="comment" targetId={c.id} />
+                  {(user?.id === c.user_id || isAdmin) && (
+                    <button
+                      onClick={() => remove(c.id)}
+                      className="text-white/20 text-xs hover:text-rose-400 transition"
+                    >
+                      {isAdmin && user?.id !== c.user_id ? '[관리자] 삭제' : '삭제'}
+                    </button>
+                  )}
+                </div>
               </div>
               <p className="text-white/80 text-sm leading-relaxed">{c.content}</p>
             </div>

@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabaseServer';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import WishlistButton from '@/components/ui/WishlistButton';
+import ReportButton from '@/components/ui/ReportButton';
+import AdminContentActions from '@/components/ui/AdminContentActions';
 import { Product } from '@/types/market';
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -89,6 +91,18 @@ export default async function ProductDetailPage({
             <div className="flex flex-col gap-2">
               <AddToCartButton productId={p.id} stock={p.stock} />
               <WishlistButton productId={p.id} />
+            </div>
+
+            {/* 신고 / 관리자 액션 */}
+            <div className="flex items-center gap-3 pt-1">
+              <ReportButton targetType="product" targetId={p.id} />
+              <AdminContentActions
+                contentType="product"
+                contentId={p.id}
+                redirectTo="/market"
+                showToggleActive
+                isActive={p.is_active}
+              />
             </div>
 
             {/* 판매자 정보 */}

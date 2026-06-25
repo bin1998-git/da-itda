@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
 import CommentSection from '@/components/ui/CommentSection';
 import PostLikeButton from '@/components/ui/PostLikeButton';
+import ReportButton from '@/components/ui/ReportButton';
+import AdminContentActions from '@/components/ui/AdminContentActions';
 
 const CATEGORIES: Record<string, { label: string; color: string }> = {
   recipe:   { label: '레시피', color: 'text-amber-400 bg-amber-500/10' },
@@ -66,9 +68,13 @@ export default async function CommunityDetailPage({
             <p className="text-white/75 text-sm leading-loose whitespace-pre-wrap">{post.content}</p>
           </div>
 
-          {/* 좋아요 */}
-          <div className="flex justify-center pb-8 border-b border-white/5">
+          {/* 좋아요 + 신고/관리자 */}
+          <div className="flex items-center justify-between pb-8 border-b border-white/5">
             <PostLikeButton postId={post.id} initialCount={likeCount ?? 0} initialLiked={false} />
+            <div className="flex items-center gap-3">
+              <ReportButton targetType="post" targetId={post.id} />
+              <AdminContentActions contentType="post" contentId={post.id} redirectTo="/community" />
+            </div>
           </div>
         </article>
 

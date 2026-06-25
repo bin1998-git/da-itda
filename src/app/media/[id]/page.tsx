@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
 import VideoPlayer from '@/components/ui/VideoPlayer';
 import LikeButton from '@/components/ui/LikeButton';
+import ReportButton from '@/components/ui/ReportButton';
+import AdminContentActions from '@/components/ui/AdminContentActions';
 import { MediaPost } from '@/types/media';
 
 export default async function MediaDetailPage({
@@ -62,8 +64,12 @@ export default async function MediaDetailPage({
           {/* 제목 & 액션 */}
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <h1 className="text-2xl font-bold text-white flex-1">{p.title}</h1>
-            <LikeButton postId={p.id} initialCount={likeCount ?? 0} initialLiked={false} />
+            <div className="flex items-center gap-3">
+              <ReportButton targetType="media" targetId={p.id} />
+              <LikeButton postId={p.id} initialCount={likeCount ?? 0} initialLiked={false} />
+            </div>
           </div>
+          <AdminContentActions contentType="media" contentId={p.id} redirectTo="/media" />
 
           {/* 메타 */}
           <div className="flex items-center gap-3 text-white/40 text-sm border-b border-white/5 pb-4">

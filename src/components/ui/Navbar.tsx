@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import NotificationBell from '@/components/ui/NotificationBell';
@@ -105,15 +105,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    supabase.from('profiles').select('role').eq('id', user.id).single()
-      .then(({ data }) => setIsAdmin(data?.role === 'admin'));
-  }, [user]);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -181,14 +175,16 @@ export default function Navbar() {
             <SearchIcon />
           </Link>
 
-          {/* 장바구니 */}
-          <Link
-            href="/cart"
-            className="relative w-9 h-9 flex items-center justify-center rounded-xl text-white/40 hover:text-white hover:bg-white/6 transition border border-transparent hover:border-white/8"
-            title="장바구니"
-          >
-            <CartIcon />
-          </Link>
+          {/* 장바구니 (관리자 제외) */}
+          {!isAdmin && (
+            <Link
+              href="/cart"
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl text-white/40 hover:text-white hover:bg-white/6 transition border border-transparent hover:border-white/8"
+              title="장바구니"
+            >
+              <CartIcon />
+            </Link>
+          )}
 
           {/* 알림 */}
           <NotificationBell />
@@ -236,24 +232,28 @@ export default function Navbar() {
                     <UserIcon />
                     마이페이지
                   </Link>
-                  <Link
-                    href="/market/manage"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
-                  >
-                    <CartIcon />
-                    판매자 센터
-                  </Link>
-                  <Link
-                    href="/orders"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
-                  >
-                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    주문 내역
-                  </Link>
+                  {!isAdmin && (
+                    <Link
+                      href="/market/manage"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
+                    >
+                      <CartIcon />
+                      판매자 센터
+                    </Link>
+                  )}
+                  {!isAdmin && (
+                    <Link
+                      href="/orders"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
+                    >
+                      <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      주문 내역
+                    </Link>
+                  )}
                   <Link
                     href="/inquiry"
                     onClick={() => setUserMenuOpen(false)}
