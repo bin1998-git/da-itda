@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import NotificationBell from '@/components/ui/NotificationBell';
@@ -107,6 +107,13 @@ export default function Navbar() {
   const isLoading = useAuthStore((s) => s.isLoading);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase.from('profiles').select('role').eq('id', user.id).single()
+      .then(({ data }) => setIsAdmin(data?.role === 'admin'));
+  }, [user]);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -247,6 +254,28 @@ export default function Navbar() {
                     </svg>
                     주문 내역
                   </Link>
+                  <Link
+                    href="/inquiry"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-white/60 text-sm hover:text-white hover:bg-white/5 transition"
+                  >
+                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    1:1 문의
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-emerald-400/70 text-sm hover:text-emerald-400 hover:bg-emerald-500/5 transition"
+                    >
+                      <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      관리자
+                    </Link>
+                  )}
                   <div className="my-1 border-t border-white/6" />
                   <button
                     onClick={handleLogout}
@@ -307,8 +336,12 @@ export default function Navbar() {
           <div className="border-t border-white/6 mt-2 pt-3 flex flex-col gap-1">
             <Link href="/ranking" onClick={() => setMenuOpen(false)} className={`px-4 py-3 rounded-xl text-[13px] font-medium transition ${isActive('/ranking') ? 'text-violet-400 bg-white/6' : 'text-white/55 hover:text-white hover:bg-white/4'}`}>랭킹</Link>
             <Link href="/events"  onClick={() => setMenuOpen(false)} className={`px-4 py-3 rounded-xl text-[13px] font-medium transition ${isActive('/events')  ? 'text-pink-400 bg-white/6'   : 'text-white/55 hover:text-white hover:bg-white/4'}`}>이벤트</Link>
+            <Link href="/notice"  onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-white/55 hover:text-white hover:bg-white/4 transition">공지사항</Link>
             <Link href="/search"  onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-white/55 hover:text-white hover:bg-white/4 transition">검색</Link>
             <Link href="/cart"    onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-white/55 hover:text-white hover:bg-white/4 transition">장바구니</Link>
+            {user && (
+              <Link href="/inquiry" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-white/55 hover:text-white hover:bg-white/4 transition">1:1 문의</Link>
+            )}
             {!user && (
               <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-white/55 hover:text-white hover:bg-white/4 transition">로그인</Link>
             )}
