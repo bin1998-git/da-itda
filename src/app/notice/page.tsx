@@ -167,7 +167,8 @@ export default async function NoticePage({
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              getHref={(p) => `/notice?${new URLSearchParams({ ...(category && category !== 'all' ? { category } : {}), page: String(p) }).toString()}`}
+              hrefBase="/notice"
+              extraParams={category && category !== 'all' ? { category } : {}}
             />
           </>
         )}

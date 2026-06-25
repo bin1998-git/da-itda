@@ -5,12 +5,21 @@ import Link from 'next/link';
 interface Props {
   currentPage: number;
   totalPages: number;
-  getHref?: (page: number) => string;
+  /** URL 기반 페이지네이션: 기본 경로 (예: "/market") */
+  hrefBase?: string;
+  /** URL 기반 페이지네이션: 추가 쿼리 파라미터 */
+  extraParams?: Record<string, string>;
+  /** 상태 기반 페이지네이션 (클라이언트 전용) */
   onPageChange?: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, totalPages, getHref, onPageChange }: Props) {
+export default function Pagination({ currentPage, totalPages, hrefBase, extraParams, onPageChange }: Props) {
   if (totalPages <= 1) return null;
+
+  const buildHref = (page: number) => {
+    const params = new URLSearchParams({ ...(extraParams ?? {}), page: String(page) });
+    return `${hrefBase}?${params.toString()}`;
+  };
 
   const pages: (number | '...')[] = [];
   if (totalPages <= 7) {
@@ -32,13 +41,9 @@ export default function Pagination({ currentPage, totalPages, getHref, onPageCha
     if (page === '...') return <span className="w-8 h-8 flex items-center justify-center text-white/20 text-sm">…</span>;
     const isActive = page === currentPage;
     if (onPageChange) {
-      return (
-        <button onClick={() => onPageChange(page)} className={`${btnBase} ${isActive ? active : normal}`}>{page}</button>
-      );
+      return <button onClick={() => onPageChange(page)} className={`${btnBase} ${isActive ? active : normal}`}>{page}</button>;
     }
-    return (
-      <Link href={getHref!(page)} className={`${btnBase} ${isActive ? active : normal}`}>{page}</Link>
-    );
+    return <Link href={buildHref(page)} className={`${btnBase} ${isActive ? active : normal}`}>{page}</Link>;
   };
 
   const PrevNext = ({ dir }: { dir: 'prev' | 'next' }) => {
@@ -46,12 +51,10 @@ export default function Pagination({ currentPage, totalPages, getHref, onPageCha
     const disabled = dir === 'prev' ? currentPage <= 1 : currentPage >= totalPages;
     const label = dir === 'prev' ? '←' : '→';
     if (onPageChange) {
-      return (
-        <button onClick={() => !disabled && onPageChange(target)} disabled={disabled} className={`${btnBase} ${arrow}`}>{label}</button>
-      );
+      return <button onClick={() => !disabled && onPageChange(target)} disabled={disabled} className={`${btnBase} ${arrow}`}>{label}</button>;
     }
     if (disabled) return <span className={`${btnBase} ${arrow} opacity-20 cursor-not-allowed`}>{label}</span>;
-    return <Link href={getHref!(target)} className={`${btnBase} ${arrow}`}>{label}</Link>;
+    return <Link href={buildHref(target)} className={`${btnBase} ${arrow}`}>{label}</Link>;
   };
 
   return (

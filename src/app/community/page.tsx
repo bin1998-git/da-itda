@@ -135,7 +135,7 @@ export default async function CommunityPage({
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              getHref={(p) => `/community?page=${p}`}
+              hrefBase="/community"
             />
           </>
         )}

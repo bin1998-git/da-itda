@@ -129,7 +129,7 @@ export default async function MediaPage({
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              getHref={(p) => `/media?page=${p}`}
+              hrefBase="/media"
             />
           </>
         )}

@@ -132,7 +132,8 @@ export default async function MarketPage({
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              getHref={(p) => `/market?${new URLSearchParams({ ...(category && category !== 'all' ? { category } : {}), page: String(p) }).toString()}`}
+              hrefBase="/market"
+              extraParams={category && category !== 'all' ? { category } : {}}
             />
           </>
         )}
