@@ -40,10 +40,10 @@ export default async function NoticeDetailPage({
     new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-2xl mx-auto px-6 py-10">
         {/* 뒤로 */}
-        <Link href="/notice" className="inline-flex items-center gap-1.5 text-white/30 hover:text-white/60 text-sm transition mb-8">
+        <Link href="/notice" className="inline-flex items-center gap-1.5 text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 text-sm transition mb-8">
           ← 공지사항 목록
         </Link>
 
@@ -57,8 +57,8 @@ export default async function NoticeDetailPage({
               <span className="text-[11px] font-semibold text-amber-400">📌 고정</span>
             )}
           </div>
-          <h1 className="text-2xl font-bold text-white leading-snug">{notice.title}</h1>
-          <div className="flex items-center gap-3 text-white/30 text-xs mt-3">
+          <h1 className="text-2xl font-bold text-stone-900 dark:text-white leading-snug">{notice.title}</h1>
+          <div className="flex items-center gap-3 text-stone-400 dark:text-white/30 text-xs mt-3">
             <span>{fmt(notice.created_at)}</span>
             {notice.updated_at !== notice.created_at && (
               <>
@@ -72,40 +72,40 @@ export default async function NoticeDetailPage({
         </div>
 
         {/* 구분선 */}
-        <div className="border-t border-white/8 mb-8" />
+        <div className="border-t border-black/8 dark:border-white/8 mb-8" />
 
         {/* 본문 */}
-        <div className="text-white/75 text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="text-stone-700 dark:text-white/75 text-sm leading-relaxed whitespace-pre-wrap">
           {notice.content}
         </div>
 
         {/* 구분선 */}
-        <div className="border-t border-white/8 mt-12 mb-6" />
+        <div className="border-t border-black/8 dark:border-white/8 mt-12 mb-6" />
 
         {/* 이전·다음 */}
         <div className="flex flex-col gap-2">
           {next && (
             <Link
               href={`/notice/${next.id}`}
-              className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 hover:bg-white/4 transition group"
+              className="flex items-center gap-3 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/4 transition group"
             >
-              <span className="text-white/25 text-xs shrink-0">▲ 다음</span>
-              <span className="text-white/60 text-sm truncate group-hover:text-white transition">{next.title}</span>
+              <span className="text-stone-400 dark:text-white/25 text-xs shrink-0">▲ 다음</span>
+              <span className="text-stone-600 dark:text-white/60 text-sm truncate group-hover:text-stone-900 dark:group-hover:text-white transition">{next.title}</span>
             </Link>
           )}
           {prev && (
             <Link
               href={`/notice/${prev.id}`}
-              className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 hover:bg-white/4 transition group"
+              className="flex items-center gap-3 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/4 transition group"
             >
-              <span className="text-white/25 text-xs shrink-0">▼ 이전</span>
-              <span className="text-white/60 text-sm truncate group-hover:text-white transition">{prev.title}</span>
+              <span className="text-stone-400 dark:text-white/25 text-xs shrink-0">▼ 이전</span>
+              <span className="text-stone-600 dark:text-white/60 text-sm truncate group-hover:text-stone-900 dark:group-hover:text-white transition">{prev.title}</span>
             </Link>
           )}
         </div>
 
         <div className="mt-6 text-center">
-          <Link href="/notice" className="text-white/30 hover:text-white/60 text-sm transition">
+          <Link href="/notice" className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 text-sm transition">
             목록으로
           </Link>
         </div>

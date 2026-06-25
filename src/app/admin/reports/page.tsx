@@ -37,7 +37,7 @@ const TYPE_LABEL: Record<string, { label: string; href: (id: string) => string }
 const STATUS_STYLE: Record<string, string> = {
   pending:   'text-amber-400 bg-amber-500/10 border-amber-500/20',
   resolved:  'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-  dismissed: 'text-white/30 bg-white/5 border-white/10',
+  dismissed: 'text-stone-400 dark:text-white/30 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10',
 };
 
 const TABLE_MAP: Record<string, string> = {
@@ -118,7 +118,7 @@ export default function AdminReportsPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
       </div>
     );
@@ -127,14 +127,14 @@ export default function AdminReportsPage() {
   const pending = reports.filter((r) => r.status === 'pending').length;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-5xl mx-auto px-6 py-10">
 
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-8 flex-wrap">
-          <Link href="/admin" className="text-white/30 hover:text-white/60 transition text-sm">← 관리자</Link>
-          <span className="text-white/15">/</span>
-          <h1 className="text-xl font-bold text-white">신고 관리</h1>
+          <Link href="/admin" className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition text-sm">← 관리자</Link>
+          <span className="text-stone-300 dark:text-white/15">/</span>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-white">신고 관리</h1>
           {pending > 0 && (
             <span className="ml-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 text-xs font-semibold border border-rose-500/25">
               미처리 {pending}건
@@ -153,7 +153,7 @@ export default function AdminReportsPage() {
                   ? key === 'pending'
                     ? 'bg-rose-500/15 border-rose-500/30 text-rose-300'
                     : 'bg-sky-500/15 border-sky-500/30 text-sky-300'
-                  : 'border-white/8 text-white/40 hover:text-white/70 hover:bg-white/5'
+                  : 'border-black/8 dark:border-white/8 text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white/70 hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               {label}
@@ -162,9 +162,9 @@ export default function AdminReportsPage() {
         </div>
 
         {reports.length === 0 ? (
-          <div className="rounded-2xl border border-white/6 bg-white/2 p-16 text-center">
+          <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-16 text-center">
             <span className="text-5xl block mb-4">🚩</span>
-            <p className="text-white/40 text-sm">
+            <p className="text-stone-400 dark:text-white/40 text-sm">
               {filter === 'pending' ? '처리할 신고가 없습니다' : '신고 내역이 없습니다'}
             </p>
           </div>
@@ -173,7 +173,7 @@ export default function AdminReportsPage() {
             {reports.map((r) => {
               const typeInfo = TYPE_LABEL[r.target_type];
               return (
-                <div key={r.id} className={`rounded-2xl border bg-white/2 p-5 ${r.status === 'pending' ? 'border-rose-500/15' : 'border-white/6'}`}>
+                <div key={r.id} className={`rounded-2xl border bg-black/[0.02] dark:bg-white/[0.02] p-5 ${r.status === 'pending' ? 'border-rose-500/15' : 'border-black/6 dark:border-white/6'}`}>
                   <div className="flex items-start gap-3 flex-wrap">
                     {/* 메타 뱃지들 */}
                     <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
@@ -190,7 +190,7 @@ export default function AdminReportsPage() {
                         <Link
                           href={typeInfo.href(r.target_id)}
                           target="_blank"
-                          className="text-[10px] text-white/30 hover:text-white/60 transition shrink-0"
+                          className="text-[10px] text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition shrink-0"
                         >
                           콘텐츠 보기 →
                         </Link>
@@ -198,17 +198,17 @@ export default function AdminReportsPage() {
                     </div>
 
                     {/* 날짜 */}
-                    <span className="text-white/25 text-xs shrink-0">{fmt(r.created_at)}</span>
+                    <span className="text-stone-400 dark:text-white/25 text-xs shrink-0">{fmt(r.created_at)}</span>
                   </div>
 
                   {/* 신고자 */}
-                  <div className="mt-2 text-white/30 text-xs">
+                  <div className="mt-2 text-stone-400 dark:text-white/30 text-xs">
                     신고자: {r.reporter_profile?.username ?? r.reporter_profile?.full_name ?? '회원'}
                   </div>
 
                   {/* 상세 내용 */}
                   {r.detail && (
-                    <p className="mt-2 text-white/50 text-sm bg-white/3 rounded-xl px-4 py-2.5 leading-relaxed">
+                    <p className="mt-2 text-stone-500 dark:text-white/50 text-sm bg-black/3 dark:bg-white/3 rounded-xl px-4 py-2.5 leading-relaxed">
                       {r.detail}
                     </p>
                   )}
@@ -233,7 +233,7 @@ export default function AdminReportsPage() {
                       <button
                         onClick={() => dismiss(r.id)}
                         disabled={processing === r.id}
-                        className="px-4 py-2 rounded-xl border border-white/10 text-white/30 text-xs font-semibold hover:bg-white/5 hover:text-white/50 transition disabled:opacity-50"
+                        className="px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/30 text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5 hover:text-stone-500 dark:hover:text-white/50 transition disabled:opacity-50"
                       >
                         신고 무시
                       </button>

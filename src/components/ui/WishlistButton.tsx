@@ -54,7 +54,7 @@ export default function WishlistButton({ productId }: Props) {
       className={`flex items-center gap-2 px-5 py-3 rounded-xl border font-medium text-sm transition ${
         liked
           ? 'bg-rose-500/15 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
-          : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/8 hover:text-white'
+          : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-stone-500 dark:text-white/50 hover:bg-black/8 dark:hover:bg-white/8 hover:text-stone-900 dark:hover:text-white'
       }`}
     >
       <svg

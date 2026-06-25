@@ -8,27 +8,30 @@ const VALUES = [
     title: '연결성',
     en: 'Connectivity',
     desc: '파편화된 서비스를 하나의 UI/UX로 통합합니다. 식품 구매부터 레시피, 커뮤니티까지 끊김 없이 연결됩니다.',
-    accent: 'from-amber-500/20 to-orange-500/5',
-    border: 'border-amber-500/20',
-    tag: 'text-amber-400',
+    accent: 'from-amber-500/[0.12] dark:from-amber-500/20 to-orange-500/5',
+    border: 'border-amber-500/30 dark:border-amber-500/20',
+    tag: 'text-amber-700 dark:text-amber-400',
+    card: 'bg-white/60 dark:bg-transparent',
   },
   {
     icon: '🎬',
     title: '몰입감',
     en: 'Immersive',
     desc: 'Higgsfield 영상 엔진이 만드는 시각적 압도감. 모든 주요 화면에 영상 Hero가 살아 숨쉽니다.',
-    accent: 'from-rose-500/20 to-pink-500/5',
-    border: 'border-rose-500/20',
-    tag: 'text-rose-400',
+    accent: 'from-rose-500/[0.10] dark:from-rose-500/20 to-pink-500/5',
+    border: 'border-rose-500/30 dark:border-rose-500/20',
+    tag: 'text-rose-700 dark:text-rose-400',
+    card: 'bg-white/60 dark:bg-transparent',
   },
   {
     icon: '🧩',
     title: '유연성',
     en: 'Scalability',
     desc: '새 기능을 모듈처럼 끼워 넣는 구조. 필요한 서비스만 선택해서 나만의 플랫폼을 구성하세요.',
-    accent: 'from-emerald-500/20 to-teal-500/5',
-    border: 'border-emerald-500/20',
-    tag: 'text-emerald-400',
+    accent: 'from-emerald-500/[0.10] dark:from-emerald-500/20 to-teal-500/5',
+    border: 'border-emerald-500/30 dark:border-emerald-500/20',
+    tag: 'text-emerald-700 dark:text-emerald-400',
+    card: 'bg-white/60 dark:bg-transparent',
   },
 ];
 
@@ -39,10 +42,11 @@ const MODULES = [
     label: '식품 마켓',
     desc: '신선식품부터 주방용품까지, 검증된 판매자의 제품을 직접 구매하세요.',
     features: ['신선식품 당일배송', '주방용품 큐레이션', '판매자 직거래'],
-    gradient: 'from-amber-500/15 to-orange-500/5',
-    border: 'border-amber-500/25',
-    accent: 'text-amber-400',
-    tag: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    gradient: 'from-amber-500/[0.12] dark:from-amber-500/15 to-orange-500/5',
+    border: 'border-amber-500/30 dark:border-amber-500/25',
+    card: 'bg-white/60 dark:bg-transparent',
+    accent: 'text-amber-600 dark:text-amber-400',
+    tag: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/25',
   },
   {
     slug: 'media',
@@ -50,10 +54,11 @@ const MODULES = [
     label: '푸드 미디어',
     desc: 'Higgsfield 영상으로 만드는 레시피 콘텐츠. 요리를 보고, 배우고, 따라하세요.',
     features: ['Higgsfield 영상 레시피', '셰프 LIVE 쿠킹', '요리 클래스'],
-    gradient: 'from-rose-500/15 to-pink-500/5',
-    border: 'border-rose-500/25',
-    accent: 'text-rose-400',
-    tag: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+    gradient: 'from-rose-500/[0.10] dark:from-rose-500/15 to-pink-500/5',
+    border: 'border-rose-500/30 dark:border-rose-500/25',
+    card: 'bg-white/60 dark:bg-transparent',
+    accent: 'text-rose-600 dark:text-rose-400',
+    tag: 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/25',
   },
   {
     slug: 'community',
@@ -61,10 +66,11 @@ const MODULES = [
     label: '푸드 커뮤니티',
     desc: '레시피를 공유하고, 리뷰를 남기고, 같은 취향의 사람들과 소통하세요.',
     features: ['레시피 공유 게시판', '상품 리뷰 & 평점', '좋아요 & 북마크'],
-    gradient: 'from-emerald-500/15 to-teal-500/5',
-    border: 'border-emerald-500/25',
-    accent: 'text-emerald-400',
-    tag: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    gradient: 'from-emerald-500/[0.10] dark:from-emerald-500/15 to-teal-500/5',
+    border: 'border-emerald-500/30 dark:border-emerald-500/25',
+    card: 'bg-white/60 dark:bg-transparent',
+    accent: 'text-emerald-600 dark:text-emerald-400',
+    tag: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25',
   },
 ];
 
@@ -77,7 +83,7 @@ const STATS = [
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen bg-[#0a0a0a]">
+    <main className="flex flex-col min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a]">
 
       {/* ── Hero 섹션 ── */}
       <HiggsfieldHero />
@@ -86,8 +92,8 @@ export default function Home() {
       <section id="why" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs font-semibold tracking-[0.3em] text-amber-400/70 uppercase mb-3">왜 다잇다인가</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+            <p className="text-xs font-semibold tracking-[0.3em] text-amber-600 dark:text-amber-400/70 uppercase mb-3">왜 다잇다인가</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 dark:text-white leading-tight">
               세 가지 핵심 가치로<br className="hidden md:block" /> 설계된 플랫폼
             </h2>
           </div>
@@ -95,15 +101,15 @@ export default function Home() {
             {VALUES.map((v) => (
               <div
                 key={v.en}
-                className={`relative rounded-2xl border bg-gradient-to-br ${v.accent} ${v.border} p-7 flex flex-col gap-4`}
+                className={`relative rounded-2xl border ${v.card} bg-gradient-to-br ${v.accent} ${v.border} p-7 flex flex-col gap-4`}
               >
                 <div className="text-4xl">{v.icon}</div>
                 <div>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <h3 className="text-white font-bold text-xl">{v.title}</h3>
+                    <h3 className="text-stone-900 dark:text-white font-bold text-xl">{v.title}</h3>
                     <span className={`text-xs font-medium ${v.tag}`}>{v.en}</span>
                   </div>
-                  <p className="text-white/50 text-sm leading-relaxed">{v.desc}</p>
+                  <p className="text-stone-500 dark:text-white/50 text-sm leading-relaxed">{v.desc}</p>
                 </div>
               </div>
             ))}
@@ -112,14 +118,14 @@ export default function Home() {
       </section>
 
       {/* ── 모듈 섹션 ── */}
-      <section id="modules" className="py-28 px-6 border-t border-white/5">
+      <section id="modules" className="py-28 px-6 border-t border-black/5 dark:border-white/5">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs font-semibold tracking-[0.3em] text-amber-400/70 uppercase mb-3">3가지 모듈</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+            <p className="text-xs font-semibold tracking-[0.3em] text-amber-600 dark:text-amber-400/70 uppercase mb-3">3가지 모듈</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 dark:text-white leading-tight">
               하나의 플랫폼,<br className="hidden md:block" /> 무한한 가능성
             </h2>
-            <p className="text-white/40 mt-4 text-base max-w-xl mx-auto">
+            <p className="text-stone-500 dark:text-white/40 mt-4 text-base max-w-xl mx-auto">
               식품 마켓, 푸드 미디어, 커뮤니티를 하나로 연결해 더 풍부한 푸드 라이프를 제공합니다.
             </p>
           </div>
@@ -127,23 +133,23 @@ export default function Home() {
             {MODULES.map((mod) => (
               <div
                 key={mod.slug}
-                className={`relative rounded-2xl border bg-gradient-to-br ${mod.gradient} ${mod.border} p-7 flex flex-col gap-5`}
+                className={`relative rounded-2xl border ${mod.card} bg-gradient-to-br ${mod.gradient} ${mod.border} p-7 flex flex-col gap-5`}
               >
                 <div>
                   <span className="text-4xl">{mod.emoji}</span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className={`text-white font-bold text-xl`}>{mod.label}</h3>
+                    <h3 className={`text-stone-900 dark:text-white font-bold text-xl`}>{mod.label}</h3>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${mod.tag}`}>
                       오픈 예정
                     </span>
                   </div>
-                  <p className="text-white/50 text-sm leading-relaxed">{mod.desc}</p>
+                  <p className="text-stone-500 dark:text-white/50 text-sm leading-relaxed">{mod.desc}</p>
                 </div>
                 <ul className="flex flex-col gap-2">
                   {mod.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-white/40 text-xs">
+                    <li key={f} className="flex items-center gap-2 text-stone-400 dark:text-white/40 text-xs">
                       <span className={`w-1 h-1 rounded-full flex-shrink-0 bg-current ${mod.accent}`} />
                       {f}
                     </li>
@@ -156,14 +162,14 @@ export default function Home() {
       </section>
 
       {/* ── 통계 섹션 ── */}
-      <section className="py-20 px-6 border-t border-white/5">
+      <section className="py-20 px-6 border-t border-black/5 dark:border-white/5">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {STATS.map((s) => (
               <div key={s.label} className="flex flex-col items-center text-center gap-3 py-6">
                 <span className="text-3xl">{s.icon}</span>
-                <span className="text-4xl font-bold text-white tracking-tight">{s.value}</span>
-                <span className="text-white/40 text-sm">{s.label}</span>
+                <span className="text-4xl font-bold text-stone-900 dark:text-white tracking-tight">{s.value}</span>
+                <span className="text-stone-500 dark:text-white/40 text-sm">{s.label}</span>
               </div>
             ))}
           </div>

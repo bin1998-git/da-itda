@@ -118,13 +118,13 @@ export default function EventsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* 헤더 */}
         <div className="mb-10">
           <p className="text-pink-400 text-xs font-semibold tracking-widest uppercase mb-2">Events</p>
-          <h1 className="text-3xl font-bold text-white">할인 · 프로모션</h1>
-          <p className="text-white/35 text-sm mt-2">
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">할인 · 프로모션</h1>
+          <p className="text-stone-400 dark:text-white/35 text-sm mt-2">
             쿠폰을 받아 장바구니에서 바로 사용하세요.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function EventsPage() {
             <span className="text-xl shrink-0">🎟️</span>
             <div className="flex-1">
               <p className="text-emerald-400 text-sm font-medium">보유 쿠폰 {myCoupons.length}개</p>
-              <p className="text-white/35 text-xs mt-0.5">
+              <p className="text-stone-400 dark:text-white/35 text-xs mt-0.5">
                 {myCoupons.map((c) => c.code).join(' · ')}
               </p>
             </div>
@@ -148,9 +148,9 @@ export default function EventsPage() {
         )}
 
         {/* 사용 방법 */}
-        <div className="mb-8 flex items-start gap-3 p-4 rounded-2xl border border-white/8 bg-white/3">
+        <div className="mb-8 flex items-start gap-3 p-4 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3">
           <span className="text-lg shrink-0">💡</span>
-          <p className="text-sm text-white/45 leading-relaxed">
+          <p className="text-sm text-stone-500 dark:text-white/45 leading-relaxed">
             쿠폰 받기 → <Link href="/cart" className="text-amber-400 hover:underline">장바구니</Link> 이동 → 내 쿠폰 선택 → 자동 적용
           </p>
         </div>
@@ -168,12 +168,12 @@ export default function EventsPage() {
                   <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${e.badgeColor}`}>
                     {e.badge}
                   </span>
-                  <span className="text-white/20 text-xs">{e.period}</span>
+                  <span className="text-stone-400 dark:text-white/20 text-xs">{e.period}</span>
                 </div>
 
                 <div>
-                  <h2 className="text-white font-bold text-lg leading-snug">{e.title}</h2>
-                  <p className="text-white/45 text-sm mt-2 leading-relaxed">{e.desc}</p>
+                  <h2 className="text-stone-900 dark:text-white font-bold text-lg leading-snug">{e.title}</h2>
+                  <p className="text-stone-500 dark:text-white/45 text-sm mt-2 leading-relaxed">{e.desc}</p>
                 </div>
 
                 {/* 쿠폰 코드 + 다운로드 */}
@@ -187,10 +187,10 @@ export default function EventsPage() {
                     disabled={owned}
                     className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                       owned
-                        ? 'bg-white/5 text-white/25 cursor-not-allowed'
+                        ? 'bg-black/5 dark:bg-white/5 text-stone-400 dark:text-white/25 cursor-not-allowed'
                         : downloading
                         ? 'bg-emerald-500/20 text-emerald-400'
-                        : 'bg-white/15 text-white hover:bg-white/25'
+                        : 'bg-black/15 dark:bg-white/15 text-stone-900 dark:text-white hover:bg-black/25 dark:hover:bg-white/25'
                     }`}
                   >
                     {owned ? '보유중' : downloading ? '받기 완료 ✓' : '쿠폰 받기'}
@@ -199,7 +199,7 @@ export default function EventsPage() {
 
                 <Link
                   href={e.href}
-                  className="inline-flex items-center justify-center gap-1 text-xs font-semibold px-4 py-2.5 rounded-xl bg-white/8 text-white/65 hover:bg-white/14 hover:text-white transition border border-white/8"
+                  className="inline-flex items-center justify-center gap-1 text-xs font-semibold px-4 py-2.5 rounded-xl bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/65 hover:bg-black/14 dark:hover:bg-white/14 hover:text-stone-900 dark:hover:text-white transition border border-black/8 dark:border-white/8"
                 >
                   {e.cta} →
                 </Link>

@@ -50,7 +50,7 @@ export default function AddressInput({ value, onChange, placeholder, inputClassN
     }).open();
   };
 
-  const base = inputClassName ?? 'w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition';
+  const base = inputClassName ?? 'w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition';
 
   return (
     <div className="flex gap-2">
@@ -65,7 +65,7 @@ export default function AddressInput({ value, onChange, placeholder, inputClassN
       <button
         type="button"
         onClick={openSearch}
-        className="shrink-0 px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white/55 text-xs font-medium hover:bg-white/14 hover:text-white transition whitespace-nowrap"
+        className="shrink-0 px-3 py-2.5 rounded-xl bg-black/8 dark:bg-white/8 border border-black/12 dark:border-white/12 text-stone-500 dark:text-white/55 text-xs font-medium hover:bg-black/14 dark:hover:bg-white/14 hover:text-stone-900 dark:hover:text-white transition whitespace-nowrap"
       >
         주소 검색
       </button>

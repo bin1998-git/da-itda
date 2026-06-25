@@ -131,21 +131,21 @@ export default function AdminNoticesPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-4xl mx-auto px-6 py-10">
 
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-8">
-          <Link href="/admin" className="text-white/30 hover:text-white/60 transition text-sm">← 관리자</Link>
-          <span className="text-white/15">/</span>
-          <h1 className="text-xl font-bold text-white">공지사항 관리</h1>
+          <Link href="/admin" className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition text-sm">← 관리자</Link>
+          <span className="text-stone-300 dark:text-white/15">/</span>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-white">공지사항 관리</h1>
           <span className="ml-auto">
             {mode === 'list' ? (
               <button
@@ -157,7 +157,7 @@ export default function AdminNoticesPage() {
             ) : (
               <button
                 onClick={() => setMode('list')}
-                className="px-5 py-2.5 rounded-xl border border-white/10 text-white/50 text-sm hover:bg-white/5 transition"
+                className="px-5 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/50 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
               >
                 ← 목록
               </button>
@@ -167,13 +167,13 @@ export default function AdminNoticesPage() {
 
         {/* 작성/수정 폼 */}
         {(mode === 'write' || mode === 'edit') && (
-          <div className="rounded-2xl border border-white/10 bg-white/3 p-6 mb-8">
-            <h2 className="text-white font-semibold mb-5">{mode === 'write' ? '새 공지 작성' : '공지 수정'}</h2>
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/3 dark:bg-white/3 p-6 mb-8">
+            <h2 className="text-stone-900 dark:text-white font-semibold mb-5">{mode === 'write' ? '새 공지 작성' : '공지 수정'}</h2>
 
             <div className="flex flex-col gap-4">
               {/* 카테고리 */}
               <div>
-                <label className="text-white/40 text-xs mb-2 block">카테고리</label>
+                <label className="text-stone-400 dark:text-white/40 text-xs mb-2 block">카테고리</label>
                 <div className="flex gap-2">
                   {CATS.map((c) => (
                     <button
@@ -183,7 +183,7 @@ export default function AdminNoticesPage() {
                       className={`px-4 py-1.5 rounded-xl text-xs font-medium border transition ${
                         form.category === c.value
                           ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-                          : 'border-white/8 text-white/40 hover:text-white/60 hover:bg-white/5'
+                          : 'border-black/8 dark:border-white/8 text-stone-400 dark:text-white/40 hover:text-stone-600 dark:hover:text-white/60 hover:bg-black/5 dark:hover:bg-white/5'
                       }`}
                     >
                       {c.label}
@@ -200,29 +200,29 @@ export default function AdminNoticesPage() {
                 >
                   <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${form.is_pinned ? 'left-5' : 'left-0.5'}`} />
                 </div>
-                <span className="text-white/50 text-sm">상단 고정</span>
+                <span className="text-stone-500 dark:text-white/50 text-sm">상단 고정</span>
               </label>
 
               {/* 제목 */}
               <div>
-                <label className="text-white/40 text-xs mb-2 block">제목</label>
+                <label className="text-stone-400 dark:text-white/40 text-xs mb-2 block">제목</label>
                 <input
                   value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="공지 제목"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-violet-500/40 transition"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/20 text-sm focus:outline-none focus:border-violet-500/40 transition"
                 />
               </div>
 
               {/* 내용 */}
               <div>
-                <label className="text-white/40 text-xs mb-2 block">내용</label>
+                <label className="text-stone-400 dark:text-white/40 text-xs mb-2 block">내용</label>
                 <textarea
                   value={form.content}
                   onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
                   placeholder="공지 내용을 입력하세요"
                   rows={8}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-violet-500/40 transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/20 text-sm focus:outline-none focus:border-violet-500/40 transition resize-none"
                 />
               </div>
 
@@ -238,7 +238,7 @@ export default function AdminNoticesPage() {
                 </button>
                 <button
                   onClick={() => setMode('list')}
-                  className="px-6 py-2.5 rounded-xl border border-white/10 text-white/40 text-sm hover:bg-white/5 transition"
+                  className="px-6 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
                 >
                   취소
                 </button>
@@ -249,20 +249,20 @@ export default function AdminNoticesPage() {
 
         {/* 목록 */}
         {notices.length === 0 ? (
-          <div className="rounded-2xl border border-white/6 bg-white/2 p-16 text-center">
+          <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-16 text-center">
             <span className="text-5xl block mb-4">📢</span>
-            <p className="text-white/40 text-sm">등록된 공지사항이 없습니다</p>
+            <p className="text-stone-400 dark:text-white/40 text-sm">등록된 공지사항이 없습니다</p>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             {notices.map((n) => (
-              <div key={n.id} className={`rounded-xl border bg-white/2 p-4 flex items-center gap-3 ${n.is_pinned ? 'border-amber-500/20' : 'border-white/6'}`}>
+              <div key={n.id} className={`rounded-xl border bg-black/[0.02] dark:bg-white/[0.02] p-4 flex items-center gap-3 ${n.is_pinned ? 'border-amber-500/20' : 'border-black/6 dark:border-white/6'}`}>
                 {n.is_pinned && <span className="text-sm shrink-0">📌</span>}
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${CAT_STYLE[n.category] ?? ''}`}>
                   {CATS.find((c) => c.value === n.category)?.label}
                 </span>
-                <p className="text-white/70 text-sm flex-1 truncate">{n.title}</p>
-                <div className="flex items-center gap-2 shrink-0 text-white/25 text-xs">
+                <p className="text-stone-700 dark:text-white/70 text-sm flex-1 truncate">{n.title}</p>
+                <div className="flex items-center gap-2 shrink-0 text-stone-400 dark:text-white/25 text-xs">
                   <span>조회 {n.view_count}</span>
                   <span>{fmt(n.created_at)}</span>
                 </div>
@@ -272,20 +272,20 @@ export default function AdminNoticesPage() {
                     className={`px-2.5 py-1 rounded-lg text-xs border transition ${
                       n.is_pinned
                         ? 'border-amber-500/30 text-amber-400 hover:bg-amber-500/8'
-                        : 'border-white/10 text-white/30 hover:text-white/60 hover:bg-white/5'
+                        : 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 hover:bg-black/5 dark:hover:bg-white/5'
                     }`}
                   >
                     {n.is_pinned ? '고정해제' : '고정'}
                   </button>
                   <button
                     onClick={() => openEdit(n)}
-                    className="px-2.5 py-1 rounded-lg text-xs border border-white/10 text-white/30 hover:text-white/60 hover:bg-white/5 transition"
+                    className="px-2.5 py-1 rounded-lg text-xs border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition"
                   >
                     수정
                   </button>
                   <button
                     onClick={() => deleteNotice(n.id)}
-                    className="px-2.5 py-1 rounded-lg text-xs border border-transparent text-white/20 hover:text-rose-400 hover:border-rose-500/20 hover:bg-rose-500/8 transition"
+                    className="px-2.5 py-1 rounded-lg text-xs border border-transparent text-stone-300 dark:text-white/20 hover:text-rose-400 hover:border-rose-500/20 hover:bg-rose-500/8 transition"
                   >
                     삭제
                   </button>

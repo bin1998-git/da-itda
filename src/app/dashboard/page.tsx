@@ -40,7 +40,7 @@ const CAT: Record<string, { label: string; cls: string }> = {
   question: { label: '질문',   cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
   recipe:   { label: '레시피', cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
   review:   { label: '후기',   cls: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
-  general:  { label: '자유',   cls: 'bg-white/8 text-white/45 border-white/10' },
+  general:  { label: '자유',   cls: 'bg-black/8 dark:bg-white/8 text-stone-500 dark:text-white/45 border-black/10 dark:border-white/10' },
 };
 
 const TABS: { id: Tab; label: string }[] = [
@@ -232,7 +232,7 @@ export default function DashboardPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
       </div>
     );
@@ -242,10 +242,10 @@ export default function DashboardPage() {
   const avatarSrc   = profile.avatar_url || user.user_metadata?.avatar_url || '';
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-[60px]">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-[60px]">
 
       {/* ── 프로필 헤더 ── */}
-      <div className="relative border-b border-white/5 overflow-hidden">
+      <div className="relative border-b border-black/5 dark:border-white/5 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-0 left-1/4 w-96 h-24 bg-amber-500/5 blur-3xl pointer-events-none" />
         <div className="max-w-5xl mx-auto px-6 py-8 relative flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -253,7 +253,7 @@ export default function DashboardPage() {
           {/* 아바타 */}
           {avatarSrc ? (
             <img src={avatarSrc} alt="프로필" referrerPolicy="no-referrer"
-              className="w-16 h-16 rounded-2xl object-cover border border-white/10 shadow-lg shrink-0" />
+              className="w-16 h-16 rounded-2xl object-cover border border-black/10 dark:border-white/10 shadow-lg shrink-0" />
           ) : (
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-black font-bold text-2xl shadow-lg shrink-0">
               {displayName[0]?.toUpperCase()}
@@ -263,14 +263,14 @@ export default function DashboardPage() {
           {/* 이름·이메일 */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl font-bold text-white">{displayName}</h1>
-              {profile.username && <span className="text-white/35 text-sm">@{profile.username}</span>}
+              <h1 className="text-xl font-bold text-stone-900 dark:text-white">{displayName}</h1>
+              {profile.username && <span className="text-stone-400 dark:text-white/35 text-sm">@{profile.username}</span>}
               {isSeller && (
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25">판매자</span>
               )}
             </div>
-            <p className="text-white/40 text-sm mt-0.5 truncate">{user.email}</p>
-            <p className="text-white/25 text-xs mt-1">가입일: {fmt(user.created_at ?? new Date().toISOString())}</p>
+            <p className="text-stone-400 dark:text-white/40 text-sm mt-0.5 truncate">{user.email}</p>
+            <p className="text-stone-400 dark:text-white/25 text-xs mt-1">가입일: {fmt(user.created_at ?? new Date().toISOString())}</p>
           </div>
 
           {/* 스탯 배지 */}
@@ -282,8 +282,8 @@ export default function DashboardPage() {
               { label: '장바구니', value: stats.cart },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-white font-bold text-lg leading-none">{s.value}</p>
-                <p className="text-white/30 text-[11px] mt-1">{s.label}</p>
+                <p className="text-stone-900 dark:text-white font-bold text-lg leading-none">{s.value}</p>
+                <p className="text-stone-400 dark:text-white/30 text-[11px] mt-1">{s.label}</p>
               </div>
             ))}
           </div>
@@ -291,12 +291,12 @@ export default function DashboardPage() {
       </div>
 
       {/* ── 탭 네비 ── */}
-      <div className="border-b border-white/[0.06] sticky top-[60px] z-20 bg-[#0a0a0a]/95 backdrop-blur-xl">
+      <div className="border-b border-black/[0.06] dark:border-white/[0.06] sticky top-[60px] z-20 bg-[#EDE8E2]/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex overflow-x-auto no-scrollbar">
           {TABS.filter(({ id }) => !isAdmin || (id !== 'likes' && id !== 'wishlist')).map(({ id, label }) => (
             <button key={id} onClick={() => { setTab(id); setPostsPage(1); setMediaPage(1); }}
               className={`px-5 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                tab === id ? 'text-amber-400 border-amber-400' : 'text-white/40 border-transparent hover:text-white/70'
+                tab === id ? 'text-amber-400 border-amber-400' : 'text-stone-400 dark:text-white/40 border-transparent hover:text-stone-700 dark:hover:text-white/70'
               }`}
             >
               {label}
@@ -313,7 +313,7 @@ export default function DashboardPage() {
 
             {/* 빠른 이동 */}
             <div>
-              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-4">빠른 이동</p>
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase mb-4">빠른 이동</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { label: '식품 마켓',  href: '/market',    icon: '🛒', c: 'hover:border-amber-500/40', adminOnly: false },
@@ -326,10 +326,10 @@ export default function DashboardPage() {
                 .map(({ label, href, icon, c, onClick }) => (
                   <Link key={label} href={href}
                     onClick={onClick}
-                    className={`flex items-center gap-3 p-4 rounded-xl border border-white/8 bg-white/3 transition ${c}`}
+                    className={`flex items-center gap-3 p-4 rounded-xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 transition ${c}`}
                   >
                     <span className="text-xl">{icon}</span>
-                    <span className="text-white/55 text-sm font-medium">{label}</span>
+                    <span className="text-stone-500 dark:text-white/55 text-sm font-medium">{label}</span>
                   </Link>
                 ))}
               </div>
@@ -338,12 +338,12 @@ export default function DashboardPage() {
             {/* 최근 게시글 */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">최근 게시글</p>
+                <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">최근 게시글</p>
                 <button onClick={() => setTab('posts')} className="text-amber-400/60 text-xs hover:text-amber-400 transition">전체 보기 →</button>
               </div>
               {recentPosts.length === 0 ? (
-                <div className="rounded-xl border border-white/6 bg-white/2 p-8 text-center">
-                  <p className="text-white/30 text-sm">아직 작성한 게시글이 없습니다.</p>
+                <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-8 text-center">
+                  <p className="text-stone-400 dark:text-white/30 text-sm">아직 작성한 게시글이 없습니다.</p>
                   <Link href="/community/write" className="mt-2 inline-block text-amber-400/60 hover:text-amber-400 text-xs transition">첫 글 작성하기 →</Link>
                 </div>
               ) : (
@@ -352,14 +352,14 @@ export default function DashboardPage() {
                     const cat = CAT[p.category] ?? CAT.general;
                     return (
                       <Link key={p.id} href={`/community/${p.id}`}
-                        className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 hover:bg-white/4 transition group"
+                        className="flex items-center gap-3 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/4 dark:hover:bg-white/4 transition group"
                       >
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${cat.cls}`}>{cat.label}</span>
-                        <span className="text-white/65 text-sm flex-1 truncate group-hover:text-white transition">{p.title}</span>
-                        <span className="text-white/25 text-xs shrink-0 hidden sm:block">
+                        <span className="text-stone-600 dark:text-white/65 text-sm flex-1 truncate group-hover:text-stone-900 dark:group-hover:text-white transition">{p.title}</span>
+                        <span className="text-stone-400 dark:text-white/25 text-xs shrink-0 hidden sm:block">
                           💬{p.comment_count} · ❤️{p.like_count}
                         </span>
-                        <span className="text-white/20 text-xs shrink-0">{fmt(p.created_at)}</span>
+                        <span className="text-stone-300 dark:text-white/20 text-xs shrink-0">{fmt(p.created_at)}</span>
                       </Link>
                     );
                   })}
@@ -370,29 +370,29 @@ export default function DashboardPage() {
             {/* 최근 영상 */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">최근 업로드 영상</p>
+                <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">최근 업로드 영상</p>
                 <button onClick={() => setTab('media')} className="text-rose-400/60 text-xs hover:text-rose-400 transition">전체 보기 →</button>
               </div>
               {recentMedia.length === 0 ? (
-                <div className="rounded-xl border border-white/6 bg-white/2 p-8 text-center">
-                  <p className="text-white/30 text-sm">아직 업로드한 영상이 없습니다.</p>
+                <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-8 text-center">
+                  <p className="text-stone-400 dark:text-white/30 text-sm">아직 업로드한 영상이 없습니다.</p>
                   <Link href="/media/upload" className="mt-2 inline-block text-rose-400/60 hover:text-rose-400 text-xs transition">첫 영상 올리기 →</Link>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {recentMedia.map((m) => (
                     <Link key={m.id} href={`/media/${m.id}`}
-                      className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition"
+                      className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden hover:border-black/15 dark:hover:border-white/15 transition"
                     >
-                      <div className="aspect-video bg-white/5 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-video bg-black/5 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                         {m.thumbnail_url
                           ? <img src={m.thumbnail_url} alt={m.title} className="w-full h-full object-cover" />
                           : <span className="text-4xl">🎬</span>
                         }
                       </div>
                       <div className="p-3">
-                        <p className="text-white/65 text-sm truncate">{m.title}</p>
-                        <p className="text-white/30 text-xs mt-1">👁 {m.views} · ❤️ {m.like_count}</p>
+                        <p className="text-stone-600 dark:text-white/65 text-sm truncate">{m.title}</p>
+                        <p className="text-stone-400 dark:text-white/30 text-xs mt-1">👁 {m.views} · ❤️ {m.like_count}</p>
                       </div>
                     </Link>
                   ))}
@@ -409,26 +409,26 @@ export default function DashboardPage() {
                   <span className="text-3xl">🏪</span>
                   <div>
                     <p className="text-amber-400 font-semibold text-sm">내 상품 관리</p>
-                    <p className="text-white/40 text-xs mt-0.5">상품 수정·삭제·공개 관리</p>
+                    <p className="text-stone-400 dark:text-white/40 text-xs mt-0.5">상품 수정·삭제·공개 관리</p>
                   </div>
                   <span className="ml-auto text-amber-400/50 text-sm">→</span>
                 </Link>
                 <Link href="/market/sell"
-                  className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-white/8 bg-white/2 hover:bg-white/4 transition text-sm text-white/50 hover:text-white whitespace-nowrap"
+                  className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-black/8 dark:border-white/8 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/4 dark:hover:bg-white/4 transition text-sm text-stone-500 dark:text-white/50 hover:text-stone-900 dark:hover:text-white whitespace-nowrap"
                 >
                   + 새 상품
                 </Link>
               </div>
             ) : (
               <Link href="/market/sell"
-                className="flex items-center gap-4 p-5 rounded-2xl border border-white/8 bg-white/2 hover:bg-white/4 transition"
+                className="flex items-center gap-4 p-5 rounded-2xl border border-black/8 dark:border-white/8 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/4 dark:hover:bg-white/4 transition"
               >
                 <span className="text-3xl">🏪</span>
                 <div>
-                  <p className="text-white/60 font-semibold text-sm">판매자 등록</p>
-                  <p className="text-white/30 text-xs mt-0.5">내 상품을 직접 판매해보세요.</p>
+                  <p className="text-stone-600 dark:text-white/60 font-semibold text-sm">판매자 등록</p>
+                  <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">내 상품을 직접 판매해보세요.</p>
                 </div>
-                <span className="ml-auto text-white/25 text-sm">→</span>
+                <span className="ml-auto text-stone-400 dark:text-white/25 text-sm">→</span>
               </Link>
             )}
           </div>
@@ -437,22 +437,22 @@ export default function DashboardPage() {
         {/* ────────────── 프로필 수정 탭 ────────────── */}
         {tab === 'profile' && (
           <div className="max-w-md space-y-6">
-            <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">프로필 수정</p>
+            <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">프로필 수정</p>
 
             {/* 아바타 미리보기 */}
             <div className="flex items-center gap-4">
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt="미리보기" referrerPolicy="no-referrer"
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                  className="w-16 h-16 rounded-2xl object-cover border border-white/15 shrink-0" />
+                  className="w-16 h-16 rounded-2xl object-cover border border-black/15 dark:border-white/15 shrink-0" />
               ) : (
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-black font-bold text-2xl shrink-0">
                   {(profile.full_name || user.email || '?')[0].toUpperCase()}
                 </div>
               )}
               <div>
-                <p className="text-white/50 text-sm font-medium">프로필 사진</p>
-                <p className="text-white/25 text-xs mt-0.5">URL 입력 시 실시간 미리보기</p>
+                <p className="text-stone-500 dark:text-white/50 text-sm font-medium">프로필 사진</p>
+                <p className="text-stone-400 dark:text-white/25 text-xs mt-0.5">URL 입력 시 실시간 미리보기</p>
               </div>
             </div>
 
@@ -464,44 +464,44 @@ export default function DashboardPage() {
               { key: 'phone',      label: '전화번호',         placeholder: '010-0000-0000',           type: 'tel'  },
             ] as { key: keyof typeof profile; label: string; placeholder: string; type: string }[]).map(({ key, label, placeholder, type }) => (
               <div key={key} className="flex flex-col gap-2">
-                <label className="text-white/45 text-sm">{label}</label>
+                <label className="text-stone-500 dark:text-white/45 text-sm">{label}</label>
                 <input
                   type={type}
                   value={profile[key]}
                   onChange={(e) => { setProfile((p) => ({ ...p, [key]: e.target.value })); setSaveMsg(null); }}
                   placeholder={placeholder}
-                  className="px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/20 border border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm"
+                  className="px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm"
                 />
               </div>
             ))}
 
             {/* 주소 (카카오 우편번호 검색) */}
             <div className="flex flex-col gap-2">
-              <label className="text-white/45 text-sm">기본 주소</label>
+              <label className="text-stone-500 dark:text-white/45 text-sm">기본 주소</label>
               <AddressInput
                 value={profile.address}
                 onChange={(addr) => { setProfile((p) => ({ ...p, address: addr })); setSaveMsg(null); }}
                 placeholder="주소 검색 버튼을 클릭하세요"
-                inputClassName="w-full px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/20 border border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm cursor-pointer"
+                inputClassName="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm cursor-pointer"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-white/45 text-sm">상세 주소</label>
+              <label className="text-stone-500 dark:text-white/45 text-sm">상세 주소</label>
               <input
                 type="text"
                 value={profile.address_detail}
                 onChange={(e) => { setProfile((p) => ({ ...p, address_detail: e.target.value })); setSaveMsg(null); }}
                 placeholder="101동 202호"
-                className="px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/20 border border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm"
+                className="px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm"
               />
             </div>
 
             {/* 이메일 (읽기 전용) */}
             <div className="flex flex-col gap-2">
-              <label className="text-white/45 text-sm">이메일</label>
+              <label className="text-stone-500 dark:text-white/45 text-sm">이메일</label>
               <input type="email" value={user.email ?? ''} disabled
-                className="px-4 py-3 rounded-xl bg-white/3 text-white/30 border border-white/6 text-sm cursor-not-allowed" />
-              <p className="text-white/20 text-xs px-1">이메일은 변경할 수 없습니다.</p>
+                className="px-4 py-3 rounded-xl bg-black/3 dark:bg-white/3 text-stone-400 dark:text-white/30 border border-black/6 dark:border-white/6 text-sm cursor-not-allowed" />
+              <p className="text-stone-300 dark:text-white/20 text-xs px-1">이메일은 변경할 수 없습니다.</p>
             </div>
 
             {saveMsg && (
@@ -520,9 +520,9 @@ export default function DashboardPage() {
         {tab === 'posts' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">내 게시글 ({stats.posts})</p>
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">내 게시글 ({stats.posts})</p>
               <Link href="/community/write"
-                className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/45 hover:text-white hover:bg-white/8 transition"
+                className="text-xs px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/45 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 transition"
               >
                 + 새 글 작성
               </Link>
@@ -533,8 +533,8 @@ export default function DashboardPage() {
                 <div className="w-5 h-5 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
               </div>
             ) : myPosts.length === 0 ? (
-              <div className="rounded-xl border border-white/6 bg-white/2 p-12 text-center">
-                <p className="text-white/30 text-sm">작성한 게시글이 없습니다.</p>
+              <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+                <p className="text-stone-400 dark:text-white/30 text-sm">작성한 게시글이 없습니다.</p>
                 <Link href="/community/write" className="mt-2 inline-block text-amber-400/60 hover:text-amber-400 text-xs transition">첫 글 작성하기 →</Link>
               </div>
             ) : (() => {
@@ -546,16 +546,16 @@ export default function DashboardPage() {
                     {pagedPosts.map((p) => {
                       const cat = CAT[p.category] ?? CAT.general;
                       return (
-                        <div key={p.id} className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 group">
+                        <div key={p.id} className="flex items-center gap-3 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] group">
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${cat.cls}`}>{cat.label}</span>
                           <Link href={`/community/${p.id}`} className="flex-1 min-w-0">
-                            <p className="text-white/65 text-sm truncate group-hover:text-white transition">{p.title}</p>
-                            <p className="text-white/25 text-xs mt-0.5">
+                            <p className="text-stone-600 dark:text-white/65 text-sm truncate group-hover:text-stone-900 dark:group-hover:text-white transition">{p.title}</p>
+                            <p className="text-stone-400 dark:text-white/25 text-xs mt-0.5">
                               👁 {p.views} · ❤️ {p.like_count} · 💬 {p.comment_count} · {fmt(p.created_at)}
                             </p>
                           </Link>
                           <button onClick={() => deletePost(p.id)}
-                            className="text-white/15 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
+                            className="text-stone-300 dark:text-white/15 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
                           >
                             삭제
                           </button>
@@ -574,9 +574,9 @@ export default function DashboardPage() {
         {tab === 'media' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">내 영상 ({stats.media})</p>
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">내 영상 ({stats.media})</p>
               <Link href="/media/upload"
-                className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/45 hover:text-white hover:bg-white/8 transition"
+                className="text-xs px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/45 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 transition"
               >
                 + 영상 올리기
               </Link>
@@ -587,8 +587,8 @@ export default function DashboardPage() {
                 <div className="w-5 h-5 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
               </div>
             ) : myMedia.length === 0 ? (
-              <div className="rounded-xl border border-white/6 bg-white/2 p-12 text-center">
-                <p className="text-white/30 text-sm">업로드한 영상이 없습니다.</p>
+              <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+                <p className="text-stone-400 dark:text-white/30 text-sm">업로드한 영상이 없습니다.</p>
                 <Link href="/media/upload" className="mt-2 inline-block text-rose-400/60 hover:text-rose-400 text-xs transition">첫 영상 올리기 →</Link>
               </div>
             ) : (() => {
@@ -599,17 +599,17 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {pagedMedia.map((m) => (
                       <Link key={m.id} href={`/media/${m.id}`}
-                        className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition group"
+                        className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden hover:border-black/15 dark:hover:border-white/15 transition group"
                       >
-                        <div className="aspect-video bg-white/5 flex items-center justify-center overflow-hidden">
+                        <div className="aspect-video bg-black/5 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                           {m.thumbnail_url
                             ? <img src={m.thumbnail_url} alt={m.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                             : <span className="text-4xl">🎬</span>
                           }
                         </div>
                         <div className="p-4">
-                          <p className="text-white/65 text-sm font-medium truncate">{m.title}</p>
-                          <div className="flex items-center gap-3 mt-1 text-white/30 text-xs">
+                          <p className="text-stone-600 dark:text-white/65 text-sm font-medium truncate">{m.title}</p>
+                          <div className="flex items-center gap-3 mt-1 text-stone-400 dark:text-white/30 text-xs">
                             <span>👁 {m.views}</span>
                             <span>❤️ {m.like_count}</span>
                             <span className="ml-auto">{fmt(m.created_at)}</span>
@@ -617,7 +617,7 @@ export default function DashboardPage() {
                           {m.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
                               {m.tags.slice(0, 3).map((t) => (
-                                <span key={t} className="text-[10px] text-white/25 bg-white/5 rounded-full px-2 py-0.5">#{t}</span>
+                                <span key={t} className="text-[10px] text-stone-400 dark:text-white/25 bg-black/5 dark:bg-white/5 rounded-full px-2 py-0.5">#{t}</span>
                               ))}
                             </div>
                           )}
@@ -635,7 +635,7 @@ export default function DashboardPage() {
         {/* ────────────── 찜 목록 탭 ────────────── */}
         {tab === 'likes' && (
           <div className="space-y-5">
-            <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">찜 목록</p>
+            <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">찜 목록</p>
 
             {/* 서브탭 */}
             <div className="flex gap-2">
@@ -643,8 +643,8 @@ export default function DashboardPage() {
                 <button key={id} onClick={() => setLikesSubTab(id)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium border transition ${
                     likesSubTab === id
-                      ? 'bg-white/8 border-white/15 text-white'
-                      : 'border-transparent text-white/35 hover:text-white/60'
+                      ? 'bg-black/8 dark:bg-white/8 border-black/15 dark:border-white/15 text-stone-900 dark:text-white'
+                      : 'border-transparent text-stone-400 dark:text-white/35 hover:text-stone-600 dark:hover:text-white/60'
                   }`}
                 >
                   {label}
@@ -658,25 +658,25 @@ export default function DashboardPage() {
               </div>
             ) : likesSubTab === 'media' ? (
               likedMedia.length === 0 ? (
-                <div className="rounded-xl border border-white/6 bg-white/2 p-12 text-center">
-                  <p className="text-white/30 text-sm">좋아요한 영상이 없습니다.</p>
+                <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+                  <p className="text-stone-400 dark:text-white/30 text-sm">좋아요한 영상이 없습니다.</p>
                   <Link href="/media" className="mt-2 inline-block text-rose-400/60 hover:text-rose-400 text-xs transition">영상 둘러보기 →</Link>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {likedMedia.filter((d) => d.media).map(({ post_id, media }) => (
                     <Link key={post_id} href={`/media/${media!.id}`}
-                      className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition group"
+                      className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden hover:border-black/15 dark:hover:border-white/15 transition group"
                     >
-                      <div className="aspect-video bg-white/5 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-video bg-black/5 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                         {media!.thumbnail_url
                           ? <img src={media!.thumbnail_url} alt={media!.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                           : <span className="text-4xl">🎬</span>
                         }
                       </div>
                       <div className="p-3">
-                        <p className="text-white/65 text-sm truncate">{media!.title}</p>
-                        <p className="text-white/25 text-xs mt-1">{fmt(media!.created_at)}</p>
+                        <p className="text-stone-600 dark:text-white/65 text-sm truncate">{media!.title}</p>
+                        <p className="text-stone-400 dark:text-white/25 text-xs mt-1">{fmt(media!.created_at)}</p>
                       </div>
                     </Link>
                   ))}
@@ -684,8 +684,8 @@ export default function DashboardPage() {
               )
             ) : (
               likedPosts.length === 0 ? (
-                <div className="rounded-xl border border-white/6 bg-white/2 p-12 text-center">
-                  <p className="text-white/30 text-sm">좋아요한 게시글이 없습니다.</p>
+                <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+                  <p className="text-stone-400 dark:text-white/30 text-sm">좋아요한 게시글이 없습니다.</p>
                   <Link href="/community" className="mt-2 inline-block text-emerald-400/60 hover:text-emerald-400 text-xs transition">커뮤니티 둘러보기 →</Link>
                 </div>
               ) : (
@@ -694,11 +694,11 @@ export default function DashboardPage() {
                     const cat = CAT[post!.category] ?? CAT.general;
                     return (
                       <Link key={post_id} href={`/community/${post!.id}`}
-                        className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 hover:bg-white/4 transition group"
+                        className="flex items-center gap-3 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/4 dark:hover:bg-white/4 transition group"
                       >
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${cat.cls}`}>{cat.label}</span>
-                        <span className="text-white/65 text-sm flex-1 truncate group-hover:text-white transition">{post!.title}</span>
-                        <span className="text-white/20 text-xs shrink-0">{fmt(post!.created_at)}</span>
+                        <span className="text-stone-600 dark:text-white/65 text-sm flex-1 truncate group-hover:text-stone-900 dark:group-hover:text-white transition">{post!.title}</span>
+                        <span className="text-stone-300 dark:text-white/20 text-xs shrink-0">{fmt(post!.created_at)}</span>
                       </Link>
                     );
                   })}
@@ -712,9 +712,9 @@ export default function DashboardPage() {
         {tab === 'wishlist' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">위시리스트 (찜한 상품)</p>
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">위시리스트 (찜한 상품)</p>
               <Link href="/market"
-                className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/45 hover:text-white hover:bg-white/8 transition"
+                className="text-xs px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/45 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 transition"
               >
                 마켓 보러가기
               </Link>
@@ -725,24 +725,24 @@ export default function DashboardPage() {
                 <div className="w-5 h-5 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
               </div>
             ) : wishlist.length === 0 ? (
-              <div className="rounded-xl border border-white/6 bg-white/2 p-12 text-center">
-                <p className="text-white/30 text-sm">찜한 상품이 없습니다.</p>
+              <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+                <p className="text-stone-400 dark:text-white/30 text-sm">찜한 상품이 없습니다.</p>
                 <Link href="/market" className="mt-2 inline-block text-amber-400/60 hover:text-amber-400 text-xs transition">마켓 구경하기 →</Link>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {wishlist.filter((w) => w.products).map(({ product_id, products }) => (
                   <Link key={product_id} href={`/market/${products!.id}`}
-                    className="rounded-xl border border-white/6 bg-white/2 overflow-hidden hover:border-white/15 transition group"
+                    className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden hover:border-black/15 dark:hover:border-white/15 transition group"
                   >
-                    <div className="aspect-square bg-white/5 flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square bg-black/5 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                       {products!.images?.[0]
                         ? <img src={products!.images[0]} alt={products!.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                         : <span className="text-4xl">📦</span>
                       }
                     </div>
                     <div className="p-4">
-                      <p className="text-white/65 text-sm font-medium truncate">{products!.title}</p>
+                      <p className="text-stone-600 dark:text-white/65 text-sm font-medium truncate">{products!.title}</p>
                       <p className="text-amber-400 font-bold text-sm mt-1">{products!.price.toLocaleString('ko-KR')}원</p>
                     </div>
                   </Link>

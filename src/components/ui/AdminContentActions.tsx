@@ -52,7 +52,7 @@ export default function AdminContentActions({
           onClick={handleToggleActive}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
             active
-              ? 'border-white/10 text-white/40 hover:text-white hover:bg-white/6'
+              ? 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:text-stone-900 dark:hover:text-white hover:bg-black/6 dark:hover:bg-white/6'
               : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/8'
           }`}
         >
@@ -78,7 +78,7 @@ export default function AdminContentActions({
           </button>
           <button
             onClick={() => setConfirm(false)}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-white/40 hover:bg-white/5 transition"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:bg-black/5 dark:hover:bg-white/5 transition"
           >
             취소
           </button>

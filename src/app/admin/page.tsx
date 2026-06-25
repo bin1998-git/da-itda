@@ -71,22 +71,22 @@ export default function AdminPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
-      <div className="relative overflow-hidden border-b border-white/5">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
+      <div className="relative overflow-hidden border-b border-black/5 dark:border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
         <div className="max-w-5xl mx-auto px-6 py-10 relative">
           <div className="flex items-center gap-3 mb-1">
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 tracking-widest uppercase">ADMIN</span>
           </div>
-          <h1 className="text-3xl font-bold text-white">관리자 대시보드</h1>
-          <p className="text-white/35 text-sm mt-1">{user?.email}</p>
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">관리자 대시보드</h1>
+          <p className="text-stone-500 dark:text-white/35 text-sm mt-1">{user?.email}</p>
         </div>
       </div>
 
@@ -101,9 +101,9 @@ export default function AdminPage() {
             { label: '가입 회원', value: stats.totalUsers, accent: 'text-emerald-400', bg: 'bg-emerald-500/8' },
           ].map((s) => (
             <div key={s.label}
-              className={`rounded-2xl border p-5 ${s.highlight ? 'border-amber-500/25 bg-amber-500/6' : 'border-white/8 bg-white/3'}`}
+              className={`rounded-2xl border p-5 ${s.highlight ? 'border-amber-500/25 bg-amber-500/6' : 'border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3'}`}
             >
-              <p className="text-white/30 text-xs mb-2">{s.label}</p>
+              <p className="text-stone-400 dark:text-white/30 text-xs mb-2">{s.label}</p>
               <p className={`text-3xl font-bold ${s.accent}`}>{s.value}</p>
             </div>
           ))}
@@ -111,30 +111,30 @@ export default function AdminPage() {
 
         {/* 관리 메뉴 */}
         <div>
-          <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-4">관리 메뉴</p>
+          <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase mb-4">관리 메뉴</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link
               href="/admin/notices"
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-white/8 bg-white/3 hover:border-violet-500/30 hover:bg-violet-500/5 transition"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 hover:border-violet-500/30 hover:bg-violet-500/5 transition"
             >
               <div className="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-2xl shrink-0 group-hover:bg-violet-500/20 transition">
                 📢
               </div>
               <div>
-                <p className="text-white font-semibold">공지사항 관리</p>
-                <p className="text-white/35 text-sm mt-0.5">공지 작성·수정·삭제 및 고정 관리</p>
+                <p className="text-stone-900 dark:text-white font-semibold">공지사항 관리</p>
+                <p className="text-stone-500 dark:text-white/35 text-sm mt-0.5">공지 작성·수정·삭제 및 고정 관리</p>
               </div>
             </Link>
             <Link
               href="/admin/inquiries"
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-white/8 bg-white/3 hover:border-sky-500/30 hover:bg-sky-500/5 transition"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 hover:border-sky-500/30 hover:bg-sky-500/5 transition"
             >
               <div className="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center text-2xl shrink-0 group-hover:bg-sky-500/20 transition">
                 💬
               </div>
               <div>
-                <p className="text-white font-semibold">1:1 문의 관리</p>
-                <p className="text-white/35 text-sm mt-0.5">
+                <p className="text-stone-900 dark:text-white font-semibold">1:1 문의 관리</p>
+                <p className="text-stone-500 dark:text-white/35 text-sm mt-0.5">
                   문의 목록 확인 및 답변 등록
                   {stats.pendingInquiries > 0 && (
                     <span className="ml-2 text-amber-400 font-semibold">미답변 {stats.pendingInquiries}건</span>
@@ -144,14 +144,14 @@ export default function AdminPage() {
             </Link>
             <Link
               href="/admin/reports"
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-white/8 bg-white/3 hover:border-rose-500/30 hover:bg-rose-500/5 transition"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 hover:border-rose-500/30 hover:bg-rose-500/5 transition"
             >
               <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center text-2xl shrink-0 group-hover:bg-rose-500/20 transition">
                 🚩
               </div>
               <div>
-                <p className="text-white font-semibold">신고 관리</p>
-                <p className="text-white/35 text-sm mt-0.5">
+                <p className="text-stone-900 dark:text-white font-semibold">신고 관리</p>
+                <p className="text-stone-500 dark:text-white/35 text-sm mt-0.5">
                   신고 콘텐츠 검토 및 처리
                   {stats.pendingReports > 0 && (
                     <span className="ml-2 text-rose-400 font-semibold">미처리 {stats.pendingReports}건</span>
@@ -166,7 +166,7 @@ export default function AdminPage() {
         {recentInquiries.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">최근 미답변 문의</p>
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">최근 미답변 문의</p>
               <Link href="/admin/inquiries" className="text-sky-400 text-xs hover:text-sky-300 transition">전체 보기 →</Link>
             </div>
             <div className="flex flex-col gap-2">
@@ -174,13 +174,13 @@ export default function AdminPage() {
                 <Link
                   key={q.id}
                   href={`/admin/inquiries`}
-                  className="flex items-center gap-3 p-4 rounded-xl border border-white/6 bg-white/2 hover:bg-white/4 transition group"
+                  className="flex items-center gap-3 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/4 transition group"
                 >
-                  <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-full shrink-0">
+                  <span className="text-[10px] text-stone-400 dark:text-white/30 bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full shrink-0">
                     {CAT_LABEL[q.category] ?? '기타'}
                   </span>
-                  <span className="text-white/60 text-sm truncate group-hover:text-white transition flex-1">{q.title}</span>
-                  <span className="text-white/25 text-xs shrink-0">{fmt(q.created_at)}</span>
+                  <span className="text-stone-600 dark:text-white/60 text-sm truncate group-hover:text-stone-900 dark:group-hover:text-white transition flex-1">{q.title}</span>
+                  <span className="text-stone-400 dark:text-white/25 text-xs shrink-0">{fmt(q.created_at)}</span>
                 </Link>
               ))}
             </div>

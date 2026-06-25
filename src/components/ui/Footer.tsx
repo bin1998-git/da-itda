@@ -34,19 +34,26 @@ export default function Footer() {
       ];
 
   return (
-    <footer className="bg-[#0a0a0a] border-t border-white/[0.06]">
+    <footer className="bg-[#EDE8E2] dark:bg-[#0a0a0a] border-t border-black/[0.06] dark:border-white/[0.06]">
       <div className="max-w-6xl mx-auto px-6">
         {/* 메인 */}
         <div className="py-14 grid grid-cols-1 md:grid-cols-5 gap-10">
           {/* 브랜드 */}
           <div className="md:col-span-2 flex flex-col gap-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-black text-sm font-black shadow-lg shadow-amber-500/20">
-                다
+              <div className="relative w-9 h-9 shrink-0">
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/25" />
+                <svg className="absolute inset-0 w-full h-full p-2" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 2C9.5 5 9 7.5 10.5 9.5C9 9.5 7 8 8 5.5C5.5 8 5 11 7 13.5C8.5 16 10.2 17.5 12 17.5C13.8 17.5 15.5 16 17 13.5C19 11 18.5 8 16 5.5C17 8 15 9.5 13.5 9.5C15 7.5 14.5 5 12 2Z" />
+                </svg>
               </div>
-              <span className="text-white font-bold text-xl tracking-tight">다잇다</span>
+              <span className="font-black text-xl tracking-tight leading-none">
+                <span className="text-stone-900 dark:text-white">다</span>
+                <span className="text-amber-500 dark:text-amber-400">잇</span>
+                <span className="text-stone-900 dark:text-white">다</span>
+              </span>
             </div>
-            <p className="text-white/35 text-sm leading-relaxed max-w-xs">
+            <p className="text-stone-400 dark:text-white/35 text-sm leading-relaxed max-w-xs">
               맛있는 모든 것을 하나로 — 식품 마켓, 레시피 영상, 푸드 커뮤니티까지 끊김 없이 연결합니다.
             </p>
             {/* 소셜 */}
@@ -67,7 +74,7 @@ export default function Footer() {
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition"
+                  className="w-9 h-9 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-center text-stone-400 dark:text-white/30 hover:text-stone-700 dark:hover:text-white hover:border-black/30 dark:hover:border-white/30 transition"
                 >
                   {icon}
                 </a>
@@ -78,13 +85,13 @@ export default function Footer() {
           {/* 링크 컬럼들 */}
           {([['서비스', SERVICE_LINKS], ['정보', INFO_LINKS], ['계정', accountLinks]] as [string, { label: string; href: string }[]][]).map(([title, items]) => (
             <div key={title} className="flex flex-col gap-3">
-              <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">{title}</p>
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">{title}</p>
               <ul className="flex flex-col gap-2">
                 {items.map(({ label, href }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-white/45 text-sm hover:text-white transition leading-relaxed"
+                      className="text-stone-500 dark:text-white/45 text-sm hover:text-stone-900 dark:hover:text-white transition leading-relaxed"
                     >
                       {label}
                     </Link>
@@ -96,12 +103,12 @@ export default function Footer() {
         </div>
 
         {/* 하단 바 */}
-        <div className="border-t border-white/[0.06] py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-white/20 text-xs">© 2026 Da-itda. All rights reserved.</p>
+        <div className="border-t border-black/[0.06] dark:border-white/[0.06] py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-stone-300 dark:text-white/20 text-xs">© 2026 Da-itda. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <span className="text-white/15 text-xs">Made in Korea 🇰🇷</span>
-            <span className="text-white/10 text-xs">·</span>
-            <span className="text-white/15 text-xs">Powered by Higgsfield AI</span>
+            <span className="text-stone-300 dark:text-white/15 text-xs">Made in Korea 🇰🇷</span>
+            <span className="text-stone-200 dark:text-white/10 text-xs">·</span>
+            <span className="text-stone-300 dark:text-white/15 text-xs">Powered by Higgsfield AI</span>
           </div>
         </div>
       </div>

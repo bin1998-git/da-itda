@@ -8,7 +8,7 @@ const CATEGORIES: Record<string, { label: string; color: string }> = {
   recipe:   { label: '레시피', color: 'text-amber-400 bg-amber-500/10' },
   review:   { label: '후기',   color: 'text-emerald-400 bg-emerald-500/10' },
   question: { label: '질문',   color: 'text-sky-400 bg-sky-500/10' },
-  general:  { label: '자유',   color: 'text-white/50 bg-white/5' },
+  general:  { label: '자유',   color: 'text-stone-500 dark:text-white/50 bg-black/5 dark:bg-white/5' },
 };
 
 function timeAgo(date: string) {
@@ -46,16 +46,16 @@ export default async function CommunityPage({
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       {/* 헤더 */}
-      <div className="relative overflow-hidden border-b border-white/5">
+      <div className="relative overflow-hidden border-b border-black/5 dark:border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
         <div className="max-w-3xl mx-auto px-6 py-10 relative">
           <div className="flex items-end justify-between flex-wrap gap-4">
             <div>
               <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-1">커뮤니티</p>
-              <h1 className="text-3xl font-bold text-white">푸드 토크</h1>
-              <p className="text-white/40 text-sm mt-1">
+              <h1 className="text-3xl font-bold text-stone-900 dark:text-white">푸드 토크</h1>
+              <p className="text-stone-400 dark:text-white/40 text-sm mt-1">
                 {error ? '불러오는 중...' : `${count ?? 0}개의 이야기`}
               </p>
             </div>
@@ -73,7 +73,7 @@ export default async function CommunityPage({
         {error || !posts || posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <span className="text-6xl">💬</span>
-            <p className="text-white font-semibold text-lg">아직 게시글이 없습니다</p>
+            <p className="text-stone-900 dark:text-white font-semibold text-lg">아직 게시글이 없습니다</p>
             <Link
               href="/community/write"
               className="px-6 py-3 rounded-full bg-emerald-500 text-black font-bold text-sm"
@@ -83,7 +83,7 @@ export default async function CommunityPage({
           </div>
         ) : (
           <>
-            <div className="flex flex-col divide-y divide-white/5">
+            <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
               {(posts as PostRow[]).map((post) => {
                 const cat = CATEGORIES[post.category] ?? CATEGORIES.general;
                 const likeCount = post.post_likes?.[0]?.count ?? 0;
@@ -92,17 +92,17 @@ export default async function CommunityPage({
                   <Link
                     key={post.id}
                     href={`/community/${post.id}`}
-                    className="py-5 flex flex-col gap-2 hover:bg-white/2 -mx-2 px-2 rounded-xl transition group"
+                    className="py-5 flex flex-col gap-2 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] -mx-2 px-2 rounded-xl transition group"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${cat.color}`}>
                         {cat.label}
                       </span>
                     </div>
-                    <p className="text-white font-semibold text-base group-hover:text-emerald-100 transition leading-snug">
+                    <p className="text-stone-900 dark:text-white font-semibold text-base group-hover:text-emerald-100 transition leading-snug">
                       {post.title}
                     </p>
-                    <div className="flex items-center gap-3 text-white/30 text-xs">
+                    <div className="flex items-center gap-3 text-stone-400 dark:text-white/30 text-xs">
                       <span>{timeAgo(post.created_at)}</span>
                       <span>·</span>
                       <span>조회 {post.views}</span>

@@ -45,7 +45,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   paid:      { label: '결제완료',  cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
   preparing: { label: '배송준비',  cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
   shipping:  { label: '배송중',    cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-  delivered: { label: '배송완료',  cls: 'bg-white/8 text-white/50 border-white/10' },
+  delivered: { label: '배송완료',  cls: 'bg-black/8 dark:bg-white/8 text-stone-500 dark:text-white/50 border-black/10 dark:border-white/10' },
   cancelled: { label: '취소됨',   cls: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
 };
 
@@ -63,7 +63,7 @@ function StatusStepper({ status, trackingNumber }: { status: string; trackingNum
   if (status === 'cancelled') return null;
   const current = STEP_INDEX[status] ?? 0;
   return (
-    <div className="px-5 py-4 border-b border-white/6">
+    <div className="px-5 py-4 border-b border-black/6 dark:border-white/6">
       <div className="flex items-center gap-0">
         {STEPS.map((step, i) => {
           const done = i <= current;
@@ -76,24 +76,24 @@ function StatusStepper({ status, trackingNumber }: { status: string; trackingNum
                     ? active
                       ? 'bg-amber-500 border-amber-500 text-black'
                       : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                    : 'bg-white/4 border-white/10 text-white/20'
+                    : 'bg-black/4 dark:bg-white/4 border-black/10 dark:border-white/10 text-stone-300 dark:text-white/20'
                 }`}>
                   {i < current ? '✓' : i + 1}
                 </div>
                 <span className={`text-[10px] whitespace-nowrap ${
-                  active ? 'text-amber-400 font-semibold' : done ? 'text-emerald-400/70' : 'text-white/20'
+                  active ? 'text-amber-400 font-semibold' : done ? 'text-emerald-400/70' : 'text-stone-300 dark:text-white/20'
                 }`}>{step.label}</span>
               </div>
               {i < STEPS.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-1 mb-4 rounded-full ${i < current ? 'bg-emerald-500/40' : 'bg-white/8'}`} />
+                <div className={`flex-1 h-0.5 mx-1 mb-4 rounded-full ${i < current ? 'bg-emerald-500/40' : 'bg-black/8 dark:bg-white/8'}`} />
               )}
             </div>
           );
         })}
       </div>
       {trackingNumber && status === 'shipping' && (
-        <p className="text-xs text-white/30 mt-3">
-          운송장 번호: <span className="font-mono text-white/50">{trackingNumber}</span>
+        <p className="text-xs text-stone-400 dark:text-white/30 mt-3">
+          운송장 번호: <span className="font-mono text-stone-500 dark:text-white/50">{trackingNumber}</span>
         </p>
       )}
     </div>
@@ -192,26 +192,26 @@ export default function OrdersPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-[60px]">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-[60px]">
       <div className="max-w-2xl mx-auto px-6 py-10">
 
         <div className="flex items-center gap-3 mb-8">
-          <Link href="/dashboard" className="text-white/30 hover:text-white transition text-sm">← 마이페이지</Link>
-          <span className="text-white/15">/</span>
-          <h1 className="text-xl font-bold text-white">주문 내역</h1>
+          <Link href="/dashboard" className="text-stone-400 dark:text-white/30 hover:text-stone-900 dark:hover:text-white transition text-sm">← 마이페이지</Link>
+          <span className="text-stone-300 dark:text-white/15">/</span>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-white">주문 내역</h1>
         </div>
 
         {orders.length === 0 ? (
-          <div className="rounded-2xl border border-white/6 bg-white/2 p-16 text-center">
+          <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-16 text-center">
             <span className="text-5xl block mb-4">📦</span>
-            <p className="text-white/40 text-sm mb-4">아직 주문 내역이 없습니다.</p>
+            <p className="text-stone-400 dark:text-white/40 text-sm mb-4">아직 주문 내역이 없습니다.</p>
             <Link href="/market"
               className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-semibold text-sm hover:bg-amber-400 transition"
             >
@@ -231,13 +231,13 @@ export default function OrdersPage() {
               const isEditingShipping = editingOrderId === order.id;
 
               return (
-                <div key={order.id} className="rounded-2xl border border-white/8 bg-white/2 overflow-hidden">
+                <div key={order.id} className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden">
 
                   {/* 주문 헤더 */}
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-white/6">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-black/6 dark:border-white/6">
                     <div>
-                      <p className="text-white/30 text-xs">{fmt(order.created_at)}</p>
-                      <p className="text-white/15 text-[10px] mt-0.5 font-mono">#{order.id.slice(0, 8).toUpperCase()}</p>
+                      <p className="text-stone-400 dark:text-white/30 text-xs">{fmt(order.created_at)}</p>
+                      <p className="text-stone-300 dark:text-white/15 text-[10px] mt-0.5 font-mono">#{order.id.slice(0, 8).toUpperCase()}</p>
                     </div>
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${st.cls}`}>{st.label}</span>
                   </div>
@@ -246,19 +246,19 @@ export default function OrdersPage() {
                   <StatusStepper status={order.status} trackingNumber={order.tracking_number} />
 
                   {/* 상품 목록 */}
-                  <div className="px-5 py-4 flex flex-col gap-3 border-b border-white/6">
+                  <div className="px-5 py-4 flex flex-col gap-3 border-b border-black/6 dark:border-white/6">
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-lg shrink-0 overflow-hidden">
+                        <div className="w-10 h-10 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-lg shrink-0 overflow-hidden">
                           {item.image_url
                             ? <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
                             : '📦'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-white/70 text-sm truncate">{item.title}</p>
-                          <p className="text-white/30 text-xs mt-0.5">{item.price.toLocaleString('ko-KR')}원 × {item.quantity}개</p>
+                          <p className="text-stone-700 dark:text-white/70 text-sm truncate">{item.title}</p>
+                          <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">{item.price.toLocaleString('ko-KR')}원 × {item.quantity}개</p>
                         </div>
-                        <p className="text-white/60 text-sm font-medium shrink-0">
+                        <p className="text-stone-600 dark:text-white/60 text-sm font-medium shrink-0">
                           {(item.price * item.quantity).toLocaleString('ko-KR')}원
                         </p>
                       </div>
@@ -266,9 +266,9 @@ export default function OrdersPage() {
                   </div>
 
                   {/* 배송지 */}
-                  <div className="px-5 py-4 border-b border-white/6">
+                  <div className="px-5 py-4 border-b border-black/6 dark:border-white/6">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-white/25 text-xs font-semibold tracking-widest uppercase">배송지</p>
+                      <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">배송지</p>
                       {canModify && !isEditingShipping && (
                         <button
                           onClick={() => openShippingEdit(order)}
@@ -283,40 +283,40 @@ export default function OrdersPage() {
                       <div className="flex flex-col gap-3 mt-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="text-white/30 text-[11px] mb-1 block">받는 분</label>
+                            <label className="text-stone-400 dark:text-white/30 text-[11px] mb-1 block">받는 분</label>
                             <input
                               value={shippingForm.name}
                               onChange={(e) => { setShippingForm((f) => ({ ...f, name: e.target.value })); setShippingError(''); }}
                               placeholder="홍길동"
-                              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-white/20"
+                              className="w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20"
                             />
                           </div>
                           <div>
-                            <label className="text-white/30 text-[11px] mb-1 block">전화번호</label>
+                            <label className="text-stone-400 dark:text-white/30 text-[11px] mb-1 block">전화번호</label>
                             <input
                               value={shippingForm.phone}
                               onChange={(e) => { setShippingForm((f) => ({ ...f, phone: e.target.value })); setShippingError(''); }}
                               placeholder="010-0000-0000"
-                              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-white/20"
+                              className="w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="text-white/30 text-[11px] mb-1 block">주소</label>
+                          <label className="text-stone-400 dark:text-white/30 text-[11px] mb-1 block">주소</label>
                           <AddressInput
                             value={shippingForm.address}
                             onChange={(addr) => { setShippingForm((f) => ({ ...f, address: addr })); setShippingError(''); }}
                             placeholder="주소 검색"
-                            inputClassName="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-white/20 cursor-pointer"
+                            inputClassName="w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20 cursor-pointer"
                           />
                         </div>
                         <div>
-                          <label className="text-white/30 text-[11px] mb-1 block">상세 주소</label>
+                          <label className="text-stone-400 dark:text-white/30 text-[11px] mb-1 block">상세 주소</label>
                           <input
                             value={shippingForm.detail}
                             onChange={(e) => setShippingForm((f) => ({ ...f, detail: e.target.value }))}
                             placeholder="101동 202호"
-                            className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-white/20"
+                            className="w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20"
                           />
                         </div>
                         {shippingError && <p className="text-rose-400 text-xs">{shippingError}</p>}
@@ -330,7 +330,7 @@ export default function OrdersPage() {
                           </button>
                           <button
                             onClick={() => { setEditingOrderId(null); setShippingError(''); }}
-                            className="px-4 py-2 rounded-lg border border-white/10 text-white/40 text-xs hover:bg-white/5 transition"
+                            className="px-4 py-2 rounded-lg border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-xs hover:bg-black/5 dark:hover:bg-white/5 transition"
                           >
                             취소
                           </button>
@@ -338,18 +338,18 @@ export default function OrdersPage() {
                       </div>
                     ) : order.shipping_name ? (
                       <div className="text-sm space-y-0.5">
-                        <p className="text-white/60">
-                          <span className="text-white/80 font-medium">{order.shipping_name}</span>
-                          <span className="text-white/30 mx-2">·</span>
+                        <p className="text-stone-600 dark:text-white/60">
+                          <span className="text-stone-800 dark:text-white/80 font-medium">{order.shipping_name}</span>
+                          <span className="text-stone-400 dark:text-white/30 mx-2">·</span>
                           {order.shipping_phone}
                         </p>
-                        <p className="text-white/40 text-xs">{order.shipping_address}</p>
+                        <p className="text-stone-400 dark:text-white/40 text-xs">{order.shipping_address}</p>
                         {order.shipping_detail && (
-                          <p className="text-white/30 text-xs">{order.shipping_detail}</p>
+                          <p className="text-stone-400 dark:text-white/30 text-xs">{order.shipping_detail}</p>
                         )}
                       </div>
                     ) : (
-                      <p className="text-white/25 text-xs">배송지 정보 없음</p>
+                      <p className="text-stone-400 dark:text-white/25 text-xs">배송지 정보 없음</p>
                     )}
                   </div>
 
@@ -362,17 +362,17 @@ export default function OrdersPage() {
                         </span>
                       )}
                       {order.discount_amount > 0 && (
-                        <span className="text-xs text-white/30">-{order.discount_amount.toLocaleString('ko-KR')}원 할인</span>
+                        <span className="text-xs text-stone-400 dark:text-white/30">-{order.discount_amount.toLocaleString('ko-KR')}원 할인</span>
                       )}
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right shrink-0">
                         {order.discount_amount > 0 && (
-                          <p className="text-white/25 text-xs line-through">
+                          <p className="text-stone-400 dark:text-white/25 text-xs line-through">
                             {(order.total_amount + order.discount_amount).toLocaleString('ko-KR')}원
                           </p>
                         )}
-                        <p className={`font-bold ${order.status === 'cancelled' ? 'text-white/30 line-through' : 'text-amber-400'}`}>
+                        <p className={`font-bold ${order.status === 'cancelled' ? 'text-stone-400 dark:text-white/30 line-through' : 'text-amber-400'}`}>
                           {order.total_amount.toLocaleString('ko-KR')}원
                         </p>
                       </div>
@@ -381,7 +381,7 @@ export default function OrdersPage() {
                       {canModify && (
                         isCancelling ? (
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <span className="text-white/40 text-xs">취소할까요?</span>
+                            <span className="text-stone-400 dark:text-white/40 text-xs">취소할까요?</span>
                             <button
                               onClick={() => cancelOrder(order.id)}
                               className="px-3 py-1.5 rounded-lg bg-rose-500 text-white font-semibold text-xs hover:bg-rose-400 transition"
@@ -390,7 +390,7 @@ export default function OrdersPage() {
                             </button>
                             <button
                               onClick={() => setCancellingId(null)}
-                              className="px-3 py-1.5 rounded-lg border border-white/10 text-white/40 text-xs hover:bg-white/5 transition"
+                              className="px-3 py-1.5 rounded-lg border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-xs hover:bg-black/5 dark:hover:bg-white/5 transition"
                             >
                               돌아가기
                             </button>

@@ -76,7 +76,7 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
     <>
       <button
         onClick={handleOpen}
-        className={`text-white/20 hover:text-rose-400 text-xs transition ${className}`}
+        className={`text-stone-300 dark:text-white/20 hover:text-rose-400 text-xs transition ${className}`}
       >
         신고
       </button>
@@ -84,16 +84,16 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="relative w-full max-w-md rounded-2xl bg-[#141414] border border-white/10 shadow-2xl p-6">
+          <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#141414] border border-black/10 dark:border-white/10 shadow-2xl p-6">
 
             {done ? (
               <div className="text-center py-4">
                 <div className="text-4xl mb-3">✅</div>
-                <p className="text-white font-semibold">신고가 접수되었습니다</p>
-                <p className="text-white/40 text-sm mt-1">검토 후 적절한 조치를 취하겠습니다.</p>
+                <p className="text-stone-900 dark:text-white font-semibold">신고가 접수되었습니다</p>
+                <p className="text-stone-400 dark:text-white/40 text-sm mt-1">검토 후 적절한 조치를 취하겠습니다.</p>
                 <button
                   onClick={() => setOpen(false)}
-                  className="mt-5 px-6 py-2 rounded-xl bg-white/8 text-white/60 text-sm hover:bg-white/12 transition"
+                  className="mt-5 px-6 py-2 rounded-xl bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 text-sm hover:bg-black/12 dark:hover:bg-white/12 transition"
                 >
                   닫기
                 </button>
@@ -101,18 +101,18 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
             ) : alreadyReported ? (
               <div className="text-center py-4">
                 <div className="text-4xl mb-3">📋</div>
-                <p className="text-white font-semibold">이미 신고한 콘텐츠입니다</p>
-                <p className="text-white/40 text-sm mt-1">이미 신고 접수되어 검토 중입니다.</p>
+                <p className="text-stone-900 dark:text-white font-semibold">이미 신고한 콘텐츠입니다</p>
+                <p className="text-stone-400 dark:text-white/40 text-sm mt-1">이미 신고 접수되어 검토 중입니다.</p>
                 <button
                   onClick={() => setOpen(false)}
-                  className="mt-5 px-6 py-2 rounded-xl bg-white/8 text-white/60 text-sm hover:bg-white/12 transition"
+                  className="mt-5 px-6 py-2 rounded-xl bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 text-sm hover:bg-black/12 dark:hover:bg-white/12 transition"
                 >
                   닫기
                 </button>
               </div>
             ) : (
               <>
-                <h2 className="text-white font-bold text-lg mb-5">신고하기</h2>
+                <h2 className="text-stone-900 dark:text-white font-bold text-lg mb-5">신고하기</h2>
 
                 <div className="flex flex-col gap-3 mb-5">
                   {REASONS.map((r) => (
@@ -122,10 +122,10 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
                         className={`w-4 h-4 rounded-full border-2 shrink-0 transition ${
                           reason === r.value
                             ? 'border-rose-500 bg-rose-500'
-                            : 'border-white/20 group-hover:border-white/40'
+                            : 'border-black/20 dark:border-white/20 group-hover:border-black/40 dark:group-hover:border-white/40'
                         }`}
                       />
-                      <span className={`text-sm transition ${reason === r.value ? 'text-white' : 'text-white/50 group-hover:text-white/70'}`}>
+                      <span className={`text-sm transition ${reason === r.value ? 'text-stone-900 dark:text-white' : 'text-stone-500 dark:text-white/50 group-hover:text-stone-700 dark:group-hover:text-white/70'}`}>
                         {r.label}
                       </span>
                     </label>
@@ -138,7 +138,7 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
                     onChange={(e) => setDetail(e.target.value)}
                     placeholder="신고 이유를 자세히 적어주세요"
                     rows={3}
-                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-rose-500/40 transition resize-none mb-4"
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/20 text-sm focus:outline-none focus:border-rose-500/40 transition resize-none mb-4"
                   />
                 )}
 
@@ -152,7 +152,7 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
                   </button>
                   <button
                     onClick={() => setOpen(false)}
-                    className="px-5 py-2.5 rounded-xl border border-white/10 text-white/40 text-sm hover:bg-white/5 transition"
+                    className="px-5 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
                   >
                     취소
                   </button>

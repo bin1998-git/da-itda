@@ -55,7 +55,7 @@ export default function PostLikeButton({
       className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-semibold transition-all ${
         liked
           ? 'bg-rose-500 border-rose-500 text-white'
-          : 'border-white/20 text-white/60 hover:border-rose-500/50 hover:text-rose-400'
+          : 'border-black/20 dark:border-white/20 text-stone-600 dark:text-white/60 hover:border-rose-500/50 hover:text-rose-400'
       }`}
     >
       <span>{liked ? '❤️' : '🤍'}</span>

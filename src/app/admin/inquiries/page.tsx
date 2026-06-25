@@ -100,21 +100,21 @@ export default function AdminInquiriesPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-4xl mx-auto px-6 py-10">
 
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-8 flex-wrap">
-          <Link href="/admin" className="text-white/30 hover:text-white/60 transition text-sm">← 관리자</Link>
-          <span className="text-white/15">/</span>
-          <h1 className="text-xl font-bold text-white">1:1 문의 관리</h1>
+          <Link href="/admin" className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition text-sm">← 관리자</Link>
+          <span className="text-stone-300 dark:text-white/15">/</span>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-white">1:1 문의 관리</h1>
         </div>
 
         {/* 필터 */}
@@ -128,7 +128,7 @@ export default function AdminInquiriesPage() {
                   ? key === 'pending'
                     ? 'bg-amber-500/15 border-amber-500/30 text-amber-300'
                     : 'bg-sky-500/15 border-sky-500/30 text-sky-300'
-                  : 'border-white/8 text-white/40 hover:text-white/70 hover:bg-white/5'
+                  : 'border-black/8 dark:border-white/8 text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white/70 hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               {label}
@@ -137,9 +137,9 @@ export default function AdminInquiriesPage() {
         </div>
 
         {inquiries.length === 0 ? (
-          <div className="rounded-2xl border border-white/6 bg-white/2 p-16 text-center">
+          <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-16 text-center">
             <span className="text-5xl block mb-4">💬</span>
-            <p className="text-white/40 text-sm">
+            <p className="text-stone-400 dark:text-white/40 text-sm">
               {filter === 'pending' ? '미답변 문의가 없습니다' : '문의 내역이 없습니다'}
             </p>
           </div>
@@ -148,33 +148,33 @@ export default function AdminInquiriesPage() {
             {inquiries.map((q) => {
               const isExpanded = expandedId === q.id;
               return (
-                <div key={q.id} className={`rounded-2xl border bg-white/2 overflow-hidden transition ${isExpanded ? 'border-sky-500/25' : 'border-white/6'}`}>
+                <div key={q.id} className={`rounded-2xl border bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden transition ${isExpanded ? 'border-sky-500/25' : 'border-black/6 dark:border-white/6'}`}>
                   {/* 헤더 행 */}
                   <button
                     onClick={() => toggleExpand(q.id, q.answer)}
-                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/2 transition"
+                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-black/2 dark:hover:bg-white/2 transition"
                   >
-                    <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[10px] text-stone-400 dark:text-white/30 bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full shrink-0">
                       {CAT_LABEL[q.category] ?? '기타'}
                     </span>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${STATUS_STYLE[q.status] ?? STATUS_STYLE.pending}`}>
                       {STATUS_LABEL[q.status] ?? '처리 중'}
                     </span>
-                    <p className="text-white/75 text-sm flex-1 truncate text-left">{q.title}</p>
-                    <div className="flex items-center gap-3 shrink-0 text-white/25 text-xs">
+                    <p className="text-stone-700 dark:text-white/75 text-sm flex-1 truncate text-left">{q.title}</p>
+                    <div className="flex items-center gap-3 shrink-0 text-stone-400 dark:text-white/25 text-xs">
                       <span>{q.profiles?.username ?? q.profiles?.full_name ?? '회원'}</span>
                       <span>{fmt(q.created_at)}</span>
                     </div>
-                    <span className={`text-white/30 text-sm transition-transform ${isExpanded ? 'rotate-90' : ''}`}>›</span>
+                    <span className={`text-stone-400 dark:text-white/30 text-sm transition-transform ${isExpanded ? 'rotate-90' : ''}`}>›</span>
                   </button>
 
                   {/* 확장 영역 */}
                   {isExpanded && (
-                    <div className="border-t border-white/6 px-4 py-5 space-y-4">
+                    <div className="border-t border-black/6 dark:border-white/6 px-4 py-5 space-y-4">
                       {/* 문의 내용 */}
                       <div>
-                        <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-2">문의 내용</p>
-                        <p className="text-white/65 text-sm leading-relaxed whitespace-pre-wrap bg-white/3 rounded-xl p-4">
+                        <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase mb-2">문의 내용</p>
+                        <p className="text-stone-600 dark:text-white/65 text-sm leading-relaxed whitespace-pre-wrap bg-black/3 dark:bg-white/3 rounded-xl p-4">
                           {q.content}
                         </p>
                       </div>
@@ -182,7 +182,7 @@ export default function AdminInquiriesPage() {
                       {/* 기존 답변 (있으면) */}
                       {q.answer && (
                         <div>
-                          <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-2">기존 답변</p>
+                          <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase mb-2">기존 답변</p>
                           <p className="text-emerald-400/80 text-sm leading-relaxed whitespace-pre-wrap bg-emerald-500/5 rounded-xl p-4 border border-emerald-500/15">
                             {q.answer}
                           </p>
@@ -191,7 +191,7 @@ export default function AdminInquiriesPage() {
 
                       {/* 답변 작성 */}
                       <div>
-                        <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-2">
+                        <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase mb-2">
                           {q.answer ? '답변 수정' : '답변 작성'}
                         </p>
                         <textarea
@@ -199,7 +199,7 @@ export default function AdminInquiriesPage() {
                           onChange={(e) => setAnswerText(e.target.value)}
                           placeholder="답변을 입력하세요"
                           rows={5}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-sky-500/40 transition resize-none"
+                          className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/20 text-sm focus:outline-none focus:border-sky-500/40 transition resize-none"
                         />
                         <div className="flex gap-2 mt-3">
                           <button
@@ -211,7 +211,7 @@ export default function AdminInquiriesPage() {
                           </button>
                           <button
                             onClick={() => setExpandedId(null)}
-                            className="px-5 py-2 rounded-xl border border-white/10 text-white/40 text-sm hover:bg-white/5 transition"
+                            className="px-5 py-2 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
                           >
                             닫기
                           </button>

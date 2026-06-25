@@ -65,12 +65,12 @@ export default function SignupPage() {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center px-4">
         <div className="text-center">
           <div className="text-5xl mb-4">✉️</div>
-          <h2 className="text-2xl font-bold text-white mb-2">이메일을 확인하세요</h2>
-          <p className="text-white/50">{form.email} 로 인증 메일을 보냈습니다.</p>
-          <Link href="/auth/login" className="mt-6 inline-block text-white/60 hover:text-white text-sm underline">
+          <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-2">이메일을 확인하세요</h2>
+          <p className="text-stone-500 dark:text-white/50">{form.email} 로 인증 메일을 보냈습니다.</p>
+          <Link href="/auth/login" className="mt-6 inline-block text-stone-600 dark:text-white/60 hover:text-stone-900 dark:hover:text-white text-sm underline">
             로그인으로 이동
           </Link>
         </div>
@@ -79,9 +79,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-24">
+    <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center px-4 py-24">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">회원가입</h1>
+        <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-8 text-center">회원가입</h1>
         <form onSubmit={handleSignup} className="flex flex-col gap-3">
           {[
             { key: 'fullName', placeholder: '이름', type: 'text' },
@@ -97,17 +97,17 @@ export default function SignupPage() {
               value={form[key as keyof typeof form]}
               onChange={set(key)}
               required
-              className="px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/40 border border-white/10 focus:outline-none focus:border-white/40"
+              className="px-4 py-3 rounded-xl bg-black/10 dark:bg-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/40 border border-black/10 dark:border-white/10 focus:outline-none focus:border-black/40 dark:focus:border-white/40"
             />
           ))}
           <div className="flex flex-col gap-1">
-            <label className="text-white/40 text-xs px-1">생년월일</label>
+            <label className="text-stone-400 dark:text-white/40 text-xs px-1">생년월일</label>
             <input
               type="date"
               value={form.birthDate}
               onChange={set('birthDate')}
               required
-              className="px-4 py-3 rounded-xl bg-white/10 text-white border border-white/10 focus:outline-none focus:border-white/40 [color-scheme:dark]"
+              className="px-4 py-3 rounded-xl bg-black/10 dark:bg-white/10 text-stone-900 dark:text-white border border-black/10 dark:border-white/10 focus:outline-none focus:border-black/40 dark:focus:border-white/40 [color-scheme:dark]"
             />
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -119,9 +119,9 @@ export default function SignupPage() {
             {loading ? '처리 중...' : '가입하기'}
           </button>
         </form>
-        <p className="text-white/40 text-sm text-center mt-6">
+        <p className="text-stone-400 dark:text-white/40 text-sm text-center mt-6">
           이미 계정이 있으신가요?{' '}
-          <Link href="/auth/login" className="text-white hover:underline">로그인</Link>
+          <Link href="/auth/login" className="text-stone-900 dark:text-white hover:underline">로그인</Link>
         </p>
       </div>
     </div>

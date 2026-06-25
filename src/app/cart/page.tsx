@@ -245,7 +245,7 @@ export default function CartPage() {
   /* ── 로딩 ── */
   if (isLoading || fetching) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
       </main>
     );
@@ -254,10 +254,10 @@ export default function CartPage() {
   /* ── 비로그인 ── */
   if (!user) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center">
         <div className="text-center">
           <span className="text-5xl block mb-4">🛒</span>
-          <p className="text-white/50 mb-4 text-sm">로그인 후 장바구니를 이용할 수 있습니다</p>
+          <p className="text-stone-500 dark:text-white/50 mb-4 text-sm">로그인 후 장바구니를 이용할 수 있습니다</p>
           <Link href="/auth/login"
             className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
           >
@@ -271,11 +271,11 @@ export default function CartPage() {
   /* ── 구매 완료 ── */
   if (purchased) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center">
         <div className="text-center max-w-sm mx-auto px-6">
           <span className="text-6xl block mb-6">🎉</span>
-          <h2 className="text-2xl font-bold text-white mb-2">주문이 완료됐습니다!</h2>
-          <p className="text-white/40 text-sm mb-8">결제가 정상 처리됐습니다. 이용해주셔서 감사합니다.</p>
+          <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-2">주문이 완료됐습니다!</h2>
+          <p className="text-stone-400 dark:text-white/40 text-sm mb-8">결제가 정상 처리됐습니다. 이용해주셔서 감사합니다.</p>
           <div className="flex flex-col gap-3">
             <Link href="/orders"
               className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition text-center"
@@ -284,12 +284,12 @@ export default function CartPage() {
             </Link>
             <div className="flex gap-3 justify-center">
               <Link href="/market"
-                className="px-6 py-3 rounded-xl border border-white/15 text-white/70 text-sm hover:bg-white/5 transition"
+                className="px-6 py-3 rounded-xl border border-black/15 dark:border-white/15 text-stone-700 dark:text-white/70 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
               >
                 계속 쇼핑하기
               </Link>
               <Link href="/dashboard"
-                className="px-6 py-3 rounded-xl border border-white/15 text-white/70 text-sm hover:bg-white/5 transition"
+                className="px-6 py-3 rounded-xl border border-black/15 dark:border-white/15 text-stone-700 dark:text-white/70 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
               >
                 마이페이지
               </Link>
@@ -302,17 +302,17 @@ export default function CartPage() {
 
   /* ── 메인 ── */
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-2xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-white">장바구니</h1>
-          {items.length > 0 && <span className="text-white/40 text-sm">{items.length}개 상품</span>}
+          <h1 className="text-2xl font-bold text-stone-900 dark:text-white">장바구니</h1>
+          {items.length > 0 && <span className="text-stone-400 dark:text-white/40 text-sm">{items.length}개 상품</span>}
         </div>
 
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <span className="text-6xl">🛒</span>
-            <p className="text-white font-semibold">장바구니가 비어있습니다</p>
+            <p className="text-stone-900 dark:text-white font-semibold">장바구니가 비어있습니다</p>
             <Link href="/market"
               className="mt-2 px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
             >
@@ -327,41 +327,41 @@ export default function CartPage() {
               if (!item.products) return null;
               const p = item.products;
               return (
-                <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl border border-white/8 bg-white/3">
-                  <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
+                <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3">
+                  <div className="w-16 h-16 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
                     {p.images?.[0]
                       ? <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
                       : '📦'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{p.title}</p>
+                    <p className="text-stone-900 dark:text-white text-sm font-medium truncate">{p.title}</p>
                     <p className="text-amber-400 text-sm font-bold mt-0.5">
                       {(p.price * item.quantity).toLocaleString('ko-KR')}원
                     </p>
-                    <p className="text-white/30 text-xs mt-0.5">
+                    <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">
                       {p.price.toLocaleString('ko-KR')}원 × {item.quantity}개
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button onClick={() => updateQty(item.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-lg bg-white/8 text-white/60 hover:bg-white/15 transition font-bold text-sm"
+                      className="w-7 h-7 rounded-lg bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 hover:bg-black/15 dark:hover:bg-white/15 transition font-bold text-sm"
                     >−</button>
-                    <span className="text-white text-sm w-4 text-center">{item.quantity}</span>
+                    <span className="text-stone-900 dark:text-white text-sm w-4 text-center">{item.quantity}</span>
                     <button onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-lg bg-white/8 text-white/60 hover:bg-white/15 transition font-bold text-sm"
+                      className="w-7 h-7 rounded-lg bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 hover:bg-black/15 dark:hover:bg-white/15 transition font-bold text-sm"
                     >+</button>
                   </div>
                   <button onClick={() => removeItem(item.id)}
-                    className="text-white/20 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
+                    className="text-stone-300 dark:text-white/20 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
                   >삭제</button>
                 </div>
               );
             })}
 
             {/* 배송 정보 섹션 */}
-            <div id="shipping-section" className="rounded-2xl border border-white/8 bg-white/3 p-5 flex flex-col gap-4">
+            <div id="shipping-section" className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <p className="text-white/50 text-sm font-medium">배송 정보</p>
+                <p className="text-stone-500 dark:text-white/50 text-sm font-medium">배송 정보</p>
                 <button
                   type="button"
                   disabled={loadingProfile}
@@ -392,30 +392,30 @@ export default function CartPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-white/35 text-xs mb-1.5 block">받는 분 이름 *</label>
+                  <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">받는 분 이름 *</label>
                   <input
                     type="text"
                     value={shipping.name}
                     onChange={(e) => { setShipping((s) => ({ ...s, name: e.target.value })); setShippingError(''); }}
                     placeholder="홍길동"
-                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
                   />
                 </div>
                 <div>
-                  <label className="text-white/35 text-xs mb-1.5 block">전화번호 *</label>
+                  <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">전화번호 *</label>
                   <input
                     type="tel"
                     value={shipping.phone}
                     onChange={(e) => { setShipping((s) => ({ ...s, phone: e.target.value })); setShippingError(''); }}
                     placeholder="010-0000-0000"
-                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="text-white/35 text-xs mb-1.5 block">
+                  <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">
                     주소 *
                     {shipping.zonecode && (
-                      <span className="ml-2 text-white/25 font-mono">[{shipping.zonecode}]</span>
+                      <span className="ml-2 text-stone-400 dark:text-white/25 font-mono">[{shipping.zonecode}]</span>
                     )}
                   </label>
                   <AddressInput
@@ -428,13 +428,13 @@ export default function CartPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="text-white/35 text-xs mb-1.5 block">상세 주소</label>
+                  <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">상세 주소</label>
                   <input
                     type="text"
                     value={shipping.detail}
                     onChange={(e) => setShipping((s) => ({ ...s, detail: e.target.value }))}
                     placeholder="101동 202호"
-                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
                   />
                 </div>
               </div>
@@ -444,25 +444,25 @@ export default function CartPage() {
             </div>
 
             {/* 쿠폰 섹션 */}
-            <div className="rounded-2xl border border-white/8 bg-white/3 p-5 flex flex-col gap-3">
-              <p className="text-white/50 text-sm font-medium">쿠폰 적용</p>
+            <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 p-5 flex flex-col gap-3">
+              <p className="text-stone-500 dark:text-white/50 text-sm font-medium">쿠폰 적용</p>
 
               {/* 보유 쿠폰 카드 목록 (이벤트에서 받은 쿠폰) */}
               {mySaved.length > 0 && !coupon && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-white/25 text-[11px] font-semibold tracking-widest uppercase">보유 쿠폰 {mySaved.length}개</p>
+                  <p className="text-stone-400 dark:text-white/25 text-[11px] font-semibold tracking-widest uppercase">보유 쿠폰 {mySaved.length}개</p>
                   {mySaved.map((s) => (
                     <button
                       key={s.code}
                       onClick={() => applyCoupon(s.code)}
                       disabled={couponLoading}
-                      className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/4 border border-white/10 hover:border-amber-500/30 hover:bg-amber-500/6 transition group text-left"
+                      className="flex items-center justify-between px-4 py-3 rounded-xl bg-black/4 dark:bg-white/4 border border-black/10 dark:border-white/10 hover:border-amber-500/30 hover:bg-amber-500/6 transition group text-left"
                     >
                       <div>
-                        <p className="font-mono font-bold text-sm text-white/80 group-hover:text-amber-400 transition tracking-wider">{s.code}</p>
-                        <p className="text-white/35 text-xs mt-0.5">{s.title} · {s.discountDesc}</p>
+                        <p className="font-mono font-bold text-sm text-stone-800 dark:text-white/80 group-hover:text-amber-400 transition tracking-wider">{s.code}</p>
+                        <p className="text-stone-400 dark:text-white/35 text-xs mt-0.5">{s.title} · {s.discountDesc}</p>
                       </div>
-                      <span className="text-xs text-white/25 group-hover:text-amber-400/60 transition shrink-0 ml-3">
+                      <span className="text-xs text-stone-400 dark:text-white/25 group-hover:text-amber-400/60 transition shrink-0 ml-3">
                         {couponLoading ? '확인 중...' : '사용하기 →'}
                       </span>
                     </button>
@@ -480,7 +480,7 @@ export default function CartPage() {
                   </div>
                   <button
                     onClick={() => { setCoupon(null); setCouponInput(''); setCouponError(''); }}
-                    className="text-white/25 hover:text-rose-400 transition text-xs"
+                    className="text-stone-400 dark:text-white/25 hover:text-rose-400 transition text-xs"
                   >취소</button>
                 </div>
               )}
@@ -495,7 +495,7 @@ export default function CartPage() {
                       onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(''); }}
                       onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
                       placeholder="쿠폰 코드 직접 입력"
-                      className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 text-white placeholder-white/20 border border-white/10 focus:outline-none focus:border-amber-500/40 transition text-sm"
+                      className="flex-1 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:border-amber-500/40 transition text-sm"
                     />
                     <button
                       onClick={() => applyCoupon()}
@@ -517,10 +517,10 @@ export default function CartPage() {
             </div>
 
             {/* 결제 요약 */}
-            <div className="rounded-2xl border border-white/8 bg-white/3 p-5">
+            <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 p-5">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-white/50 text-sm">상품 합계</span>
-                <span className="text-white">{subtotal.toLocaleString('ko-KR')}원</span>
+                <span className="text-stone-500 dark:text-white/50 text-sm">상품 합계</span>
+                <span className="text-stone-900 dark:text-white">{subtotal.toLocaleString('ko-KR')}원</span>
               </div>
               {coupon && (
                 <div className="flex items-center justify-between mb-3">
@@ -529,14 +529,14 @@ export default function CartPage() {
                 </div>
               )}
               <div className="flex items-center justify-between mb-4">
-                <span className="text-white/50 text-sm">배송비</span>
+                <span className="text-stone-500 dark:text-white/50 text-sm">배송비</span>
                 <span className="text-emerald-400 text-sm font-medium">무료</span>
               </div>
-              <div className="border-t border-white/8 pt-4 flex items-center justify-between">
-                <span className="text-white font-semibold">총 결제금액</span>
+              <div className="border-t border-black/8 dark:border-white/8 pt-4 flex items-center justify-between">
+                <span className="text-stone-900 dark:text-white font-semibold">총 결제금액</span>
                 <div className="text-right">
                   {coupon && (
-                    <p className="text-white/30 text-xs line-through mb-0.5">{subtotal.toLocaleString('ko-KR')}원</p>
+                    <p className="text-stone-400 dark:text-white/30 text-xs line-through mb-0.5">{subtotal.toLocaleString('ko-KR')}원</p>
                   )}
                   <span className="text-amber-400 font-bold text-xl">{total.toLocaleString('ko-KR')}원</span>
                 </div>

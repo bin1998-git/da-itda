@@ -57,7 +57,7 @@ export default function InquiryDetailPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin" />
       </div>
     );
@@ -66,30 +66,30 @@ export default function InquiryDetailPage() {
   if (!inquiry) return null;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <Link href="/inquiry" className="inline-flex items-center gap-1.5 text-white/30 hover:text-white/60 text-sm transition mb-8">
+        <Link href="/inquiry" className="inline-flex items-center gap-1.5 text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 text-sm transition mb-8">
           ← 문의 내역
         </Link>
 
         {/* 헤더 */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-[11px] text-white/30 bg-white/5 px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] text-stone-400 dark:text-white/30 bg-black/5 dark:bg-white/5 px-2.5 py-0.5 rounded-full">
               {CAT_LABEL[inquiry.category] ?? '기타'}
             </span>
             <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${STATUS_STYLE[inquiry.status] ?? STATUS_STYLE.pending}`}>
               {STATUS_LABEL[inquiry.status] ?? '처리 중'}
             </span>
           </div>
-          <h1 className="text-xl font-bold text-white leading-snug">{inquiry.title}</h1>
-          <p className="text-white/30 text-xs mt-2">{fmt(inquiry.created_at)}</p>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-white leading-snug">{inquiry.title}</h1>
+          <p className="text-stone-400 dark:text-white/30 text-xs mt-2">{fmt(inquiry.created_at)}</p>
         </div>
 
         {/* 문의 내용 */}
-        <div className="rounded-2xl border border-white/8 bg-white/2 p-6 mb-6">
-          <p className="text-white/25 text-xs font-semibold tracking-widest uppercase mb-3">문의 내용</p>
-          <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{inquiry.content}</p>
+        <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/[0.02] dark:bg-white/[0.02] p-6 mb-6">
+          <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase mb-3">문의 내용</p>
+          <p className="text-stone-700 dark:text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{inquiry.content}</p>
         </div>
 
         {/* 답변 */}
@@ -98,20 +98,20 @@ export default function InquiryDetailPage() {
             <div className="flex items-center gap-2 mb-3">
               <span className="text-sky-400 text-xs font-semibold tracking-widest uppercase">관리자 답변</span>
               {inquiry.answered_at && (
-                <span className="text-white/25 text-xs">{fmt(inquiry.answered_at)}</span>
+                <span className="text-stone-400 dark:text-white/25 text-xs">{fmt(inquiry.answered_at)}</span>
               )}
             </div>
-            <p className="text-white/75 text-sm leading-relaxed whitespace-pre-wrap">{inquiry.answer}</p>
+            <p className="text-stone-700 dark:text-white/75 text-sm leading-relaxed whitespace-pre-wrap">{inquiry.answer}</p>
           </div>
         ) : (
-          <div className="rounded-2xl border border-white/6 bg-white/[0.02] p-6 text-center">
-            <p className="text-white/30 text-sm">아직 답변이 등록되지 않았습니다.</p>
-            <p className="text-white/20 text-xs mt-1">영업일 기준 1~2일 내 답변드립니다.</p>
+          <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-6 text-center">
+            <p className="text-stone-400 dark:text-white/30 text-sm">아직 답변이 등록되지 않았습니다.</p>
+            <p className="text-stone-300 dark:text-white/20 text-xs mt-1">영업일 기준 1~2일 내 답변드립니다.</p>
           </div>
         )}
 
         <div className="mt-8 text-center">
-          <Link href="/inquiry" className="text-white/30 hover:text-white/60 text-sm transition">
+          <Link href="/inquiry" className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 text-sm transition">
             목록으로
           </Link>
         </div>

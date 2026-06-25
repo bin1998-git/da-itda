@@ -69,14 +69,14 @@ export default async function NoticePage({
   const normalList = rows ?? [];
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       {/* 헤더 */}
-      <div className="relative overflow-hidden border-b border-white/5">
+      <div className="relative overflow-hidden border-b border-black/5 dark:border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-purple-500/5" />
         <div className="max-w-3xl mx-auto px-6 py-10 relative">
           <p className="text-violet-400 text-xs font-semibold tracking-widest uppercase mb-1">NOTICE</p>
-          <h1 className="text-3xl font-bold text-white">공지사항</h1>
-          <p className="text-white/40 text-sm mt-1">다잇다의 새로운 소식과 업데이트를 확인하세요</p>
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">공지사항</h1>
+          <p className="text-stone-400 dark:text-white/40 text-sm mt-1">다잇다의 새로운 소식과 업데이트를 확인하세요</p>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export default async function NoticePage({
                 className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
                   active
                     ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-                    : 'border-white/8 text-white/40 hover:text-white/70 hover:bg-white/5'
+                    : 'border-black/8 dark:border-white/8 text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white/70 hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
                 {label}
@@ -104,17 +104,17 @@ export default async function NoticePage({
         {pinnedList.length === 0 && normalList.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <span className="text-6xl">📢</span>
-            <p className="text-white/40 text-sm">등록된 공지사항이 없습니다</p>
+            <p className="text-stone-400 dark:text-white/40 text-sm">등록된 공지사항이 없습니다</p>
           </div>
         ) : (
           <>
-            <div className="flex flex-col divide-y divide-white/5">
+            <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
               {/* 고정 공지 */}
               {pinnedList.map((n) => (
                 <Link
                   key={n.id}
                   href={`/notice/${n.id}`}
-                  className="py-5 flex items-start gap-3 hover:bg-white/2 -mx-2 px-2 rounded-xl transition group"
+                  className="py-5 flex items-start gap-3 hover:bg-black/2 dark:hover:bg-white/2 -mx-2 px-2 rounded-xl transition group"
                 >
                   <span className="mt-0.5 text-sm shrink-0">📌</span>
                   <div className="flex-1 min-w-0">
@@ -124,16 +124,16 @@ export default async function NoticePage({
                       </span>
                       <span className="text-[10px] text-amber-400 font-semibold">고정</span>
                     </div>
-                    <p className="text-white font-semibold text-sm group-hover:text-violet-200 transition leading-snug">
+                    <p className="text-stone-900 dark:text-white font-semibold text-sm group-hover:text-violet-200 transition leading-snug">
                       {n.title}
                     </p>
-                    <div className="flex items-center gap-3 text-white/25 text-xs mt-1.5">
+                    <div className="flex items-center gap-3 text-stone-400 dark:text-white/25 text-xs mt-1.5">
                       <span>{timeAgo(n.created_at)}</span>
                       <span>·</span>
                       <span>조회 {n.view_count}</span>
                     </div>
                   </div>
-                  <span className="text-white/20 text-sm shrink-0 group-hover:translate-x-0.5 transition-transform">›</span>
+                  <span className="text-stone-300 dark:text-white/20 text-sm shrink-0 group-hover:translate-x-0.5 transition-transform">›</span>
                 </Link>
               ))}
 
@@ -142,7 +142,7 @@ export default async function NoticePage({
                 <Link
                   key={n.id}
                   href={`/notice/${n.id}`}
-                  className="py-5 flex items-start gap-3 hover:bg-white/2 -mx-2 px-2 rounded-xl transition group"
+                  className="py-5 flex items-start gap-3 hover:bg-black/2 dark:hover:bg-white/2 -mx-2 px-2 rounded-xl transition group"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
@@ -150,16 +150,16 @@ export default async function NoticePage({
                         {CAT_LABEL[n.category] ?? '공지'}
                       </span>
                     </div>
-                    <p className="text-white/80 font-medium text-sm group-hover:text-white transition leading-snug">
+                    <p className="text-stone-800 dark:text-white/80 font-medium text-sm group-hover:text-stone-900 dark:group-hover:text-white transition leading-snug">
                       {n.title}
                     </p>
-                    <div className="flex items-center gap-3 text-white/25 text-xs mt-1.5">
+                    <div className="flex items-center gap-3 text-stone-400 dark:text-white/25 text-xs mt-1.5">
                       <span>{timeAgo(n.created_at)}</span>
                       <span>·</span>
                       <span>조회 {n.view_count}</span>
                     </div>
                   </div>
-                  <span className="text-white/20 text-sm shrink-0 group-hover:translate-x-0.5 transition-transform">›</span>
+                  <span className="text-stone-300 dark:text-white/20 text-sm shrink-0 group-hover:translate-x-0.5 transition-transform">›</span>
                 </Link>
               ))}
             </div>

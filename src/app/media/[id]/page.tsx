@@ -35,10 +35,10 @@ export default async function MediaDetailPage({
   db.rpc('increment_views', { post_id: id }).then(() => {});
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* 뒤로가기 */}
-        <Link href="/media" className="inline-flex items-center gap-1.5 text-white/40 text-sm hover:text-white transition mb-6">
+        <Link href="/media" className="inline-flex items-center gap-1.5 text-stone-400 dark:text-white/40 text-sm hover:text-stone-900 dark:hover:text-white transition mb-6">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -63,7 +63,7 @@ export default async function MediaDetailPage({
 
           {/* 제목 & 액션 */}
           <div className="flex items-start justify-between gap-4 flex-wrap">
-            <h1 className="text-2xl font-bold text-white flex-1">{p.title}</h1>
+            <h1 className="text-2xl font-bold text-stone-900 dark:text-white flex-1">{p.title}</h1>
             <div className="flex items-center gap-3">
               <ReportButton targetType="media" targetId={p.id} />
               <LikeButton postId={p.id} initialCount={likeCount ?? 0} initialLiked={false} />
@@ -72,8 +72,8 @@ export default async function MediaDetailPage({
           <AdminContentActions contentType="media" contentId={p.id} redirectTo="/media" />
 
           {/* 메타 */}
-          <div className="flex items-center gap-3 text-white/40 text-sm border-b border-white/5 pb-4">
-            <span className="text-white/60 font-medium">{p.profiles?.username ?? '익명'}</span>
+          <div className="flex items-center gap-3 text-stone-400 dark:text-white/40 text-sm border-b border-black/5 dark:border-white/5 pb-4">
+            <span className="text-stone-600 dark:text-white/60 font-medium">{p.profiles?.username ?? '익명'}</span>
             <span>·</span>
             <span>조회 {p.views.toLocaleString('ko-KR')}</span>
             <span>·</span>
@@ -82,7 +82,7 @@ export default async function MediaDetailPage({
 
           {/* 설명 */}
           {p.description && (
-            <p className="text-white/60 text-sm leading-relaxed whitespace-pre-wrap">
+            <p className="text-stone-600 dark:text-white/60 text-sm leading-relaxed whitespace-pre-wrap">
               {p.description}
             </p>
           )}
@@ -92,7 +92,7 @@ export default async function MediaDetailPage({
         <div className="mt-12">
           <Link
             href="/media"
-            className="inline-flex items-center gap-2 text-white/40 text-sm hover:text-rose-400 transition"
+            className="inline-flex items-center gap-2 text-stone-400 dark:text-white/40 text-sm hover:text-rose-400 transition"
           >
             다른 레시피 영상 보기 →
           </Link>

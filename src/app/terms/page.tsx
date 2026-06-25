@@ -49,24 +49,24 @@ const SECTIONS = [
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-3xl mx-auto px-6 py-14">
         {/* 헤더 */}
         <div className="mb-12">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-white/30 text-sm hover:text-white transition mb-8">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-stone-400 dark:text-white/30 text-sm hover:text-stone-900 dark:hover:text-white transition mb-8">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             홈으로
           </Link>
           <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-3">Legal</p>
-          <h1 className="text-4xl font-bold text-white mb-4">이용약관</h1>
-          <p className="text-white/35 text-sm">최종 업데이트: 2026년 1월 1일</p>
+          <h1 className="text-4xl font-bold text-stone-900 dark:text-white mb-4">이용약관</h1>
+          <p className="text-stone-400 dark:text-white/35 text-sm">최종 업데이트: 2026년 1월 1일</p>
         </div>
 
         {/* 안내 박스 */}
-        <div className="rounded-2xl border border-white/8 bg-white/3 p-5 mb-10">
-          <p className="text-white/50 text-sm leading-relaxed">
+        <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 p-5 mb-10">
+          <p className="text-stone-500 dark:text-white/50 text-sm leading-relaxed">
             다잇다 서비스를 이용하시기 전에 본 이용약관을 주의 깊게 읽어주시기 바랍니다.
             서비스에 접속하거나 이용함으로써 본 약관에 동의하는 것으로 간주됩니다.
           </p>
@@ -76,16 +76,16 @@ export default function TermsPage() {
         <div className="flex flex-col gap-10">
           {SECTIONS.map((s) => (
             <section key={s.title}>
-              <h2 className="text-white font-semibold text-base mb-3">{s.title}</h2>
-              <p className="text-white/45 text-sm leading-[1.9] whitespace-pre-wrap">{s.content}</p>
+              <h2 className="text-stone-900 dark:text-white font-semibold text-base mb-3">{s.title}</h2>
+              <p className="text-stone-500 dark:text-white/45 text-sm leading-[1.9] whitespace-pre-wrap">{s.content}</p>
             </section>
           ))}
         </div>
 
         {/* 하단 링크 */}
-        <div className="mt-14 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-white/20 text-xs">© 2026 Da-itda. All rights reserved.</p>
-          <Link href="/privacy" className="text-white/40 text-sm hover:text-white transition">
+        <div className="mt-14 pt-8 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <p className="text-stone-300 dark:text-white/20 text-xs">© 2026 Da-itda. All rights reserved.</p>
+          <Link href="/privacy" className="text-stone-400 dark:text-white/40 text-sm hover:text-stone-900 dark:hover:text-white transition">
             개인정보처리방침 →
           </Link>
         </div>

@@ -73,32 +73,32 @@ export default function CommentSection({
 
   return (
     <div className="mt-10">
-      <h3 className="text-white font-semibold text-base mb-4">
+      <h3 className="text-stone-900 dark:text-white font-semibold text-base mb-4">
         댓글 <span className="text-emerald-400">{comments.length}</span>
       </h3>
 
       {/* 댓글 목록 */}
       <div className="flex flex-col gap-1 mb-6">
         {comments.length === 0 ? (
-          <p className="text-white/30 text-sm py-6 text-center">첫 댓글을 남겨보세요</p>
+          <p className="text-stone-400 dark:text-white/30 text-sm py-6 text-center">첫 댓글을 남겨보세요</p>
         ) : (
           comments.map((c) => (
-            <div key={c.id} className="py-3 border-b border-white/5 flex flex-col gap-1">
+            <div key={c.id} className="py-3 border-b border-black/5 dark:border-white/5 flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span className="text-white/50 text-xs">{timeAgo(c.created_at)}</span>
+                <span className="text-stone-500 dark:text-white/50 text-xs">{timeAgo(c.created_at)}</span>
                 <div className="flex items-center gap-2">
                   <ReportButton targetType="comment" targetId={c.id} />
                   {(user?.id === c.user_id || isAdmin) && (
                     <button
                       onClick={() => remove(c.id)}
-                      className="text-white/20 text-xs hover:text-rose-400 transition"
+                      className="text-stone-300 dark:text-white/20 text-xs hover:text-rose-400 transition"
                     >
                       {isAdmin && user?.id !== c.user_id ? '[관리자] 삭제' : '삭제'}
                     </button>
                   )}
                 </div>
               </div>
-              <p className="text-white/80 text-sm leading-relaxed">{c.content}</p>
+              <p className="text-stone-800 dark:text-white/80 text-sm leading-relaxed">{c.content}</p>
             </div>
           ))
         )}
@@ -112,7 +112,7 @@ export default function CommentSection({
           onKeyDown={(e) => { if (e.key === 'Enter' && e.metaKey) submit(); }}
           placeholder={user ? '댓글을 입력하세요 (⌘+Enter로 전송)' : '로그인 후 댓글을 달 수 있습니다'}
           rows={2}
-          className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition resize-none"
+          className="flex-1 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm placeholder-stone-400 dark:placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition resize-none"
         />
         <button
           onClick={submit}

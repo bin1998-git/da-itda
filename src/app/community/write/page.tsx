@@ -24,9 +24,9 @@ export default function CommunityWritePage() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white/60 mb-4">로그인이 필요합니다</p>
+          <p className="text-stone-600 dark:text-white/60 mb-4">로그인이 필요합니다</p>
           <button
             onClick={() => router.push('/auth/login')}
             className="px-6 py-3 rounded-full bg-emerald-500 text-black font-bold"
@@ -59,17 +59,17 @@ export default function CommunityWritePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-2xl mx-auto px-6 py-10">
         <div className="mb-8">
           <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-1">커뮤니티</p>
-          <h1 className="text-3xl font-bold text-white">글 쓰기</h1>
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">글 쓰기</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* 카테고리 */}
           <div className="flex flex-col gap-2">
-            <label className="text-white/60 text-sm font-medium">카테고리</label>
+            <label className="text-stone-600 dark:text-white/60 text-sm font-medium">카테고리</label>
             <div className="grid grid-cols-4 gap-2">
               {CATEGORIES.map((c) => (
                 <button
@@ -79,7 +79,7 @@ export default function CommunityWritePage() {
                   className={`py-3 rounded-xl border text-center transition flex flex-col gap-0.5 items-center ${
                     category === c.value
                       ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
-                      : 'border-white/10 text-white/40 hover:border-white/20'
+                      : 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:border-black/20 dark:hover:border-white/20'
                   }`}
                 >
                   <span className="text-sm font-semibold">{c.label}</span>
@@ -91,24 +91,24 @@ export default function CommunityWritePage() {
 
           {/* 제목 */}
           <div className="flex flex-col gap-2">
-            <label className="text-white/60 text-sm font-medium">제목</label>
+            <label className="text-stone-600 dark:text-white/60 text-sm font-medium">제목</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="제목을 입력하세요"
-              className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition"
+              className="px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition"
             />
           </div>
 
           {/* 내용 */}
           <div className="flex flex-col gap-2">
-            <label className="text-white/60 text-sm font-medium">내용</label>
+            <label className="text-stone-600 dark:text-white/60 text-sm font-medium">내용</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="내용을 입력하세요"
               rows={10}
-              className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition resize-none"
+              className="px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition resize-none"
             />
           </div>
 
@@ -118,7 +118,7 @@ export default function CommunityWritePage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 py-3 rounded-full border border-white/20 text-white/60 text-sm font-semibold hover:bg-white/5 transition"
+              className="flex-1 py-3 rounded-full border border-white/20 text-stone-600 dark:text-white/60 text-sm font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition"
             >
               취소
             </button>

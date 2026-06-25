@@ -34,7 +34,7 @@ export default function AddToCartButton({ productId, stock }: AddToCartButtonPro
 
   if (stock === 0) {
     return (
-      <button disabled className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white/30 font-semibold cursor-not-allowed">
+      <button disabled className="w-full py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/30 font-semibold cursor-not-allowed">
         품절
       </button>
     );
@@ -45,14 +45,14 @@ export default function AddToCartButton({ productId, stock }: AddToCartButtonPro
       <div className="flex items-center gap-3">
         <button
           onClick={() => setQty((q) => Math.max(1, q - 1))}
-          className="w-10 h-10 rounded-full border border-white/15 text-white hover:bg-white/10 transition flex items-center justify-center text-lg"
+          className="w-10 h-10 rounded-full border border-black/15 dark:border-white/15 text-stone-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 transition flex items-center justify-center text-lg"
         >
           −
         </button>
-        <span className="text-white font-semibold text-lg w-8 text-center">{qty}</span>
+        <span className="text-stone-900 dark:text-white font-semibold text-lg w-8 text-center">{qty}</span>
         <button
           onClick={() => setQty((q) => Math.min(stock, q + 1))}
-          className="w-10 h-10 rounded-full border border-white/15 text-white hover:bg-white/10 transition flex items-center justify-center text-lg"
+          className="w-10 h-10 rounded-full border border-black/15 dark:border-white/15 text-stone-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 transition flex items-center justify-center text-lg"
         >
           +
         </button>

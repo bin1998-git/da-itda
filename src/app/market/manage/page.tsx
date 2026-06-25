@@ -134,7 +134,7 @@ export default function ManagePage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
       </div>
     );
@@ -142,11 +142,11 @@ export default function ManagePage() {
 
   if (isSeller === false) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center px-6">
+      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center px-6">
         <div className="text-center max-w-sm">
           <span className="text-5xl block mb-4">🏪</span>
-          <h2 className="text-xl font-bold text-white mb-2">판매자 등록이 필요합니다</h2>
-          <p className="text-white/40 text-sm mb-6">먼저 판매자 등록 후 상품을 관리할 수 있습니다.</p>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white mb-2">판매자 등록이 필요합니다</h2>
+          <p className="text-stone-400 dark:text-white/40 text-sm mb-6">먼저 판매자 등록 후 상품을 관리할 수 있습니다.</p>
           <Link href="/market/sell"
             className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
           >
@@ -158,14 +158,14 @@ export default function ManagePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-[60px]">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-[60px]">
       <div className="max-w-4xl mx-auto px-6 py-10">
 
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white">내 상품 관리</h1>
-            <p className="text-white/35 text-sm mt-1">{products.length}개 상품 등록됨</p>
+            <h1 className="text-2xl font-bold text-stone-900 dark:text-white">내 상품 관리</h1>
+            <p className="text-stone-400 dark:text-white/35 text-sm mt-1">{products.length}개 상품 등록됨</p>
           </div>
           <Link href="/market/sell"
             className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-semibold text-sm hover:bg-amber-400 transition"
@@ -175,9 +175,9 @@ export default function ManagePage() {
         </div>
 
         {products.length === 0 ? (
-          <div className="rounded-2xl border border-white/6 bg-white/2 p-16 text-center">
+          <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-16 text-center">
             <span className="text-5xl block mb-4">📦</span>
-            <p className="text-white/40 text-sm mb-4">아직 등록한 상품이 없습니다.</p>
+            <p className="text-stone-400 dark:text-white/40 text-sm mb-4">아직 등록한 상품이 없습니다.</p>
             <Link href="/market/sell"
               className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-semibold text-sm hover:bg-amber-400 transition"
             >
@@ -192,14 +192,14 @@ export default function ManagePage() {
           <div className="flex flex-col gap-3">
             {paged.map((p) => (
               <div key={p.id}
-                className={`rounded-2xl border bg-white/2 overflow-hidden transition ${
-                  p.is_active ? 'border-white/8' : 'border-white/4 opacity-60'
+                className={`rounded-2xl border bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden transition ${
+                  p.is_active ? 'border-black/8 dark:border-white/8' : 'border-black/4 dark:border-white/4 opacity-60'
                 }`}
               >
                 {/* 상품 행 */}
                 <div className="flex items-center gap-4 p-4">
                   {/* 썸네일 */}
-                  <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
+                  <div className="w-14 h-14 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
                     {p.images[0]
                       ? <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
                       : CAT_EMOJI[p.category] ?? '📦'}
@@ -208,8 +208,8 @@ export default function ManagePage() {
                   {/* 정보 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-white font-medium text-sm truncate">{p.title}</p>
-                      <span className="text-[10px] text-white/30 bg-white/6 rounded-full px-2 py-0.5 shrink-0">
+                      <p className="text-stone-900 dark:text-white font-medium text-sm truncate">{p.title}</p>
+                      <span className="text-[10px] text-stone-400 dark:text-white/30 bg-black/6 dark:bg-white/6 rounded-full px-2 py-0.5 shrink-0">
                         {CAT_LABEL[p.category]}
                       </span>
                       {!p.is_active && (
@@ -217,7 +217,7 @@ export default function ManagePage() {
                       )}
                     </div>
                     <p className="text-amber-400 font-bold text-sm mt-0.5">{p.price.toLocaleString('ko-KR')}원</p>
-                    <p className="text-white/30 text-xs mt-0.5">재고 {p.stock}개</p>
+                    <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">재고 {p.stock}개</p>
                   </div>
 
                   {/* 액션 버튼 */}
@@ -226,7 +226,7 @@ export default function ManagePage() {
                       onClick={() => toggleActive(p.id, p.is_active)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
                         p.is_active
-                          ? 'border-white/10 text-white/40 hover:text-white hover:bg-white/6'
+                          ? 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:text-stone-900 dark:hover:text-white hover:bg-black/6 dark:hover:bg-white/6'
                           : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/8'
                       }`}
                     >
@@ -234,19 +234,19 @@ export default function ManagePage() {
                     </button>
                     <button
                       onClick={() => editingId === p.id ? cancelEdit() : startEdit(p)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-white/40 hover:text-white hover:bg-white/6 transition"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:text-stone-900 dark:hover:text-white hover:bg-black/6 dark:hover:bg-white/6 transition"
                     >
                       {editingId === p.id ? '취소' : '수정'}
                     </button>
                     <Link
                       href={`/market/${p.id}`}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-white/40 hover:text-white hover:bg-white/6 transition"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:text-stone-900 dark:hover:text-white hover:bg-black/6 dark:hover:bg-white/6 transition"
                     >
                       보기
                     </Link>
                     <button
                       onClick={() => deleteProduct(p.id)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-transparent text-white/20 hover:text-rose-400 hover:bg-rose-500/8 hover:border-rose-500/20 transition"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-transparent text-stone-300 dark:text-white/20 hover:text-rose-400 hover:bg-rose-500/8 hover:border-rose-500/20 transition"
                     >
                       삭제
                     </button>
@@ -255,45 +255,45 @@ export default function ManagePage() {
 
                 {/* 수정 폼 (인라인 확장) */}
                 {editingId === p.id && (
-                  <div className="border-t border-white/6 bg-white/[0.02] px-4 py-5">
+                  <div className="border-t border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] px-4 py-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="sm:col-span-2">
-                        <label className="text-white/40 text-xs mb-1.5 block">상품명</label>
+                        <label className="text-stone-400 dark:text-white/40 text-xs mb-1.5 block">상품명</label>
                         <input
                           value={editForm.title}
                           onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))}
-                          className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-amber-500/50 transition placeholder-white/20"
+                          className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label className="text-white/40 text-xs mb-1.5 block">상품 설명</label>
+                        <label className="text-stone-400 dark:text-white/40 text-xs mb-1.5 block">상품 설명</label>
                         <textarea
                           value={editForm.description}
                           onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
                           rows={2}
-                          className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-amber-500/50 transition resize-none placeholder-white/20"
+                          className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition resize-none placeholder-stone-300 dark:placeholder-white/20"
                         />
                       </div>
                       <div>
-                        <label className="text-white/40 text-xs mb-1.5 block">가격 (원)</label>
+                        <label className="text-stone-400 dark:text-white/40 text-xs mb-1.5 block">가격 (원)</label>
                         <input
                           type="number"
                           value={editForm.price}
                           onChange={(e) => setEditForm((f) => ({ ...f, price: e.target.value }))}
-                          className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-amber-500/50 transition"
+                          className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition"
                         />
                       </div>
                       <div>
-                        <label className="text-white/40 text-xs mb-1.5 block">재고</label>
+                        <label className="text-stone-400 dark:text-white/40 text-xs mb-1.5 block">재고</label>
                         <input
                           type="number"
                           value={editForm.stock}
                           onChange={(e) => setEditForm((f) => ({ ...f, stock: e.target.value }))}
-                          className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-amber-500/50 transition"
+                          className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition"
                         />
                       </div>
                       <div>
-                        <label className="text-white/40 text-xs mb-1.5 block">카테고리</label>
+                        <label className="text-stone-400 dark:text-white/40 text-xs mb-1.5 block">카테고리</label>
                         <div className="flex gap-2 flex-wrap">
                           {CATEGORIES.map((c) => (
                             <button
@@ -303,7 +303,7 @@ export default function ManagePage() {
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
                                 editForm.category === c.value
                                   ? 'bg-amber-500 border-amber-500 text-black'
-                                  : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
+                                  : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-stone-500 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10'
                               }`}
                             >
                               {c.label}
@@ -312,13 +312,13 @@ export default function ManagePage() {
                         </div>
                       </div>
                       <div>
-                        <label className="text-white/40 text-xs mb-1.5 block">이미지 URL</label>
+                        <label className="text-stone-400 dark:text-white/40 text-xs mb-1.5 block">이미지 URL</label>
                         <input
                           type="url"
                           value={editForm.imageUrl}
                           onChange={(e) => setEditForm((f) => ({ ...f, imageUrl: e.target.value }))}
                           placeholder="https://..."
-                          className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-amber-500/50 transition placeholder-white/20"
+                          className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20"
                         />
                       </div>
                     </div>
@@ -333,7 +333,7 @@ export default function ManagePage() {
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="px-5 py-2 rounded-xl border border-white/10 text-white/40 text-sm hover:bg-white/5 transition"
+                        className="px-5 py-2 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
                       >
                         취소
                       </button>

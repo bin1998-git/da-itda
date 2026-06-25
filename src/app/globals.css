@@ -1,23 +1,56 @@
 @import "tailwindcss";
 
+/* ─── Tailwind v4: class-based dark mode ─────────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Semantic color tokens ──────────────────────────────────────────────── */
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Light mode (default) */
+  --bg:           #EDE8E2;
+  --bg-card:      #FAF8F5;
+  --bg-raised:    rgba(0, 0, 0, 0.04);
+  --border:       rgba(0, 0, 0, 0.09);
+  --border-soft:  rgba(0, 0, 0, 0.06);
+  --text-1:       #1c1917;
+  --text-2:       rgba(28, 25, 23, 0.60);
+  --text-3:       rgba(28, 25, 23, 0.40);
+  --foreground:   #1c1917;
 }
 
+.dark {
+  --bg:           #0a0a0a;
+  --bg-card:      #141414;
+  --bg-raised:    rgba(255, 255, 255, 0.03);
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-soft:  rgba(255, 255, 255, 0.05);
+  --text-1:       #ffffff;
+  --text-2:       rgba(255, 255, 255, 0.50);
+  --text-3:       rgba(255, 255, 255, 0.30);
+  --foreground:   #ededed;
+}
+
+/* ─── Tailwind theme tokens ──────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
+body {
+  background-color: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ─── Hero gradient (dark only) ──────────────────────────────────────────── */
 @keyframes hero-gradient {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -26,18 +59,30 @@ body {
 
 .hero-bg-animated {
   background: linear-gradient(
-    -45deg,
-    #0a0a0a,
-    #1a0a2e,
-    #0f172a,
-    #1c0a10,
-    #0a0a0a,
-    #0f1a0a
+    -45deg, #0a0a0a, #1a0a2e, #0f172a, #1c0a10, #0a0a0a, #0f1a0a
   );
   background-size: 400% 400%;
   animation: hero-gradient 12s ease infinite;
 }
 
+.dark .hero-bg-animated {
+  background: linear-gradient(
+    -45deg, #0a0a0a, #1a0a2e, #0f172a, #1c0a10, #0a0a0a, #0f1a0a
+  );
+  background-size: 400% 400%;
+  animation: hero-gradient 12s ease infinite;
+}
+
+/* Light hero — warm amber gradient */
+:not(.dark) .hero-bg-animated {
+  background: linear-gradient(
+    -45deg, #EDE8E2, #FDE68A, #FED7AA, #FEF3C7, #EDE8E2, #FDE68A
+  );
+  background-size: 400% 400%;
+  animation: hero-gradient 12s ease infinite;
+}
+
+/* ─── Orb animations ─────────────────────────────────────────────────────── */
 @keyframes float-up {
   0%   { transform: translateY(0px) scale(1); opacity: 0.15; }
   50%  { transform: translateY(-20px) scale(1.05); opacity: 0.25; }
@@ -48,6 +93,7 @@ body {
 .orb-2 { animation: float-up 11s ease-in-out 2s infinite; }
 .orb-3 { animation: float-up 9s ease-in-out 4s infinite; }
 
+/* ─── Fade-in animation ──────────────────────────────────────────────────── */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -57,3 +103,15 @@ body {
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
+
+/* ─── Smooth theme transition for all elements ───────────────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* Disable transition on page load to avoid flash */
+.no-transition, .no-transition * {
+  transition: none !important;
+}

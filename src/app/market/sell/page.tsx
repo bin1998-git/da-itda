@@ -82,7 +82,7 @@ export default function SellPage() {
 
   if (step === 'loading') {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
       </div>
     );
@@ -90,11 +90,11 @@ export default function SellPage() {
 
   if (step === 'done') {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center px-6">
         <div className="text-center max-w-sm">
           <span className="text-6xl block mb-4">🎉</span>
-          <h2 className="text-2xl font-bold text-white mb-2">상품이 등록되었습니다!</h2>
-          <p className="text-white/40 text-sm mb-8">마켓에서 확인해보세요.</p>
+          <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-2">상품이 등록되었습니다!</h2>
+          <p className="text-stone-400 dark:text-white/40 text-sm mb-8">마켓에서 확인해보세요.</p>
           <div className="flex flex-col gap-3">
             <button
               onClick={() => router.push('/market/manage')}
@@ -104,13 +104,13 @@ export default function SellPage() {
             </button>
             <button
               onClick={() => { setTitle(''); setDesc(''); setPrice(''); setStock(''); setImageUrl(''); setStep('register-product'); }}
-              className="px-6 py-3 rounded-full border border-white/15 text-white text-sm hover:bg-white/8 transition"
+              className="px-6 py-3 rounded-full border border-white/15 text-stone-900 dark:text-white text-sm hover:bg-black/8 dark:hover:bg-white/8 transition"
             >
               상품 추가 등록
             </button>
             <button
               onClick={() => router.push('/market')}
-              className="px-6 py-3 rounded-full border border-white/15 text-white/60 text-sm hover:bg-white/8 transition"
+              className="px-6 py-3 rounded-full border border-white/15 text-stone-600 dark:text-white/60 text-sm hover:bg-black/8 dark:hover:bg-white/8 transition"
             >
               마켓 보러가기
             </button>
@@ -121,7 +121,7 @@ export default function SellPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-lg mx-auto px-6 py-10">
         {/* 진행 단계 표시 */}
         <div className="flex items-center gap-3 mb-8">
@@ -131,9 +131,9 @@ export default function SellPage() {
             </span>
             판매자 등록
           </div>
-          <div className="flex-1 h-px bg-white/10" />
-          <div className={`flex items-center gap-2 text-sm font-semibold ${step === 'register-product' ? 'text-amber-400' : 'text-white/20'}`}>
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 'register-product' ? 'bg-amber-500 text-black' : 'bg-white/10 text-white/30'}`}>
+          <div className="flex-1 h-px bg-black/10 dark:bg-white/10" />
+          <div className={`flex items-center gap-2 text-sm font-semibold ${step === 'register-product' ? 'text-amber-400' : 'text-stone-300 dark:text-white/20'}`}>
+            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 'register-product' ? 'bg-amber-500 text-black' : 'bg-black/10 dark:bg-white/10 text-stone-400 dark:text-white/30'}`}>
               2
             </span>
             상품 등록
@@ -144,12 +144,12 @@ export default function SellPage() {
         {step === 'register-seller' && (
           <>
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-white">판매자 등록</h1>
-              <p className="text-white/40 text-sm mt-1">스토어 정보를 입력하면 상품을 판매할 수 있습니다.</p>
+              <h1 className="text-2xl font-bold text-stone-900 dark:text-white">판매자 등록</h1>
+              <p className="text-stone-400 dark:text-white/40 text-sm mt-1">스토어 정보를 입력하면 상품을 판매할 수 있습니다.</p>
             </div>
             <form onSubmit={handleRegisterSeller} className="flex flex-col gap-4">
               <div>
-                <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">스토어 이름 *</label>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">스토어 이름 *</label>
                 <input
                   type="text"
                   placeholder="예: 홍길동 신선마트"
@@ -157,17 +157,17 @@ export default function SellPage() {
                   onChange={(e) => setStoreName(e.target.value)}
                   required
                   maxLength={50}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
                 />
               </div>
               <div>
-                <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">스토어 소개</label>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">스토어 소개</label>
                 <textarea
                   placeholder="어떤 상품을 판매하는 스토어인지 간단히 소개해주세요."
                   value={storeDesc}
                   onChange={(e) => setStoreDesc(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition resize-none"
                 />
               </div>
               {error && <p className="text-rose-400 text-sm">{error}</p>}
@@ -186,12 +186,12 @@ export default function SellPage() {
         {step === 'register-product' && (
           <>
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-white">상품 등록</h1>
-              <p className="text-white/40 text-sm mt-1">판매할 상품 정보를 입력해주세요.</p>
+              <h1 className="text-2xl font-bold text-stone-900 dark:text-white">상품 등록</h1>
+              <p className="text-stone-400 dark:text-white/40 text-sm mt-1">판매할 상품 정보를 입력해주세요.</p>
             </div>
             <form onSubmit={handleRegisterProduct} className="flex flex-col gap-4">
               <div>
-                <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">상품명 *</label>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">상품명 *</label>
                 <input
                   type="text"
                   placeholder="예: 제주 한라봉 3kg"
@@ -199,22 +199,22 @@ export default function SellPage() {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   maxLength={100}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
                 />
               </div>
               <div>
-                <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">상품 설명</label>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">상품 설명</label>
                 <textarea
                   placeholder="상품 특징, 원산지, 보관 방법 등을 입력해주세요."
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">가격 (원) *</label>
+                  <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">가격 (원) *</label>
                   <input
                     type="number"
                     placeholder="15000"
@@ -222,11 +222,11 @@ export default function SellPage() {
                     onChange={(e) => setPrice(e.target.value)}
                     required
                     min={100}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
+                    className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
                   />
                 </div>
                 <div>
-                  <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">재고 *</label>
+                  <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">재고 *</label>
                   <input
                     type="number"
                     placeholder="100"
@@ -234,12 +234,12 @@ export default function SellPage() {
                     onChange={(e) => setStock(e.target.value)}
                     required
                     min={0}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
+                    className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">카테고리 *</label>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">카테고리 *</label>
                 <div className="grid grid-cols-4 gap-2">
                   {CATEGORIES.map((cat) => (
                     <button
@@ -249,7 +249,7 @@ export default function SellPage() {
                       className={`py-2.5 rounded-xl text-sm font-medium transition border ${
                         category === cat.value
                           ? 'bg-amber-500 border-amber-500 text-black'
-                          : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                          : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-stone-600 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10'
                       }`}
                     >
                       {cat.label}
@@ -258,13 +258,13 @@ export default function SellPage() {
                 </div>
               </div>
               <div>
-                <label className="text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">이미지 URL</label>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">이미지 URL</label>
                 <input
                   type="url"
                   placeholder="https://example.com/image.jpg"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
+                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
                 />
               </div>
               {error && <p className="text-rose-400 text-sm">{error}</p>}

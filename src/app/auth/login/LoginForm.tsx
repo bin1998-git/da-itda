@@ -58,12 +58,12 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* 로고 */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white tracking-tight">다잇다</h1>
-          <p className="text-white/40 text-sm mt-1">Connect Everything</p>
+          <h1 className="text-4xl font-bold text-stone-900 dark:text-white tracking-tight">다잇다</h1>
+          <p className="text-stone-400 dark:text-white/40 text-sm mt-1">Connect Everything</p>
         </div>
 
         {/* 이메일 로그인 폼 */}
@@ -74,7 +74,7 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="px-4 py-3 rounded-xl bg-white/8 text-white placeholder-white/40 border border-white/10 focus:outline-none focus:border-white/40 transition"
+            className="px-4 py-3 rounded-xl bg-black/8 dark:bg-white/8 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/40 border border-black/10 dark:border-white/10 focus:outline-none focus:border-black/40 dark:focus:border-white/40 transition"
           />
           <input
             type="password"
@@ -82,13 +82,13 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="px-4 py-3 rounded-xl bg-white/8 text-white placeholder-white/40 border border-white/10 focus:outline-none focus:border-white/40 transition"
+            className="px-4 py-3 rounded-xl bg-black/8 dark:bg-white/8 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/40 border border-black/10 dark:border-white/10 focus:outline-none focus:border-black/40 dark:focus:border-white/40 transition"
           />
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="py-3 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition disabled:opacity-50"
+            className="py-3 rounded-xl bg-white dark:bg-white text-black font-semibold hover:bg-white/90 transition disabled:opacity-50"
           >
             {loading ? '로그인 중...' : '로그인'}
           </button>
@@ -96,9 +96,9 @@ export default function LoginForm() {
 
         {/* 구분선 */}
         <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-px bg-white/10" />
-          <span className="text-white/30 text-xs">또는</span>
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-black/10 dark:bg-white/10" />
+          <span className="text-stone-400 dark:text-white/30 text-xs">또는</span>
+          <div className="flex-1 h-px bg-black/10 dark:bg-white/10" />
         </div>
 
         {/* 소셜 로그인 */}
@@ -135,7 +135,7 @@ export default function LoginForm() {
           <button
             onClick={() => handleSocial('apple')}
             disabled={!!socialLoading}
-            className="flex items-center justify-center gap-3 py-3 rounded-xl bg-white/5 border border-white/15 text-white font-medium hover:bg-white/10 transition disabled:opacity-50"
+            className="flex items-center justify-center gap-3 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/15 dark:border-white/15 text-stone-900 dark:text-white font-medium hover:bg-black/10 dark:hover:bg-white/10 transition disabled:opacity-50"
           >
             <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor">
               <path d="M13.173 9.545c-.022-2.132 1.746-3.163 1.826-3.214-1-1.447-2.545-1.645-3.09-1.664-1.31-.133-2.566.775-3.232.775-.667 0-1.682-.758-2.768-.737-1.413.02-2.72.824-3.447 2.087C.88 9.18 1.88 13.46 3.41 15.8c.762 1.095 1.663 2.32 2.845 2.277 1.147-.045 1.577-.735 2.961-.735 1.384 0 1.775.735 2.987.712 1.23-.02 2.008-1.112 2.762-2.212.875-1.265 1.232-2.495 1.25-2.558-.027-.012-2.398-.92-2.042-3.739zM11.07 3.147C11.679 2.4 12.09 1.373 11.97.333c-.877.037-1.943.583-2.576 1.315-.565.652-1.06 1.697-.928 2.697.983.077 1.991-.497 2.604-1.198z"/>
@@ -144,9 +144,9 @@ export default function LoginForm() {
           </button>
         </div>
 
-        <p className="text-white/30 text-sm text-center mt-6">
+        <p className="text-stone-400 dark:text-white/30 text-sm text-center mt-6">
           계정이 없으신가요?{' '}
-          <Link href="/auth/signup" className="text-white hover:underline">회원가입</Link>
+          <Link href="/auth/signup" className="text-stone-900 dark:text-white hover:underline">회원가입</Link>
         </p>
       </div>
     </div>

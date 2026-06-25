@@ -17,7 +17,7 @@ function formatPrice(price: number) {
 function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/market/${product.id}`} className="group block">
-      <div className="rounded-2xl border border-white/8 bg-white/3 overflow-hidden hover:border-amber-500/30 hover:bg-white/5 transition-all duration-200">
+      <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 overflow-hidden hover:border-amber-500/30 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-200">
         {/* 이미지 영역 */}
         <div className="aspect-square bg-gradient-to-br from-amber-500/10 to-orange-500/5 flex items-center justify-center text-6xl">
           {product.images?.[0]
@@ -35,7 +35,7 @@ function ProductCard({ product }: { product: Product }) {
               <span className="text-[10px] text-rose-400 font-medium">잔여 {product.stock}개</span>
             )}
           </div>
-          <p className="text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-100 transition">
+          <p className="text-stone-900 dark:text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-100 transition">
             {product.title}
           </p>
           <p className="text-amber-400 font-bold text-base mt-0.5">
@@ -74,16 +74,16 @@ export default async function MarketPage({
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       {/* 헤더 */}
-      <div className="relative overflow-hidden border-b border-white/5">
+      <div className="relative overflow-hidden border-b border-black/5 dark:border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5" />
         <div className="max-w-5xl mx-auto px-6 py-10 relative">
           <div className="flex items-end justify-between flex-wrap gap-4">
             <div>
               <p className="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-1">식품 마켓</p>
-              <h1 className="text-3xl font-bold text-white">신선식품 · 주방용품</h1>
-              <p className="text-white/40 text-sm mt-1">
+              <h1 className="text-3xl font-bold text-stone-900 dark:text-white">신선식품 · 주방용품</h1>
+              <p className="text-stone-400 dark:text-white/40 text-sm mt-1">
                 {error ? '서비스 준비 중입니다' : `총 ${count ?? 0}개 상품`}
               </p>
             </div>
@@ -105,10 +105,10 @@ export default async function MarketPage({
         {error || items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <span className="text-6xl">🛒</span>
-            <p className="text-white font-semibold text-lg">
+            <p className="text-stone-900 dark:text-white font-semibold text-lg">
               {error ? 'DB 테이블을 먼저 생성해주세요' : '등록된 상품이 없습니다'}
             </p>
-            <p className="text-white/30 text-sm text-center max-w-sm">
+            <p className="text-stone-400 dark:text-white/30 text-sm text-center max-w-sm">
               {error
                 ? 'Supabase에서 products, sellers, cart_items 테이블을 생성하면 상품이 표시됩니다.'
                 : '상품 등록 버튼을 눌러 첫 상품을 올려보세요.'}

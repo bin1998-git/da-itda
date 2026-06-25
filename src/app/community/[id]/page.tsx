@@ -35,12 +35,12 @@ export default async function CommunityDetailPage({
   const cat = CATEGORIES[post.category] ?? CATEGORIES.general;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-3xl mx-auto px-6 py-8">
         {/* 뒤로가기 */}
         <Link
           href="/community"
-          className="inline-flex items-center gap-1.5 text-white/40 text-sm hover:text-white transition mb-6"
+          className="inline-flex items-center gap-1.5 text-stone-400 dark:text-white/40 text-sm hover:text-stone-900 dark:hover:text-white transition mb-6"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -55,22 +55,22 @@ export default async function CommunityDetailPage({
             <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${cat.color}`}>
               {cat.label}
             </span>
-            <span className="text-white/30 text-xs">
+            <span className="text-stone-400 dark:text-white/30 text-xs">
               {new Date(post.created_at).toLocaleDateString('ko-KR')}
             </span>
-            <span className="text-white/30 text-xs">조회 {post.views}</span>
+            <span className="text-stone-400 dark:text-white/30 text-xs">조회 {post.views}</span>
           </div>
 
           {/* 제목 */}
-          <h1 className="text-2xl font-bold text-white leading-snug mb-6">{post.title}</h1>
+          <h1 className="text-2xl font-bold text-stone-900 dark:text-white leading-snug mb-6">{post.title}</h1>
 
           {/* 본문 */}
-          <div className="border-t border-white/5 pt-6 pb-8">
-            <p className="text-white/75 text-sm leading-loose whitespace-pre-wrap">{post.content}</p>
+          <div className="border-t border-black/5 dark:border-white/5 pt-6 pb-8">
+            <p className="text-stone-700 dark:text-white/75 text-sm leading-loose whitespace-pre-wrap">{post.content}</p>
           </div>
 
           {/* 좋아요 + 신고/관리자 */}
-          <div className="flex items-center justify-between pb-8 border-b border-white/5">
+          <div className="flex items-center justify-between pb-8 border-b border-black/5 dark:border-white/5">
             <PostLikeButton postId={post.id} initialCount={likeCount ?? 0} initialLiked={false} />
             <div className="flex items-center gap-3">
               <ReportButton targetType="post" targetId={post.id} />

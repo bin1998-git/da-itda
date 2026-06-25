@@ -86,7 +86,7 @@ export default function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative w-9 h-9 flex items-center justify-center rounded-xl text-white/40 hover:text-white hover:bg-white/6 transition border border-transparent hover:border-white/8"
+        className="relative w-9 h-9 flex items-center justify-center rounded-xl text-stone-400 dark:text-white/40 hover:text-stone-900 dark:hover:text-white hover:bg-black/6 dark:hover:bg-white/6 transition border border-transparent hover:border-black/8 dark:hover:border-white/8"
         title="알림"
       >
         <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,12 +100,12 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-[#141414] border border-white/10 shadow-xl shadow-black/50 overflow-hidden z-50">
+        <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white dark:bg-[#141414] border border-black/10 dark:border-white/10 shadow-xl shadow-black/10 dark:shadow-black/50 overflow-hidden z-50">
           {/* 헤더 */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/6">
-            <p className="text-white/70 text-sm font-semibold">알림</p>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-black/6 dark:border-white/6">
+            <p className="text-stone-700 dark:text-white/70 text-sm font-semibold">알림</p>
             {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-xs text-white/30 hover:text-white transition">
+              <button onClick={markAllRead} className="text-xs text-stone-400 dark:text-white/30 hover:text-stone-900 dark:hover:text-white transition">
                 모두 읽음
               </button>
             )}
@@ -116,20 +116,20 @@ export default function NotificationBell() {
             {notifications.length === 0 ? (
               <div className="py-10 text-center">
                 <span className="text-3xl block mb-2">🔔</span>
-                <p className="text-white/30 text-xs">새 알림이 없습니다.</p>
+                <p className="text-stone-400 dark:text-white/30 text-xs">새 알림이 없습니다.</p>
               </div>
             ) : (
               notifications.map((n) => {
                 const inner = (
                   <div
-                    className={`flex items-start gap-3 px-4 py-3 hover:bg-white/4 transition cursor-pointer ${!n.is_read ? 'bg-white/[0.02]' : ''}`}
+                    className={`flex items-start gap-3 px-4 py-3 hover:bg-black/4 dark:hover:bg-white/4 transition cursor-pointer ${!n.is_read ? 'bg-black/[0.02] dark:bg-white/[0.02]' : ''}`}
                     onClick={() => { if (!n.is_read) markRead(n.id); setOpen(false); }}
                   >
                     <span className="text-lg shrink-0 mt-0.5">{TYPE_ICON[n.type] ?? TYPE_ICON.default}</span>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm leading-snug ${n.is_read ? 'text-white/45' : 'text-white/80'}`}>{n.title}</p>
-                      {n.body && <p className="text-white/25 text-xs mt-0.5 truncate">{n.body}</p>}
-                      <p className="text-white/20 text-[10px] mt-1">{fmt(n.created_at)}</p>
+                      <p className={`text-sm leading-snug ${n.is_read ? 'text-stone-500 dark:text-white/45' : 'text-stone-800 dark:text-white/80'}`}>{n.title}</p>
+                      {n.body && <p className="text-stone-400 dark:text-white/25 text-xs mt-0.5 truncate">{n.body}</p>}
+                      <p className="text-stone-300 dark:text-white/20 text-[10px] mt-1">{fmt(n.created_at)}</p>
                     </div>
                     {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0 mt-1.5" />}
                   </div>

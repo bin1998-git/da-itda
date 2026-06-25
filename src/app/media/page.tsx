@@ -14,7 +14,7 @@ function formatViews(n: number) {
 function MediaCard({ post }: { post: MediaPost }) {
   return (
     <Link href={`/media/${post.id}`} className="group block">
-      <div className="rounded-2xl overflow-hidden border border-white/8 bg-white/3 hover:border-rose-500/30 hover:bg-white/5 transition-all duration-200">
+      <div className="rounded-2xl overflow-hidden border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 hover:border-rose-500/30 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-200">
         {/* 썸네일 */}
         <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-rose-500/10 to-pink-500/5">
           {post.thumbnail_url ? (
@@ -36,17 +36,17 @@ function MediaCard({ post }: { post: MediaPost }) {
             </div>
           </div>
           {/* 조회수 */}
-          <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/60 text-white/80 text-xs">
+          <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/60 text-stone-800 dark:text-white/80 text-xs">
             조회 {formatViews(post.views)}
           </div>
         </div>
         {/* 정보 */}
         <div className="p-3 flex flex-col gap-1.5">
-          <p className="text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-rose-100 transition">
+          <p className="text-stone-900 dark:text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-rose-100 transition">
             {post.title}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-white/40 text-xs">
+            <span className="text-stone-400 dark:text-white/40 text-xs">
               {post.profiles?.username ?? '익명'}
             </span>
             {post.tags.slice(0, 2).map((tag) => (
@@ -82,16 +82,16 @@ export default async function MediaPage({
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       {/* 헤더 */}
-      <div className="relative overflow-hidden border-b border-white/5">
+      <div className="relative overflow-hidden border-b border-black/5 dark:border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 via-transparent to-pink-500/5" />
         <div className="max-w-5xl mx-auto px-6 py-10 relative">
           <div className="flex items-end justify-between flex-wrap gap-4">
             <div>
               <p className="text-rose-400 text-xs font-semibold tracking-widest uppercase mb-1">푸드 미디어</p>
-              <h1 className="text-3xl font-bold text-white">레시피 영상</h1>
-              <p className="text-white/40 text-sm mt-1">
+              <h1 className="text-3xl font-bold text-stone-900 dark:text-white">레시피 영상</h1>
+              <p className="text-stone-400 dark:text-white/40 text-sm mt-1">
                 {error ? '서비스 준비 중' : `${count ?? 0}개의 레시피 영상`}
               </p>
             </div>
@@ -109,7 +109,7 @@ export default async function MediaPage({
         {error || posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <span className="text-6xl">🎬</span>
-            <p className="text-white font-semibold text-lg">
+            <p className="text-stone-900 dark:text-white font-semibold text-lg">
               {error ? '잠시 후 다시 시도해주세요' : '아직 영상이 없습니다'}
             </p>
             <Link

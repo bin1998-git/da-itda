@@ -34,11 +34,11 @@ export default function Pagination({ currentPage, totalPages, hrefBase, extraPar
 
   const btnBase = 'w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition';
   const active  = 'bg-amber-500 text-black';
-  const normal  = 'text-white/40 hover:text-white hover:bg-white/8 border border-transparent hover:border-white/10';
-  const arrow   = 'text-white/30 hover:text-white hover:bg-white/8 border border-white/8 disabled:opacity-20 disabled:cursor-not-allowed';
+  const normal  = 'text-stone-400 dark:text-white/40 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 border border-transparent hover:border-black/10 dark:hover:border-white/10';
+  const arrow   = 'text-stone-400 dark:text-white/30 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 border border-black/8 dark:border-white/8 disabled:opacity-20 disabled:cursor-not-allowed';
 
   const PageBtn = ({ page }: { page: number | '...' }) => {
-    if (page === '...') return <span className="w-8 h-8 flex items-center justify-center text-white/20 text-sm">…</span>;
+    if (page === '...') return <span className="w-8 h-8 flex items-center justify-center text-stone-300 dark:text-white/20 text-sm">…</span>;
     const isActive = page === currentPage;
     if (onPageChange) {
       return <button onClick={() => onPageChange(page)} className={`${btnBase} ${isActive ? active : normal}`}>{page}</button>;
