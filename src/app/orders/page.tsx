@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import AddressInput from '@/components/ui/AddressInput';
 
 interface OrderItem {
   id: string;
@@ -294,11 +295,11 @@ export default function OrdersPage() {
                         </div>
                         <div>
                           <label className="text-white/30 text-[11px] mb-1 block">주소</label>
-                          <input
+                          <AddressInput
                             value={shippingForm.address}
-                            onChange={(e) => { setShippingForm((f) => ({ ...f, address: e.target.value })); setShippingError(''); }}
-                            placeholder="서울특별시 강남구 테헤란로 123"
-                            className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-white/20"
+                            onChange={(addr) => { setShippingForm((f) => ({ ...f, address: addr })); setShippingError(''); }}
+                            placeholder="주소 검색"
+                            inputClassName="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-white/20 cursor-pointer"
                           />
                         </div>
                         <div>

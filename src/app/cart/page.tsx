@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import AddressInput from '@/components/ui/AddressInput';
 
 interface CartItem {
   id: string;
@@ -49,7 +50,7 @@ export default function CartPage() {
 
   // 배송 정보
   const [shipping, setShipping] = useState({
-    name: '', phone: '', address: '', detail: '',
+    name: '', phone: '', address: '', detail: '', zonecode: '',
   });
   const [shippingError, setShippingError] = useState('');
   const [loadingProfile, setLoadingProfile] = useState(false);
@@ -374,10 +375,11 @@ export default function CartPage() {
                       .single();
                     if (data) {
                       setShipping({
-                        name:    data.full_name     || '',
-                        phone:   data.phone         || '',
-                        address: data.address       || '',
-                        detail:  data.address_detail || '',
+                        name:     data.full_name      || '',
+                        phone:    data.phone          || '',
+                        address:  data.address        || '',
+                        detail:   data.address_detail || '',
+                        zonecode: '',
                       });
                       setShippingError('');
                     }
@@ -410,13 +412,19 @@ export default function CartPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="text-white/35 text-xs mb-1.5 block">주소 *</label>
-                  <input
-                    type="text"
+                  <label className="text-white/35 text-xs mb-1.5 block">
+                    주소 *
+                    {shipping.zonecode && (
+                      <span className="ml-2 text-white/25 font-mono">[{shipping.zonecode}]</span>
+                    )}
+                  </label>
+                  <AddressInput
                     value={shipping.address}
-                    onChange={(e) => { setShipping((s) => ({ ...s, address: e.target.value })); setShippingError(''); }}
-                    placeholder="서울특별시 강남구 테헤란로 123"
-                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
+                    onChange={(addr, code) => {
+                      setShipping((s) => ({ ...s, address: addr, zonecode: code }));
+                      setShippingError('');
+                    }}
+                    placeholder="주소 검색 버튼을 클릭하세요"
                   />
                 </div>
                 <div className="sm:col-span-2">

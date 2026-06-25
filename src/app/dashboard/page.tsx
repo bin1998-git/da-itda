@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import AddressInput from '@/components/ui/AddressInput';
 
 type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist';
 type LikesSubTab = 'media' | 'posts';
@@ -449,12 +450,10 @@ export default function DashboardPage() {
 
             {/* 폼 필드 */}
             {([
-              { key: 'full_name',      label: '이름',             placeholder: '홍길동',                  type: 'text' },
-              { key: 'username',       label: '닉네임',            placeholder: 'gildong_hong',            type: 'text' },
-              { key: 'avatar_url',     label: '프로필 사진 URL',   placeholder: 'https://example.com/...', type: 'url'  },
-              { key: 'phone',          label: '전화번호',           placeholder: '010-0000-0000',           type: 'tel'  },
-              { key: 'address',        label: '기본 주소',          placeholder: '서울특별시 강남구 테헤란로 123', type: 'text' },
-              { key: 'address_detail', label: '상세 주소',          placeholder: '101동 202호',             type: 'text' },
+              { key: 'full_name',  label: '이름',           placeholder: '홍길동',                  type: 'text' },
+              { key: 'username',   label: '닉네임',          placeholder: 'gildong_hong',            type: 'text' },
+              { key: 'avatar_url', label: '프로필 사진 URL', placeholder: 'https://example.com/...', type: 'url'  },
+              { key: 'phone',      label: '전화번호',         placeholder: '010-0000-0000',           type: 'tel'  },
             ] as { key: keyof typeof profile; label: string; placeholder: string; type: string }[]).map(({ key, label, placeholder, type }) => (
               <div key={key} className="flex flex-col gap-2">
                 <label className="text-white/45 text-sm">{label}</label>
@@ -467,6 +466,27 @@ export default function DashboardPage() {
                 />
               </div>
             ))}
+
+            {/* 주소 (카카오 우편번호 검색) */}
+            <div className="flex flex-col gap-2">
+              <label className="text-white/45 text-sm">기본 주소</label>
+              <AddressInput
+                value={profile.address}
+                onChange={(addr) => { setProfile((p) => ({ ...p, address: addr })); setSaveMsg(null); }}
+                placeholder="주소 검색 버튼을 클릭하세요"
+                inputClassName="w-full px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/20 border border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm cursor-pointer"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-white/45 text-sm">상세 주소</label>
+              <input
+                type="text"
+                value={profile.address_detail}
+                onChange={(e) => { setProfile((p) => ({ ...p, address_detail: e.target.value })); setSaveMsg(null); }}
+                placeholder="101동 202호"
+                className="px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/20 border border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm"
+              />
+            </div>
 
             {/* 이메일 (읽기 전용) */}
             <div className="flex flex-col gap-2">
