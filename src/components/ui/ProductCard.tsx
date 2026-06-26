@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -22,6 +22,17 @@ export default function ProductCard({ product }: { product: Product }) {
   const [cartLoading, setCartLoading] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('product_likes')
+      .select('id')
+      .eq('product_id', product.id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setLiked(!!data));
+  }, [user, product.id]);
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
