@@ -11,7 +11,7 @@ import Pagination from '@/components/ui/Pagination';
 const POSTS_PER_PAGE = 10;
 const MEDIA_PER_PAGE = 10;
 
-type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist';
+type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist' | 'chat';
 type LikesSubTab = 'media' | 'posts';
 
 interface Post {
@@ -35,6 +35,14 @@ interface WishlistProduct {
   product_id: string;
   products: { id: string; title: string; price: number; images: string[]; category: string } | null;
 }
+interface ChatRoomItem {
+  id: string;
+  name: string;
+  category: string | null;
+  creator_id: string | null;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+}
 
 const CAT: Record<string, { label: string; cls: string }> = {
   question: { label: '질문',   cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
@@ -50,6 +58,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'media',     label: '내 영상' },
   { id: 'likes',     label: '찜 목록' },
   { id: 'wishlist',  label: '위시리스트' },
+  { id: 'chat',      label: '채팅방' },
 ];
 
 const fmt = (d: string) =>
@@ -86,6 +95,9 @@ export default function DashboardPage() {
   const [likedMedia, setLikedMedia] = useState<LikedMedia[]>([]);
   const [likedPosts, setLikedPosts] = useState<LikedPost[]>([]);
   const [wishlist, setWishlist] = useState<WishlistProduct[]>([]);
+  const [myChatRooms, setMyChatRooms] = useState<ChatRoomItem[]>([]);
+  const [createdChatRooms, setCreatedChatRooms] = useState<ChatRoomItem[]>([]);
+  const [chatSubTab, setChatSubTab] = useState<'joined' | 'created'>('joined');
 
   // auth guard
   useEffect(() => {
@@ -199,6 +211,62 @@ export default function DashboardPage() {
         .order('created_at', { ascending: false })
         .then(({ data }) => {
           if (data) setWishlist(data.map((d: any) => ({ product_id: d.product_id, products: d.products })));
+          setTabLoading(false);
+        });
+    }
+
+    if (tab === 'chat') {
+      setTabLoading(true);
+
+      // 참여한 방
+      supabase
+        .from('chat_room_members')
+        .select('room_id, chat_rooms(id, name, category, creator_id)')
+        .eq('user_id', user.id)
+        .then(async ({ data }) => {
+          const rooms = (data ?? []).map((d: any) => d.chat_rooms).filter(Boolean) as {
+            id: string; name: string; category: string | null; creator_id: string | null;
+          }[];
+          const roomIds = rooms.map((r) => r.id);
+          const { data: msgs } = roomIds.length > 0
+            ? await supabase
+                .from('chat_room_messages')
+                .select('room_id, content, created_at')
+                .in('room_id', roomIds)
+                .order('created_at', { ascending: false })
+            : { data: [] };
+          const lastMap: Record<string, { content: string; created_at: string }> = {};
+          (msgs ?? []).forEach((m: any) => { if (!lastMap[m.room_id]) lastMap[m.room_id] = m; });
+          setMyChatRooms(rooms.map((r) => ({
+            ...r,
+            lastMessage: lastMap[r.id]?.content ?? null,
+            lastMessageAt: lastMap[r.id]?.created_at ?? null,
+          })));
+        });
+
+      // 내가 만든 방
+      supabase
+        .from('chat_rooms')
+        .select('id, name, category, creator_id')
+        .eq('creator_id', user.id)
+        .order('created_at', { ascending: false })
+        .then(async ({ data }) => {
+          const rooms = data ?? [];
+          const roomIds = rooms.map((r) => r.id);
+          const { data: msgs } = roomIds.length > 0
+            ? await supabase
+                .from('chat_room_messages')
+                .select('room_id, content, created_at')
+                .in('room_id', roomIds)
+                .order('created_at', { ascending: false })
+            : { data: [] };
+          const lastMap: Record<string, { content: string; created_at: string }> = {};
+          (msgs ?? []).forEach((m: any) => { if (!lastMap[m.room_id]) lastMap[m.room_id] = m; });
+          setCreatedChatRooms(rooms.map((r) => ({
+            ...r,
+            lastMessage: lastMap[r.id]?.content ?? null,
+            lastMessageAt: lastMap[r.id]?.created_at ?? null,
+          })));
           setTabLoading(false);
         });
     }
@@ -749,6 +817,64 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ────────────── 채팅방 탭 ────────────── */}
+        {tab === 'chat' && (
+          <div className="space-y-5">
+            <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">채팅방</p>
+
+            {/* 서브탭 */}
+            <div className="flex gap-2">
+              {([['joined', '참여한 방'], ['created', '내가 만든 방']] as ['joined' | 'created', string][]).map(([id, label]) => (
+                <button key={id} onClick={() => setChatSubTab(id)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium border transition ${
+                    chatSubTab === id
+                      ? 'bg-black/8 dark:bg-white/8 border-black/15 dark:border-white/15 text-stone-900 dark:text-white'
+                      : 'border-transparent text-stone-400 dark:text-white/35 hover:text-stone-600 dark:hover:text-white/60'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {tabLoading ? (
+              <div className="flex justify-center py-16">
+                <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+              </div>
+            ) : (() => {
+              const list = chatSubTab === 'joined' ? myChatRooms : createdChatRooms;
+              if (list.length === 0) return (
+                <div className="rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+                  <p className="text-stone-400 dark:text-white/30 text-sm">
+                    {chatSubTab === 'joined' ? '참여한 채팅방이 없습니다.' : '만든 채팅방이 없습니다.'}
+                  </p>
+                  <a href="/chat" className="mt-2 inline-block text-emerald-400/60 hover:text-emerald-400 text-xs transition">채팅 허브 가기 →</a>
+                </div>
+              );
+              return (
+                <div className="flex flex-col gap-2">
+                  {list.map((room) => (
+                    <a key={room.id} href={`/chat/room/${room.id}`}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/4 dark:hover:bg-white/4 transition group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-500 font-bold text-sm shrink-0">
+                        {room.name[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-stone-700 dark:text-white/70 text-sm font-semibold truncate">{room.name}</p>
+                        <p className="text-stone-400 dark:text-white/30 text-xs truncate mt-0.5">
+                          {room.lastMessage ?? '아직 메시지가 없습니다'}
+                        </p>
+                      </div>
+                      <span className="text-stone-300 dark:text-white/20 text-sm group-hover:translate-x-0.5 transition-transform">›</span>
+                    </a>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         )}
 
