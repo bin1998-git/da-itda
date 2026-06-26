@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 
 interface Inquiry {
   id: string;
+  user_id: string;
   title: string;
   content: string;
   category: string;
@@ -15,7 +16,7 @@ interface Inquiry {
   answered_at: string | null;
   created_at: string;
   file_urls: string[];
-  user_profile?: { username: string | null; full_name: string | null; email?: string } | null;
+  user_profile?: { username: string | null; full_name: string | null } | null;
 }
 
 const CAT_LABEL: Record<string, string> = {
@@ -48,8 +49,21 @@ export default function AdminInquiriesPage() {
       .select('*')
       .order('created_at', { ascending: false });
     if (filter !== 'all') q = q.eq('status', filter);
-    const { data } = await q;
-    setInquiries((data ?? []) as Inquiry[]);
+    const { data: rows } = await q;
+    const items = (rows ?? []) as Inquiry[];
+
+    // 작성자 프로필 별도 조회 (auth.users 참조라 join 불가)
+    if (items.length > 0) {
+      const ids = [...new Set(items.map((r) => r.user_id).filter(Boolean))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, username, full_name')
+        .in('id', ids as string[]);
+      const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]));
+      items.forEach((r) => { r.user_profile = profileMap[r.user_id as string] ?? null; });
+    }
+
+    setInquiries(items);
     setLoading(false);
   }, [filter]);
 
