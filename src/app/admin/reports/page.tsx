@@ -62,13 +62,23 @@ export default function AdminReportsPage() {
     setLoading(true);
     let query = supabase
       .from('reports')
-      .select('*, profiles!reporter_id(username, full_name)')
+      .select('*')
       .order('created_at', { ascending: false });
     if (filter !== 'all') query = query.eq('status', filter);
-    const { data } = await query;
-    setReports(
-      (data ?? []).map((d: any) => ({ ...d, reporter_profile: d.profiles })) as Report[],
-    );
+    const { data: rows } = await query;
+    const items = (rows ?? []) as Report[];
+
+    if (items.length > 0) {
+      const ids = [...new Set(items.map((r) => r.reporter_id).filter(Boolean))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, username, full_name')
+        .in('id', ids);
+      const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]));
+      items.forEach((r) => { r.reporter_profile = profileMap[r.reporter_id] ?? null; });
+    }
+
+    setReports(items);
     setLoading(false);
   }, [filter]);
 
