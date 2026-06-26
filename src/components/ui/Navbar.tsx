@@ -8,6 +8,11 @@ import { useAuthStore } from '@/store/authStore';
 import NotificationBell from '@/components/ui/NotificationBell';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
+const BOARD_SUB = [
+  { href: '/board',   label: '게시판',   sub: '공지·소식' },
+  { href: '/inquiry', label: '1:1 문의', sub: '문의 접수' },
+];
+
 const NAV_LINKS = [
   {
     href: '/market',
@@ -109,6 +114,7 @@ export default function Navbar() {
   const isAdmin = useAuthStore((s) => s.isAdmin);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [boardOpen, setBoardOpen] = useState(false);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -172,6 +178,49 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          {/* 게시판 드롭다운 */}
+          <div className="relative" onMouseEnter={() => setBoardOpen(true)} onMouseLeave={() => setBoardOpen(false)}>
+            <button
+              className={`relative flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
+                pathname.startsWith('/board') || pathname.startsWith('/inquiry')
+                  ? 'text-indigo-400 bg-indigo-500/12 border-indigo-500/20'
+                  : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5 border-transparent'
+              }`}
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6" />
+              </svg>
+              <span className="hidden lg:inline xl:hidden text-[13px]">게시판</span>
+              <span className="hidden xl:flex flex-col leading-none gap-0.5">
+                <span>게시판</span>
+                <span className="text-[10px] font-normal text-stone-400 dark:text-white/25">공지·문의</span>
+              </span>
+              <svg className="w-2.5 h-2.5 ml-0.5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              {(pathname.startsWith('/board') || pathname.startsWith('/inquiry')) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+              )}
+            </button>
+
+            {boardOpen && (
+              <div className="absolute top-full left-0 mt-1 w-44 rounded-2xl bg-white dark:bg-[#141414] border border-black/10 dark:border-white/10 shadow-xl shadow-black/10 dark:shadow-black/50 overflow-hidden py-1.5 z-50">
+                {BOARD_SUB.map(({ href, label, sub }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="flex flex-col px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/5 transition group"
+                  >
+                    <span className={`text-sm font-medium transition ${pathname.startsWith(href) ? 'text-indigo-400' : 'text-stone-700 dark:text-white/70 group-hover:text-stone-900 dark:group-hover:text-white'}`}>
+                      {label}
+                    </span>
+                    <span className="text-[11px] text-stone-400 dark:text-white/30 mt-0.5">{sub}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 우측 유틸리티 */}
@@ -349,6 +398,7 @@ export default function Navbar() {
           <div className="border-t border-black/6 dark:border-white/6 mt-2 pt-3 flex flex-col gap-1">
             <Link href="/ranking" onClick={() => setMenuOpen(false)} className={`px-4 py-3 rounded-xl text-[13px] font-medium transition ${isActive('/ranking') ? 'text-violet-500 dark:text-violet-400 bg-black/6 dark:bg-white/6' : 'text-stone-500 dark:text-white/55 hover:text-stone-900 dark:hover:text-white hover:bg-black/4 dark:hover:bg-white/4'}`}>랭킹</Link>
             <Link href="/events"  onClick={() => setMenuOpen(false)} className={`px-4 py-3 rounded-xl text-[13px] font-medium transition ${isActive('/events')  ? 'text-pink-500 dark:text-pink-400 bg-black/6 dark:bg-white/6'   : 'text-stone-500 dark:text-white/55 hover:text-stone-900 dark:hover:text-white hover:bg-black/4 dark:hover:bg-white/4'}`}>이벤트</Link>
+            <Link href="/board"   onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-stone-500 dark:text-white/55 hover:text-stone-900 dark:hover:text-white hover:bg-black/4 dark:hover:bg-white/4 transition">게시판</Link>
             <Link href="/notice"  onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-stone-500 dark:text-white/55 hover:text-stone-900 dark:hover:text-white hover:bg-black/4 dark:hover:bg-white/4 transition">공지사항</Link>
             <Link href="/search"  onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-stone-500 dark:text-white/55 hover:text-stone-900 dark:hover:text-white hover:bg-black/4 dark:hover:bg-white/4 transition">검색</Link>
             <Link href="/cart"    onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl text-[13px] text-stone-500 dark:text-white/55 hover:text-stone-900 dark:hover:text-white hover:bg-black/4 dark:hover:bg-white/4 transition">장바구니</Link>
@@ -365,6 +415,9 @@ export default function Navbar() {
       {/* 드롭다운 닫기 오버레이 */}
       {userMenuOpen && (
         <div className="fixed inset-0 z-[-1]" onClick={() => setUserMenuOpen(false)} />
+      )}
+      {boardOpen && (
+        <div className="fixed inset-0 z-[49]" onClick={() => setBoardOpen(false)} />
       )}
     </nav>
   );
