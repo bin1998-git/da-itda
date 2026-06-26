@@ -13,16 +13,21 @@ export default function ChatUnreadBadge() {
     if (!user) { setUnread(0); return; }
 
     const fetchUnread = async () => {
+      if (!user) { setUnread(0); return; }
+      // Step 1: get user's conversation IDs
+      const { data: convs } = await supabase
+        .from('direct_conversations')
+        .select('id')
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+      if (!convs || convs.length === 0) { setUnread(0); return; }
+      const ids = convs.map((c) => c.id);
+      // Step 2: count unread messages
       const { count } = await supabase
         .from('direct_messages')
         .select('id', { count: 'exact', head: true })
         .neq('sender_id', user.id)
         .is('read_at', null)
-        .filter(
-          'conversation_id',
-          'in',
-          `(select id from direct_conversations where user1_id='${user.id}' or user2_id='${user.id}')`
-        );
+        .in('conversation_id', ids);
       setUnread(count ?? 0);
     };
 
@@ -30,7 +35,7 @@ export default function ChatUnreadBadge() {
 
     const channel = supabase
       .channel(`chat:unread:${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'direct_messages' }, fetchUnread)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'direct_messages' }, fetchUnread)
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };

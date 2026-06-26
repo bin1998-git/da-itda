@@ -1,4 +1,6 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabaseServer';
 import ChatRoomClient from '@/components/ui/ChatRoomClient';
 
@@ -8,6 +10,16 @@ export default async function ChatRoomPage({
   params: Promise<{ roomId: string }>;
 }) {
   const { roomId } = await params;
+
+  const cookieStore = await cookies();
+  const authClient = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll() } }
+  );
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) redirect('/auth/login');
+
   const db = supabaseServer();
 
   const [{ data: room }, { data: messages }] = await Promise.all([

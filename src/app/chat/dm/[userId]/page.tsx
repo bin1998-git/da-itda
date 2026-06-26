@@ -43,8 +43,11 @@ export default function DmPage() {
 
     // 대화방 조회 또는 생성 (RPC)
     // @ts-ignore – custom RPC
-    supabase.rpc('get_or_create_conversation', { other_user: targetId }).then(({ data: cid }) => {
-      if (!cid) return;
+    supabase.rpc('get_or_create_conversation', { other_user: targetId }).then(({ data: cid, error: rpcErr }) => {
+      if (rpcErr || !cid) {
+        setInitDone(true); // show page, not spinner
+        return;
+      }
       setConvId(cid);
 
       // 초기 메시지 로드
