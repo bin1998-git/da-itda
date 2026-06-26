@@ -45,13 +45,11 @@ export default function AdminInquiriesPage() {
     setLoading(true);
     let q = supabase
       .from('inquiries')
-      .select('*, profiles!user_id(username, full_name)')
+      .select('*')
       .order('created_at', { ascending: false });
     if (filter !== 'all') q = q.eq('status', filter);
     const { data } = await q;
-    setInquiries(
-      (data ?? []).map((d: Record<string, unknown>) => ({ ...d, user_profile: d.profiles })) as Inquiry[],
-    );
+    setInquiries((data ?? []) as Inquiry[]);
     setLoading(false);
   }, [filter]);
 
