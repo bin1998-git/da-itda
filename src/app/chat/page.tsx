@@ -1,25 +1,8 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { COMMUNITY_CATEGORY_MAP } from '@/types/community';
 
-async function getUser() {
-  const cookieStore = await cookies();
-  const sb = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } }
-  );
-  const { data: { user } } = await sb.auth.getUser();
-  return user;
-}
-
 export default async function ChatPage() {
-  const user = await getUser();
-  if (!user) redirect('/auth/login?next=/chat');
-
   const db = supabaseServer();
 
   const [{ data: fixedRooms }, { data: userRooms }] = await Promise.all([
