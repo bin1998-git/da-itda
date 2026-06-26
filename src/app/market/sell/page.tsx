@@ -78,11 +78,25 @@ export default function SellPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 5);
+    setError('');
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const invalid = files.find((f) => !ALLOWED_TYPES.includes(f.type));
+    if (invalid) {
+      setError(`${invalid.name}은 지원하지 않는 파일 형식입니다. (jpg, png, webp, gif만 가능)`);
+      return;
+    }
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    const oversized = files.find((f) => f.size > MAX_SIZE);
+    if (oversized) {
+      setError(`${oversized.name}의 파일 크기가 5MB를 초과합니다.`);
+      return;
+    }
     setImageFiles(files);
     setImagePreviews(files.map((f) => URL.createObjectURL(f)));
   };
 
   const removeImage = (idx: number) => {
+    URL.revokeObjectURL(imagePreviews[idx]);
     setImageFiles((prev) => prev.filter((_, i) => i !== idx));
     setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
   };
@@ -102,15 +116,18 @@ export default function SellPage() {
     // 이미지 업로드
     const uploadedUrls: string[] = [];
     for (const file of imageFiles) {
-      const safeName = file.name.replace(/\s/g, '_');
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const path = `${user.id}/${Date.now()}_${safeName}`;
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(path, file, { upsert: true });
-      if (!uploadError) {
-        const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-        uploadedUrls.push(data.publicUrl);
+        .upload(path, file);
+      if (uploadError) {
+        setError(`이미지 업로드 실패: ${file.name}`);
+        setSubmitting(false);
+        return;
       }
+      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+      uploadedUrls.push(data.publicUrl);
     }
 
     const { error } = await supabase.from('products').insert({
@@ -153,6 +170,7 @@ export default function SellPage() {
             </button>
             <button
               onClick={() => {
+                imagePreviews.forEach((url) => URL.revokeObjectURL(url));
                 setTitle(''); setDesc(''); setPrice(''); setStock('');
                 setImageFiles([]); setImagePreviews([]); setSelectedColors([]);
                 setStep('register-product');
