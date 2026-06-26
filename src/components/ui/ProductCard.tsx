@@ -60,12 +60,12 @@ export default function ProductCard({ product }: { product: Product }) {
     if (likeLoading) return;
     setLikeLoading(true);
     if (liked) {
-      await supabase.from('product_likes').delete()
+      const { error } = await supabase.from('product_likes').delete()
         .eq('product_id', product.id).eq('user_id', user.id);
-      setLiked(false);
+      if (!error) setLiked(false);
     } else {
-      await supabase.from('product_likes').insert({ product_id: product.id, user_id: user.id });
-      setLiked(true);
+      const { error } = await supabase.from('product_likes').insert({ product_id: product.id, user_id: user.id });
+      if (!error) setLiked(true);
     }
     setLikeLoading(false);
   };
