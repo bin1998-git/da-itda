@@ -147,39 +147,36 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* 데스크탑 중앙 네비 */}
-        <div className="hidden md:flex items-center gap-1.5">
-          {/* 일반 네비 링크 pill */}
-          <div className="flex items-center gap-0.5 bg-black/[0.04] dark:bg-white/[0.04] rounded-2xl px-1.5 py-1.5 border border-black/[0.07] dark:border-white/[0.07]">
-            {NAV_LINKS.map(({ href, label, sub, icon, accent, activeBg, dot }) => {
-              const active = isActive(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  title={label}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
-                    active
-                      ? `${accent} ${activeBg}`
-                      : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5 border-transparent'
-                  }`}
-                >
-                  <span className={active ? accent : 'text-stone-400 dark:text-white/30'}>
-                    {icon}
-                  </span>
-                  <span className={`hidden lg:inline xl:hidden text-[13px] ${active ? accent : ''}`}>{label}</span>
-                  <span className="hidden xl:flex flex-col leading-none gap-0.5">
-                    <span className={active ? accent : ''}>{label}</span>
-                    <span className={`text-[10px] font-normal ${active ? 'opacity-60' : 'text-stone-400 dark:text-white/25'}`}>{sub}</span>
-                  </span>
-                  {active && <span className={`w-1.5 h-1.5 rounded-full ${dot} shrink-0`} />}
-                </Link>
-              );
-            })}
-          </div>
+        {/* 데스크탑 중앙 네비 — 하나의 pill */}
+        <div className="hidden md:flex items-center gap-0.5 bg-black/[0.04] dark:bg-white/[0.04] rounded-2xl px-1.5 py-1.5 border border-black/[0.07] dark:border-white/[0.07]">
+          {NAV_LINKS.map(({ href, label, sub, icon, accent, activeBg, dot }) => {
+            const active = isActive(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                title={label}
+                className={`relative flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
+                  active
+                    ? `${accent} ${activeBg}`
+                    : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5 border-transparent'
+                }`}
+              >
+                <span className={active ? accent : 'text-stone-400 dark:text-white/30'}>
+                  {icon}
+                </span>
+                <span className={`hidden lg:inline xl:hidden text-[13px] ${active ? accent : ''}`}>{label}</span>
+                <span className="hidden xl:flex flex-col leading-none gap-0.5">
+                  <span className={active ? accent : ''}>{label}</span>
+                  <span className={`text-[10px] font-normal ${active ? 'opacity-60' : 'text-stone-400 dark:text-white/25'}`}>{sub}</span>
+                </span>
+                {active && <span className={`w-1.5 h-1.5 rounded-full ${dot} shrink-0`} />}
+              </Link>
+            );
+          })}
 
-          {/* 게시판 드롭다운 — pill 외부에 위치해야 absolute 드롭다운이 클리핑 없이 표시됨 */}
-          <div className="group relative flex items-center bg-black/[0.04] dark:bg-white/[0.04] rounded-2xl px-1.5 py-1.5 border border-black/[0.07] dark:border-white/[0.07]">
+          {/* 게시판 드롭다운 — CSS group-hover로 제어 (JS onMouseLeave gap 버그 방지) */}
+          <div className="group/board relative">
             <button
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
                 pathname.startsWith('/board') || pathname.startsWith('/inquiry')
@@ -195,7 +192,7 @@ export default function Navbar() {
                 <span>게시판</span>
                 <span className="text-[10px] font-normal text-stone-400 dark:text-white/25">공지·문의</span>
               </span>
-              <svg className="w-2.5 h-2.5 ml-0.5 opacity-40 group-hover:opacity-70 transition-transform duration-150 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-2.5 h-2.5 ml-0.5 opacity-40 transition-transform duration-150 group-hover/board:rotate-180 group-hover/board:opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
               {(pathname.startsWith('/board') || pathname.startsWith('/inquiry')) && (
@@ -203,8 +200,7 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* CSS group-hover로 제어 — JS state 불필요, 클리핑 없음 */}
-            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/60 overflow-hidden py-1.5 z-[200] transition-all duration-150 translate-y-1 group-hover:translate-y-0">
+            <div className="invisible opacity-0 group-hover/board:visible group-hover/board:opacity-100 absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/60 overflow-hidden py-1.5 z-[200] transition-all duration-150 translate-y-1 group-hover/board:translate-y-0">
               {BOARD_SUB.map(({ href, label, sub }) => (
                 <Link
                   key={href}
