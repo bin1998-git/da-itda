@@ -95,17 +95,21 @@ export default function AdminPage() {
         {/* 통계 */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: '공지사항', value: stats.totalNotices, accent: 'text-violet-400', bg: 'bg-violet-500/8' },
-            { label: '미답변 문의', value: stats.pendingInquiries, accent: 'text-amber-400', bg: 'bg-amber-500/8', highlight: stats.pendingInquiries > 0 },
-            { label: '미처리 신고', value: stats.pendingReports, accent: 'text-rose-400', bg: 'bg-rose-500/8', highlight: stats.pendingReports > 0 },
-            { label: '가입 회원', value: stats.totalUsers, accent: 'text-emerald-400', bg: 'bg-emerald-500/8' },
+            { label: '공지사항',  value: stats.totalNotices,    accent: 'text-violet-400', highlight: false,                          href: '/admin/notices' },
+            { label: '미답변 문의', value: stats.pendingInquiries, accent: 'text-amber-400', highlight: stats.pendingInquiries > 0, href: '/admin/inquiries' },
+            { label: '미처리 신고', value: stats.pendingReports,   accent: 'text-rose-400',  highlight: stats.pendingReports > 0,   href: '/admin/reports' },
+            { label: '가입 회원',  value: stats.totalUsers,      accent: 'text-emerald-400', highlight: false,                         href: '/admin/users' },
           ].map((s) => (
-            <div key={s.label}
-              className={`rounded-2xl border p-5 ${s.highlight ? 'border-amber-500/25 bg-amber-500/6' : 'border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3'}`}
+            <Link key={s.label} href={s.href}
+              className={`rounded-2xl border p-5 transition hover:scale-[1.02] hover:shadow-lg cursor-pointer ${
+                s.highlight
+                  ? 'border-amber-500/25 bg-amber-500/6 hover:border-amber-500/40'
+                  : 'border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 hover:border-black/15 dark:hover:border-white/15'
+              }`}
             >
               <p className="text-stone-400 dark:text-white/30 text-xs mb-2">{s.label}</p>
               <p className={`text-3xl font-bold ${s.accent}`}>{s.value}</p>
-            </div>
+            </Link>
           ))}
         </div>
 
