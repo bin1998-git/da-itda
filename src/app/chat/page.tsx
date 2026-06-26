@@ -1,14 +1,20 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { COMMUNITY_CATEGORY_MAP } from '@/types/community';
+import { COMMUNITY_CATEGORIES } from '@/types/community';
 
 export default async function ChatPage() {
   const db = supabaseServer();
 
-  const [{ data: fixedRooms }, { data: userRooms }] = await Promise.all([
-    db.from('chat_rooms').select('id, name, description, category').eq('type', 'fixed').order('created_at'),
-    db.from('chat_rooms').select('id, name, description, created_at').eq('type', 'user').order('created_at', { ascending: false }).limit(20),
-  ]);
+  // 카테고리별 방 수 조회
+  const { data: rooms } = await db
+    .from('chat_rooms')
+    .select('category')
+    .eq('type', 'user');
+
+  const countByCategory: Record<string, number> = {};
+  (rooms ?? []).forEach((r) => {
+    if (r.category) countByCategory[r.category] = (countByCategory[r.category] ?? 0) + 1;
+  });
 
   return (
     <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
@@ -16,66 +22,27 @@ export default async function ChatPage() {
         <div className="mb-8">
           <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-1">채팅</p>
           <h1 className="text-3xl font-bold text-stone-900 dark:text-white">채팅 허브</h1>
-          <p className="text-stone-400 dark:text-white/40 text-sm mt-1">오픈 채팅방에서 이야기를 나눠요</p>
+          <p className="text-stone-400 dark:text-white/40 text-sm mt-1">카테고리를 선택해 채팅방에 참여하세요</p>
         </div>
 
-        {/* 고정 채팅방 */}
-        <section className="mb-10">
-          <h2 className="text-stone-700 dark:text-white/70 text-sm font-semibold mb-3">카테고리 채팅방</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {(fixedRooms ?? []).map((room) => {
-              const cat = room.category ? COMMUNITY_CATEGORY_MAP[room.category] : null;
-              return (
-                <Link
-                  key={room.id}
-                  href={`/chat/room/${room.id}`}
-                  className="flex items-center gap-3 p-4 rounded-2xl bg-white/60 dark:bg-white/5 border border-black/8 dark:border-white/8 hover:bg-white/80 dark:hover:bg-white/8 transition group"
-                >
-                  <span className="text-2xl">{cat?.emoji ?? '💬'}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-stone-900 dark:text-white font-semibold text-sm truncate">{room.name}</p>
-                    {room.description && (
-                      <p className="text-stone-400 dark:text-white/40 text-xs truncate mt-0.5">{room.description}</p>
-                    )}
-                  </div>
-                  <span className="text-stone-300 dark:text-white/20 group-hover:translate-x-0.5 transition-transform">›</span>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* 유저 생성 채팅방 */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-stone-700 dark:text-white/70 text-sm font-semibold">유저 채팅방</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {COMMUNITY_CATEGORIES.map((cat) => (
             <Link
-              href="/chat/room/create"
-              className="text-xs text-emerald-500 hover:text-emerald-400 font-semibold transition"
+              key={cat.value}
+              href={`/chat/category/${cat.value}`}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white/60 dark:bg-white/5 border border-black/8 dark:border-white/8 hover:bg-white/80 dark:hover:bg-white/8 transition group"
             >
-              + 방 만들기
+              <span className="text-3xl">{cat.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-stone-900 dark:text-white font-semibold text-sm">{cat.label}</p>
+                <p className="text-stone-400 dark:text-white/40 text-xs mt-0.5">
+                  방 {countByCategory[cat.value] ?? 0}개
+                </p>
+              </div>
+              <span className="text-stone-300 dark:text-white/20 group-hover:translate-x-0.5 transition-transform text-lg">›</span>
             </Link>
-          </div>
-          {(userRooms ?? []).length === 0 ? (
-            <div className="py-12 text-center text-stone-400 dark:text-white/30 text-sm">
-              아직 유저 채팅방이 없어요
-            </div>
-          ) : (
-            <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
-              {(userRooms ?? []).map((room) => (
-                <Link
-                  key={room.id}
-                  href={`/chat/room/${room.id}`}
-                  className="py-3.5 flex items-center gap-3 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] -mx-2 px-2 rounded-xl transition group"
-                >
-                  <span className="text-xl">💬</span>
-                  <p className="flex-1 text-stone-900 dark:text-white text-sm font-medium truncate">{room.name}</p>
-                  <span className="text-stone-300 dark:text-white/20 text-sm group-hover:translate-x-0.5 transition-transform">›</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
+          ))}
+        </div>
       </div>
     </main>
   );
