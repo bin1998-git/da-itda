@@ -393,6 +393,7 @@ export default function DashboardPage() {
                   { label: '장바구니',   href: '/cart',      icon: '🛍️', c: 'hover:border-violet-500/40', adminOnly: false },
                   { label: '주문 내역',  href: '/orders',    icon: '📦', c: 'hover:border-blue-500/40', adminOnly: false },
                   { label: '위시리스트', href: '#',          icon: '❤️', c: 'hover:border-rose-500/40', onClick: () => setTab('wishlist'), adminOnly: false },
+                  { label: '내 채팅방',  href: '#',          icon: '🗨️', c: 'hover:border-emerald-500/40', onClick: () => { setTab('chat'); setChatSubTab('joined'); }, adminOnly: false },
                 ].filter(({ label }) => !isAdmin || (label !== '장바구니' && label !== '주문 내역' && label !== '위시리스트'))
                 .map(({ label, href, icon, c, onClick }) => (
                   <Link key={label} href={href}

@@ -58,9 +58,16 @@ export default async function CategoryChatPage({
   return (
     <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-3xl mx-auto px-6 py-8">
-        <div className="flex items-center gap-2 mb-1">
-          <Link href="/chat" className="text-stone-400 dark:text-white/30 text-sm hover:text-stone-600 dark:hover:text-white/60 transition">채팅</Link>
-          <span className="text-stone-300 dark:text-white/20 text-sm">›</span>
+        <div className="mb-5">
+          <Link
+            href="/chat"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/50 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 transition text-sm font-medium"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            채팅 허브
+          </Link>
         </div>
         <div className="flex items-center justify-between mb-8">
           <div>

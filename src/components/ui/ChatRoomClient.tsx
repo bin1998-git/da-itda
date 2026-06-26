@@ -168,8 +168,14 @@ export default function ChatRoomClient({
     <div className="flex flex-col h-[calc(100vh-64px)]">
       {/* 헤더 */}
       <div className="px-4 py-3 border-b border-black/5 dark:border-white/5 bg-[#EDE8E2]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-sm flex items-center gap-3">
-        <Link href={category ? `/chat/category/${category}` : '/chat'} className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition text-sm">
-          ←
+        <Link
+          href={category ? `/chat/category/${category}` : '/chat'}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/50 hover:text-stone-900 dark:hover:text-white hover:bg-black/8 dark:hover:bg-white/8 transition text-sm font-medium shrink-0"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
+            <path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          뒤로
         </Link>
         <div className="flex-1 min-w-0">
           <h1 className="text-stone-900 dark:text-white font-bold text-base truncate">{roomName}</h1>
