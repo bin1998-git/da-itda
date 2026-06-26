@@ -176,7 +176,7 @@ export default function Navbar() {
           })}
 
           {/* 게시판 드롭다운 — CSS group-hover로 제어 (JS onMouseLeave gap 버그 방지) */}
-          <div className="group/board relative">
+          <div className="group/board relative pb-2 -mb-2">
             <button
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
                 pathname.startsWith('/board') || pathname.startsWith('/inquiry')
@@ -200,7 +200,7 @@ export default function Navbar() {
               )}
             </button>
 
-            <div className="invisible opacity-0 group-hover/board:visible group-hover/board:opacity-100 absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/60 overflow-hidden py-1.5 z-[200] transition-all duration-150 translate-y-1 group-hover/board:translate-y-0">
+            <div className="invisible opacity-0 group-hover/board:visible group-hover/board:opacity-100 absolute top-full left-0 mt-0 w-48 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/60 overflow-hidden py-1.5 z-[200] transition-all duration-150 translate-y-1 group-hover/board:translate-y-0">
               {BOARD_SUB.map(({ href, label, sub }) => (
                 <Link
                   key={href}
