@@ -246,6 +246,20 @@ export default function Navbar() {
           {/* 알림 */}
           <NotificationBell />
 
+          {/* 마이페이지 (로그인 시) */}
+          {user && (
+            <Link
+              href="/dashboard"
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white hover:bg-black/6 dark:hover:bg-white/6 transition border border-transparent hover:border-black/8 dark:hover:border-white/8"
+              title="마이페이지"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </Link>
+          )}
+
           {/* 테마 토글 */}
           <ThemeToggle />
 

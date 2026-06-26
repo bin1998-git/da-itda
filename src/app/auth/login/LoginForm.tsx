@@ -17,9 +17,11 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
+  const next = searchParams.get('next') ?? '/dashboard';
+
   useEffect(() => {
-    if (!isLoading && user) router.replace('/dashboard');
-  }, [user, isLoading, router]);
+    if (!isLoading && user) router.replace(next);
+  }, [user, isLoading, router, next]);
 
   useEffect(() => {
     const err = searchParams.get('error');
@@ -34,17 +36,18 @@ export default function LoginForm() {
     setError('');
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setError('이메일 또는 비밀번호가 올바르지 않습니다.');
-    else router.push('/dashboard');
+    else router.push(next);
     setLoading(false);
   };
 
   const handleSocial = async (provider: 'google' | 'kakao' | 'apple') => {
     setSocialLoading(provider);
+    const redirectTo = `${window.location.origin}${next}`;
     if (provider === 'kakao') {
       await supabase.auth.signInWithOAuth({
         provider: 'kakao',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo,
           scopes: 'profile_nickname profile_image',
           queryParams: { scope: 'profile_nickname profile_image' },
         },
@@ -52,7 +55,7 @@ export default function LoginForm() {
     } else {
       await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}/dashboard` },
+        options: { redirectTo },
       });
     }
   };
