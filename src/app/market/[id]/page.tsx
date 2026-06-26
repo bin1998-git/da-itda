@@ -5,6 +5,7 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import WishlistButton from '@/components/ui/WishlistButton';
 import ReportButton from '@/components/ui/ReportButton';
 import AdminContentActions from '@/components/ui/AdminContentActions';
+import ProductImageGallery from '@/components/ui/ProductImageGallery';
 import { Product } from '@/types/market';
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -47,13 +48,12 @@ export default async function ProductDetailPage({
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* 이미지 */}
-          <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-gradient-to-br from-amber-500/10 to-orange-500/5 aspect-square flex items-center justify-center overflow-hidden">
-            {p.images?.[0]
-              ? <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
-              : <span className="text-9xl">{CATEGORY_EMOJI[p.category] ?? '📦'}</span>
-            }
-          </div>
+          {/* 이미지 갤러리 */}
+          <ProductImageGallery
+            images={p.images ?? []}
+            title={p.title}
+            categoryEmoji={CATEGORY_EMOJI[p.category] ?? '📦'}
+          />
 
           {/* 정보 */}
           <div className="flex flex-col gap-5">
@@ -71,6 +71,36 @@ export default async function ProductDetailPage({
 
             {p.description && (
               <p className="text-stone-500 dark:text-white/50 text-sm leading-relaxed">{p.description}</p>
+            )}
+
+            {p.colors && p.colors.length > 0 && (
+              <div>
+                <p className="text-stone-400 dark:text-white/30 text-xs mb-2">색상</p>
+                <div className="flex gap-2 flex-wrap">
+                  {p.colors.map((color) => {
+                    const HEX: Record<string, string> = {
+                      red: '#ef4444', orange: '#f97316', yellow: '#eab308',
+                      green: '#22c55e', blue: '#3b82f6', sky: '#0ea5e9',
+                      purple: '#a855f7', pink: '#ec4899', white: '#f3f4f6',
+                      gray: '#6b7280', black: '#1c1c1e', brown: '#92400e',
+                    };
+                    const NAME: Record<string, string> = {
+                      red: '빨강', orange: '주황', yellow: '노랑', green: '초록',
+                      blue: '파랑', sky: '하늘', purple: '보라', pink: '핑크',
+                      white: '흰색', gray: '회색', black: '검정', brown: '갈색',
+                    };
+                    return (
+                      <div key={color} className="flex items-center gap-1.5">
+                        <span
+                          className="w-5 h-5 rounded-full border border-black/10 dark:border-white/10 inline-block"
+                          style={{ backgroundColor: HEX[color] ?? color }}
+                        />
+                        <span className="text-xs text-stone-500 dark:text-white/50">{NAME[color] ?? color}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
 
             {/* 가격 */}
