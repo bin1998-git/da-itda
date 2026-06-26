@@ -216,13 +216,16 @@ export default function DashboardPage() {
     }
 
     if (tab === 'chat') {
+      if (!user) return;
       setTabLoading(true);
 
       // 참여한 방
-      supabase
-        .from('chat_room_members')
-        .select('room_id, chat_rooms(id, name, category, creator_id)')
-        .eq('user_id', user.id)
+      Promise.resolve(
+        supabase
+          .from('chat_room_members')
+          .select('room_id, chat_rooms(id, name, category, creator_id)')
+          .eq('user_id', user.id)
+      )
         .then(async ({ data }) => {
           const rooms = (data ?? []).map((d: any) => d.chat_rooms).filter(Boolean) as {
             id: string; name: string; category: string | null; creator_id: string | null;
@@ -242,14 +245,17 @@ export default function DashboardPage() {
             lastMessage: lastMap[r.id]?.content ?? null,
             lastMessageAt: lastMap[r.id]?.created_at ?? null,
           })));
-        });
+        })
+        .catch(() => setTabLoading(false));
 
       // 내가 만든 방
-      supabase
-        .from('chat_rooms')
-        .select('id, name, category, creator_id')
-        .eq('creator_id', user.id)
-        .order('created_at', { ascending: false })
+      Promise.resolve(
+        supabase
+          .from('chat_rooms')
+          .select('id, name, category, creator_id')
+          .eq('creator_id', user.id)
+          .order('created_at', { ascending: false })
+      )
         .then(async ({ data }) => {
           const rooms = data ?? [];
           const roomIds = rooms.map((r) => r.id);
@@ -268,7 +274,8 @@ export default function DashboardPage() {
             lastMessageAt: lastMap[r.id]?.created_at ?? null,
           })));
           setTabLoading(false);
-        });
+        })
+        .catch(() => setTabLoading(false));
     }
   }, [tab, user, enrichPosts, enrichMedia]);
 
