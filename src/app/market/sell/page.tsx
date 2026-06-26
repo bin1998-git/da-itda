@@ -13,6 +13,21 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'drink',   label: '음료' },
 ];
 
+const COLOR_OPTIONS = [
+  { name: '빨강', value: 'red',    hex: '#ef4444' },
+  { name: '주황', value: 'orange', hex: '#f97316' },
+  { name: '노랑', value: 'yellow', hex: '#eab308' },
+  { name: '초록', value: 'green',  hex: '#22c55e' },
+  { name: '파랑', value: 'blue',   hex: '#3b82f6' },
+  { name: '하늘', value: 'sky',    hex: '#0ea5e9' },
+  { name: '보라', value: 'purple', hex: '#a855f7' },
+  { name: '핑크', value: 'pink',   hex: '#ec4899' },
+  { name: '흰색', value: 'white',  hex: '#f3f4f6' },
+  { name: '회색', value: 'gray',   hex: '#6b7280' },
+  { name: '검정', value: 'black',  hex: '#1c1c1e' },
+  { name: '갈색', value: 'brown',  hex: '#92400e' },
+];
+
 type Step = 'loading' | 'register-seller' | 'register-product' | 'done';
 
 export default function SellPage() {
@@ -34,7 +49,9 @@ export default function SellPage() {
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState<Category>('food');
   const [stock, setStock] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageFiles, setImageFiles]       = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -59,20 +76,52 @@ export default function SellPage() {
     else setStep('register-product');
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []).slice(0, 5);
+    setImageFiles(files);
+    setImagePreviews(files.map((f) => URL.createObjectURL(f)));
+  };
+
+  const removeImage = (idx: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== idx));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const toggleColor = (value: string) => {
+    setSelectedColors((prev) =>
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
+    );
+  };
+
   const handleRegisterProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setSubmitting(true);
     setError('');
 
+    // 이미지 업로드
+    const uploadedUrls: string[] = [];
+    for (const file of imageFiles) {
+      const safeName = file.name.replace(/\s/g, '_');
+      const path = `${user.id}/${Date.now()}_${safeName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(path, file, { upsert: true });
+      if (!uploadError) {
+        const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+        uploadedUrls.push(data.publicUrl);
+      }
+    }
+
     const { error } = await supabase.from('products').insert({
       seller_id: user.id,
-      title: title.trim(),
+      title:       title.trim(),
       description: desc.trim() || null,
-      price: Number(price),
+      price:       Number(price),
       category,
-      stock: Number(stock),
-      images: imageUrl.trim() ? [imageUrl.trim()] : [],
+      stock:       Number(stock),
+      images:      uploadedUrls,
+      colors:      selectedColors,
     });
 
     setSubmitting(false);
@@ -103,7 +152,11 @@ export default function SellPage() {
               내 상품 관리하기
             </button>
             <button
-              onClick={() => { setTitle(''); setDesc(''); setPrice(''); setStock(''); setImageUrl(''); setStep('register-product'); }}
+              onClick={() => {
+                setTitle(''); setDesc(''); setPrice(''); setStock('');
+                setImageFiles([]); setImagePreviews([]); setSelectedColors([]);
+                setStep('register-product');
+              }}
               className="px-6 py-3 rounded-full border border-white/15 text-stone-900 dark:text-white text-sm hover:bg-black/8 dark:hover:bg-white/8 transition"
             >
               상품 추가 등록
@@ -258,14 +311,71 @@ export default function SellPage() {
                 </div>
               </div>
               <div>
-                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">이미지 URL</label>
-                <input
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
-                />
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">
+                  색상 <span className="text-stone-400 dark:text-white/30 normal-case font-normal">(선택사항)</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {COLOR_OPTIONS.map((color) => {
+                    const isSelected = selectedColors.includes(color.value);
+                    return (
+                      <button
+                        key={color.value}
+                        type="button"
+                        onClick={() => toggleColor(color.value)}
+                        title={color.name}
+                        className={`w-8 h-8 rounded-full border-2 transition-all ${
+                          isSelected
+                            ? 'border-amber-400 scale-110 shadow-md'
+                            : 'border-transparent hover:border-white/40 hover:scale-105'
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      />
+                    );
+                  })}
+                </div>
+                {selectedColors.length > 0 && (
+                  <p className="text-xs text-stone-400 dark:text-white/40 mt-2">
+                    선택됨: {selectedColors.map((v) => COLOR_OPTIONS.find((c) => c.value === v)?.name).filter(Boolean).join(', ')}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">
+                  상품 이미지 <span className="text-stone-400 dark:text-white/30 normal-case font-normal">(최대 5장)</span>
+                </label>
+
+                {/* 업로드 버튼 */}
+                <label className="flex flex-col items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-black/15 dark:border-white/15 cursor-pointer hover:border-amber-500/50 hover:bg-amber-500/3 transition group">
+                  <svg className="w-6 h-6 text-stone-400 dark:text-white/30 group-hover:text-amber-400 transition mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                  </svg>
+                  <span className="text-xs text-stone-400 dark:text-white/40 group-hover:text-amber-400 transition">클릭하여 이미지 선택</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+
+                {/* 미리보기 */}
+                {imagePreviews.length > 0 && (
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    {imagePreviews.map((src, idx) => (
+                      <div key={idx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-black/10 dark:border-white/10 group">
+                        <img src={src} alt="" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx)}
+                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-lg"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               {error && <p className="text-rose-400 text-sm">{error}</p>}
               <button
