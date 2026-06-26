@@ -1,13 +1,13 @@
 // src/app/board/write/page.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 
-export default function BoardWritePage() {
+function BoardWriteContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const editId       = searchParams.get('id');
@@ -175,5 +175,13 @@ export default function BoardWritePage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function BoardWritePage() {
+  return (
+    <Suspense>
+      <BoardWriteContent />
+    </Suspense>
   );
 }
