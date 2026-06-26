@@ -58,12 +58,17 @@ export default function ChatRoomClient({
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [profileMap, setProfileMap] = useState<Record<string, Profile>>(initialProfileMap);
+  const profileMapRef = useRef(profileMap);
   const [content, setContent] = useState('');
   const [sending, setSending] = useState(false);
+  const [joining, setJoining] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [memberCount, setMemberCount] = useState(initialMemberCount);
   const [memberChecked, setMemberChecked] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // profileMapRef를 profileMap 상태와 동기화
+  useEffect(() => { profileMapRef.current = profileMap; }, [profileMap]);
 
   // 참여 여부 확인
   useEffect(() => {
@@ -96,7 +101,7 @@ export default function ChatRoomClient({
           const msg = payload.new as Message;
           setMessages((prev) => [...prev, msg]);
           // 발신자 프로필 없으면 조회
-          if (!profileMap[msg.sender_id]) {
+          if (!profileMapRef.current[msg.sender_id]) {
             const { data } = await supabase
               .from('profiles')
               .select('id, full_name, username, avatar_url')
@@ -113,13 +118,15 @@ export default function ChatRoomClient({
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [roomId, profileMap]);
+  }, [roomId]);
 
   const join = async () => {
     if (!user) { router.push('/auth/login'); return; }
+    setJoining(true);
     const { error } = await supabase
       .from('chat_room_members')
       .insert({ room_id: roomId, user_id: user.id });
+    setJoining(false);
     if (!error) {
       setIsMember(true);
       setMemberCount((c) => c + 1);
@@ -263,7 +270,8 @@ export default function ChatRoomClient({
         ) : !isMember ? (
           <button
             onClick={join}
-            className="w-full py-3 rounded-xl bg-emerald-500 text-black font-bold text-sm hover:bg-emerald-400 transition"
+            disabled={joining}
+            className="w-full py-3 rounded-xl bg-emerald-500 text-black font-bold text-sm hover:bg-emerald-400 transition disabled:opacity-50"
           >
             채팅방 참여하기
           </button>
