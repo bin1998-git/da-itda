@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import NotificationBell from '@/components/ui/NotificationBell';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import ChatUnreadBadge from '@/components/ui/ChatUnreadBadge';
 
 const BOARD_SUB = [
   { href: '/board',   label: '게시판',   sub: '공지·소식' },
@@ -227,6 +228,9 @@ export default function Navbar() {
           >
             <SearchIcon />
           </Link>
+
+          {/* 채팅 */}
+          <ChatUnreadBadge />
 
           {/* 장바구니 (관리자 제외) */}
           {!isAdmin && (
