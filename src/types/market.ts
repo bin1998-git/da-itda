@@ -16,6 +16,7 @@ export interface Product {
   price: number;
   category: Category;
   images: string[];
+  colors?: string[];
   stock: number;
   is_active: boolean;
   created_at: string;
