@@ -116,6 +116,33 @@ export default function AdminReportsPage() {
     setProcessing(null);
   };
 
+  const unbanUser = async (targetType: string, targetId: string) => {
+    // target_id에서 user_id 찾기 (user 타입이면 targetId가 바로 user_id)
+    let userId: string | null = null;
+    if (targetType === 'user') {
+      userId = targetId;
+    } else {
+      const tableMap: Record<string, string> = {
+        comment: 'comments', post: 'posts', product: 'products', media: 'media_posts',
+      };
+      const tbl = tableMap[targetType];
+      if (tbl) {
+        const { data } = await supabase.from(tbl).select('user_id').eq('id', targetId).single();
+        userId = data?.user_id ?? null;
+      }
+    }
+    if (!userId) { alert('유저를 찾을 수 없습니다.'); return; }
+    if (!confirm('이 유저의 제재를 해제하시겠습니까?')) return;
+    setProcessing(targetId);
+    await supabase.from('profiles').update({
+      comment_banned_until: null,
+      post_banned_until:    null,
+      products_blocked:     false,
+    }).eq('id', userId);
+    setProcessing(null);
+    alert('제재가 해제되었습니다.');
+  };
+
   if (isLoading || loading) {
     return (
       <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
@@ -236,6 +263,13 @@ export default function AdminReportsPage() {
                         className="px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/30 text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5 hover:text-stone-500 dark:hover:text-white/50 transition disabled:opacity-50"
                       >
                         신고 무시
+                      </button>
+                      <button
+                        onClick={() => unbanUser(r.target_type, r.target_id)}
+                        disabled={processing === r.id}
+                        className="px-4 py-2 rounded-xl border border-amber-500/20 text-amber-400 text-xs font-semibold hover:bg-amber-500/10 transition disabled:opacity-50"
+                      >
+                        제재 해제
                       </button>
                     </div>
                   )}
