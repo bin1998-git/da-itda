@@ -52,16 +52,17 @@ export default function InquiryWritePage() {
     try {
       const file_urls = await uploadFiles();
       const { error: err } = await supabase.from('inquiries').insert({
-        user_id:   user.id,
-        title:     form.title.trim(),
-        content:   form.content.trim(),
-        category:  form.category,
+        user_id:  user.id,
+        title:    form.title.trim(),
+        content:  form.content.trim(),
+        category: form.category,
         file_urls,
       });
       if (err) throw err;
       router.push('/inquiry');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '문의 등록에 실패했습니다.');
+      const msg = err instanceof Error ? err.message : String(err);
+      setError('문의 등록 실패: ' + msg);
       setSubmitting(false);
     }
   };

@@ -5,6 +5,7 @@ import CommentSection from '@/components/ui/CommentSection';
 import PostLikeButton from '@/components/ui/PostLikeButton';
 import ReportButton from '@/components/ui/ReportButton';
 import AdminContentActions from '@/components/ui/AdminContentActions';
+import PostAuthorActions from '@/components/ui/PostAuthorActions';
 
 const CATEGORIES: Record<string, { label: string; color: string }> = {
   recipe:   { label: '레시피', color: 'text-amber-400 bg-amber-500/10' },
@@ -74,6 +75,7 @@ export default async function CommunityDetailPage({
             <PostLikeButton postId={post.id} initialCount={likeCount ?? 0} initialLiked={false} />
             <div className="flex items-center gap-3">
               <ReportButton targetType="post" targetId={post.id} />
+              <PostAuthorActions postId={post.id} authorId={post.user_id} />
               <AdminContentActions contentType="post" contentId={post.id} redirectTo="/community" />
             </div>
           </div>

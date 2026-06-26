@@ -74,7 +74,7 @@ export default function ReportButton({ targetType, targetId, className = '' }: P
       <button
         onClick={handleOpen}
         title="신고하기"
-        className={`inline-flex items-center gap-1 text-stone-300 dark:text-white/20 hover:text-rose-400 text-xs transition ${className}`}
+        className={`inline-flex items-center gap-1 text-stone-300 dark:text-white/20 hover:text-amber-400 text-xs transition ${className}`}
       >
         {/* 사이렌 아이콘 */}
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>

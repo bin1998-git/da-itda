@@ -11,6 +11,7 @@ function BoardWriteContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const editId       = searchParams.get('id');
+  const user         = useAuthStore((s) => s.user);
   const isAdmin      = useAuthStore((s) => s.isAdmin);
   const isLoading    = useAuthStore((s) => s.isLoading);
   const fileRef      = useRef<HTMLInputElement>(null);

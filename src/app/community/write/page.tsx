@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 
@@ -12,50 +12,71 @@ const CATEGORIES = [
   { value: 'general',  label: '자유',   desc: '자유롭게 이야기' },
 ];
 
-export default function CommunityWritePage() {
-  const router = useRouter();
-  const user = useAuthStore((s) => s.user);
+function CommunityWriteContent() {
+  const router      = useRouter();
+  const searchParams = useSearchParams();
+  const editId      = searchParams.get('id');
+  const user        = useAuthStore((s) => s.user);
+  const isLoading   = useAuthStore((s) => s.isLoading);
 
   const [category, setCategory] = useState('general');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [title, setTitle]       = useState('');
+  const [content, setContent]   = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [initLoading, setInitLoading] = useState(!!editId);
+  const [error, setError]       = useState('');
 
-  if (!user) {
+  useEffect(() => {
+    if (isLoading) return;
+    if (!user) { router.replace('/auth/login'); return; }
+    if (!editId) return;
+
+    supabase.from('posts').select('title, content, category, user_id').eq('id', editId).single()
+      .then(({ data }) => {
+        if (!data || data.user_id !== user.id) { router.replace('/community'); return; }
+        setTitle(data.title);
+        setContent(data.content);
+        setCategory(data.category);
+        setInitLoading(false);
+      });
+  }, [editId, user, isLoading, router]);
+
+  if (isLoading || initLoading) {
     return (
-      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-stone-600 dark:text-white/60 mb-4">로그인이 필요합니다</p>
-          <button
-            onClick={() => router.push('/auth/login')}
-            className="px-6 py-3 rounded-full bg-emerald-500 text-black font-bold"
-          >
-            로그인하기
-          </button>
-        </div>
-      </main>
+      <div className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      </div>
     );
   }
 
+  if (!user) return null;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) {
-      setError('제목과 내용을 입력해주세요.');
-      return;
-    }
+    if (!title.trim() || !content.trim()) { setError('제목과 내용을 입력해주세요.'); return; }
     setLoading(true);
     setError('');
 
-    const { data, error: err } = await supabase
-      .from('posts')
-      .insert({ user_id: user.id, title: title.trim(), content: content.trim(), category })
-      .select('id')
-      .single();
-
-    setLoading(false);
-    if (err || !data) { setError(err?.message ?? '오류가 발생했습니다.'); return; }
-    router.push(`/community/${data.id}`);
+    if (editId) {
+      const { error: err } = await supabase
+        .from('posts')
+        .update({ title: title.trim(), content: content.trim(), category })
+        .eq('id', editId)
+        .eq('user_id', user.id);
+      setLoading(false);
+      if (err) { setError(err.message); return; }
+      router.push(`/community/${editId}`);
+      router.refresh();
+    } else {
+      const { data, error: err } = await supabase
+        .from('posts')
+        .insert({ user_id: user.id, title: title.trim(), content: content.trim(), category })
+        .select('id')
+        .single();
+      setLoading(false);
+      if (err || !data) { setError(err?.message ?? '오류가 발생했습니다.'); return; }
+      router.push(`/community/${data.id}`);
+    }
   };
 
   return (
@@ -63,7 +84,9 @@ export default function CommunityWritePage() {
       <div className="max-w-2xl mx-auto px-6 py-10">
         <div className="mb-8">
           <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-1">커뮤니티</p>
-          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">글 쓰기</h1>
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">
+            {editId ? '글 수정' : '글 쓰기'}
+          </h1>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -118,7 +141,7 @@ export default function CommunityWritePage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 py-3 rounded-full border border-white/20 text-stone-600 dark:text-white/60 text-sm font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition"
+              className="flex-1 py-3 rounded-full border border-black/10 dark:border-white/10 text-stone-600 dark:text-white/60 text-sm font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition"
             >
               취소
             </button>
@@ -127,11 +150,19 @@ export default function CommunityWritePage() {
               disabled={loading}
               className="flex-1 py-3 rounded-full bg-emerald-500 text-black text-sm font-bold hover:bg-emerald-400 transition disabled:opacity-50"
             >
-              {loading ? '등록 중...' : '게시하기'}
+              {loading ? (editId ? '수정 중...' : '등록 중...') : (editId ? '수정하기' : '게시하기')}
             </button>
           </div>
         </form>
       </div>
     </main>
+  );
+}
+
+export default function CommunityWritePage() {
+  return (
+    <Suspense>
+      <CommunityWriteContent />
+    </Suspense>
   );
 }

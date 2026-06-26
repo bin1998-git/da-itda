@@ -77,11 +77,21 @@ export default function AdminInquiriesPage() {
     const answer = (answerMap[id] ?? '').trim();
     if (!answer) return;
     setProcessing(id);
+    const target = inquiries.find((q) => q.id === id);
     await supabase.from('inquiries').update({
       answer,
       status: 'answered',
       answered_at: new Date().toISOString(),
     }).eq('id', id);
+    if (target) {
+      await supabase.from('notifications').insert({
+        user_id: target.user_id,
+        type: 'inquiry_answered',
+        title: '1:1 문의 답변이 등록되었습니다',
+        body: target.title,
+        link: `/inquiry/${id}`,
+      });
+    }
     setProcessing(null);
     setAnswerMap((m) => { const n = { ...m }; delete n[id]; return n; });
     await load();

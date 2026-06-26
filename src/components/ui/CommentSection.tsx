@@ -30,18 +30,25 @@ export default function CommentSection({
   postId: string;
   initialComments: Comment[];
 }) {
-  const user = useAuthStore((s) => s.user);
+  const user    = useAuthStore((s) => s.user);
   const isAdmin = useAuthStore((s) => s.isAdmin);
-  const router = useRouter();
+  const router  = useRouter();
+
   const [comments, setComments] = useState<Comment[]>(initialComments);
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [content, setContent]   = useState('');
+  const [loading, setLoading]   = useState(false);
+
+  const [editingId, setEditingId]     = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [editSaving, setEditSaving]   = useState(false);
+
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const submit = async () => {
     if (!user) { router.push('/auth/login'); return; }
     if (!content.trim() || loading) return;
-
     setLoading(true);
+
     const { data, error } = await supabase
       .from('comments')
       .insert({ post_id: postId, user_id: user.id, content: content.trim() })
@@ -51,7 +58,6 @@ export default function CommentSection({
     if (!error && data) {
       setComments((prev) => [...prev, data as Comment]);
       setContent('');
-      // 게시글 작성자에게 알림 (본인 제외)
       const { data: post } = await supabase.from('posts').select('user_id, title').eq('id', postId).single();
       if (post && post.user_id !== user.id) {
         await supabase.from('notifications').insert({
@@ -66,9 +72,30 @@ export default function CommentSection({
     setLoading(false);
   };
 
+  const startEdit = (c: Comment) => {
+    setEditingId(c.id);
+    setEditContent(c.content);
+    setConfirmDeleteId(null);
+  };
+
+  const saveEdit = async (id: string) => {
+    if (!editContent.trim()) return;
+    setEditSaving(true);
+    const { error } = await supabase
+      .from('comments')
+      .update({ content: editContent.trim() })
+      .eq('id', id);
+    if (!error) {
+      setComments((prev) => prev.map((c) => c.id === id ? { ...c, content: editContent.trim() } : c));
+      setEditingId(null);
+    }
+    setEditSaving(false);
+  };
+
   const remove = async (id: string) => {
     await supabase.from('comments').delete().eq('id', id);
     setComments((prev) => prev.filter((c) => c.id !== id));
+    setConfirmDeleteId(null);
   };
 
   return (
@@ -82,25 +109,80 @@ export default function CommentSection({
         {comments.length === 0 ? (
           <p className="text-stone-400 dark:text-white/30 text-sm py-6 text-center">첫 댓글을 남겨보세요</p>
         ) : (
-          comments.map((c) => (
-            <div key={c.id} className="py-3 border-b border-black/5 dark:border-white/5 flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <span className="text-stone-500 dark:text-white/50 text-xs">{timeAgo(c.created_at)}</span>
-                <div className="flex items-center gap-2">
-                  <ReportButton targetType="comment" targetId={c.id} />
-                  {(user?.id === c.user_id || isAdmin) && (
-                    <button
-                      onClick={() => remove(c.id)}
-                      className="text-stone-300 dark:text-white/20 text-xs hover:text-rose-400 transition"
-                    >
-                      {isAdmin && user?.id !== c.user_id ? '[관리자] 삭제' : '삭제'}
-                    </button>
-                  )}
+          comments.map((c) => {
+            const isOwner = user?.id === c.user_id;
+            const canManage = isOwner || isAdmin;
+
+            return (
+              <div key={c.id} className="py-3 border-b border-black/5 dark:border-white/5 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-500 dark:text-white/50 text-xs">{timeAgo(c.created_at)}</span>
+                  <div className="flex items-center gap-3">
+                    {/* 신고 (비본인) */}
+                    {!isOwner && <ReportButton targetType="comment" targetId={c.id} />}
+
+                    {/* 수정 (본인만) */}
+                    {isOwner && editingId !== c.id && (
+                      <button
+                        onClick={() => startEdit(c)}
+                        className="text-stone-300 dark:text-white/20 text-xs hover:text-sky-400 transition"
+                      >
+                        수정
+                      </button>
+                    )}
+
+                    {/* 삭제 */}
+                    {canManage && editingId !== c.id && (
+                      confirmDeleteId === c.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-rose-400 text-xs">삭제할까요?</span>
+                          <button onClick={() => remove(c.id)} className="text-xs font-semibold text-rose-400 hover:text-rose-300 transition">확인</button>
+                          <button onClick={() => setConfirmDeleteId(null)} className="text-xs text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition">취소</button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDeleteId(c.id)}
+                          className="text-stone-300 dark:text-white/20 text-xs hover:text-rose-400 transition"
+                        >
+                          {isAdmin && !isOwner ? '[관리자] 삭제' : '삭제'}
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
+
+                {/* 인라인 수정 폼 */}
+                {editingId === c.id ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      rows={2}
+                      autoFocus
+                      className="w-full px-3 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-sky-500/30 text-stone-900 dark:text-white text-sm focus:outline-none resize-none transition"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveEdit(c.id)}
+                        disabled={editSaving || !editContent.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 text-white text-xs font-semibold hover:bg-sky-400 transition disabled:opacity-40"
+                      >
+                        {editSaving ? '저장 중...' : '저장'}
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="px-4 py-1.5 rounded-xl border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 text-xs hover:bg-black/5 dark:hover:bg-white/5 transition"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-stone-800 dark:text-white/80 text-sm leading-relaxed">{c.content}</p>
+                )}
               </div>
-              <p className="text-stone-800 dark:text-white/80 text-sm leading-relaxed">{c.content}</p>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
