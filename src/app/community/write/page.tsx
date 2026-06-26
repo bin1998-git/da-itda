@@ -4,42 +4,50 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
-
-const CATEGORIES = [
-  { value: 'recipe',   label: '레시피', desc: '나만의 레시피 공유' },
-  { value: 'review',   label: '후기',   desc: '상품·식당 리뷰' },
-  { value: 'question', label: '질문',   desc: '요리 고민 상담' },
-  { value: 'general',  label: '자유',   desc: '자유롭게 이야기' },
-];
+import { COMMUNITY_CATEGORIES } from '@/types/community';
 
 function CommunityWriteContent() {
-  const router      = useRouter();
+  const router       = useRouter();
   const searchParams = useSearchParams();
-  const editId      = searchParams.get('id');
-  const user        = useAuthStore((s) => s.user);
-  const isLoading   = useAuthStore((s) => s.isLoading);
+  const editId       = searchParams.get('id');
+  const user         = useAuthStore((s) => s.user);
+  const isLoading    = useAuthStore((s) => s.isLoading);
 
-  const [category, setCategory] = useState('general');
-  const [title, setTitle]       = useState('');
-  const [content, setContent]   = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [category,    setCategory]    = useState('general');
+  const [subcategory, setSubcategory] = useState('');
+  const [title,       setTitle]       = useState('');
+  const [content,     setContent]     = useState('');
+  const [loading,     setLoading]     = useState(false);
   const [initLoading, setInitLoading] = useState(!!editId);
-  const [error, setError]       = useState('');
+  const [error,       setError]       = useState('');
+
+  const activeCat = COMMUNITY_CATEGORIES.find((c) => c.value === category);
 
   useEffect(() => {
     if (isLoading) return;
     if (!user) { router.replace('/auth/login'); return; }
     if (!editId) return;
 
-    supabase.from('posts').select('title, content, category, user_id').eq('id', editId).single()
+    supabase
+      .from('posts')
+      .select('title, content, category, subcategory, user_id')
+      .eq('id', editId)
+      .single()
       .then(({ data }) => {
         if (!data || data.user_id !== user.id) { router.replace('/community'); return; }
         setTitle(data.title);
         setContent(data.content);
         setCategory(data.category);
+        setSubcategory(data.subcategory ?? '');
         setInitLoading(false);
       });
   }, [editId, user, isLoading, router]);
+
+  // 카테고리 변경 시 서브카테고리 초기화
+  const handleCategoryChange = (val: string) => {
+    setCategory(val);
+    setSubcategory('');
+  };
 
   if (isLoading || initLoading) {
     return (
@@ -48,7 +56,6 @@ function CommunityWriteContent() {
       </div>
     );
   }
-
   if (!user) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,10 +64,17 @@ function CommunityWriteContent() {
     setLoading(true);
     setError('');
 
+    const payload = {
+      title:      title.trim(),
+      content:    content.trim(),
+      category,
+      subcategory: subcategory || null,
+    };
+
     if (editId) {
       const { error: err } = await supabase
         .from('posts')
-        .update({ title: title.trim(), content: content.trim(), category })
+        .update(payload)
         .eq('id', editId)
         .eq('user_id', user.id);
       setLoading(false);
@@ -70,7 +84,7 @@ function CommunityWriteContent() {
     } else {
       const { data, error: err } = await supabase
         .from('posts')
-        .insert({ user_id: user.id, title: title.trim(), content: content.trim(), category })
+        .insert({ user_id: user.id, ...payload })
         .select('id')
         .single();
       setLoading(false);
@@ -94,23 +108,59 @@ function CommunityWriteContent() {
           <div className="flex flex-col gap-2">
             <label className="text-stone-600 dark:text-white/60 text-sm font-medium">카테고리</label>
             <div className="grid grid-cols-4 gap-2">
-              {CATEGORIES.map((c) => (
+              {COMMUNITY_CATEGORIES.map((c) => (
                 <button
                   key={c.value}
                   type="button"
-                  onClick={() => setCategory(c.value)}
+                  onClick={() => handleCategoryChange(c.value)}
                   className={`py-3 rounded-xl border text-center transition flex flex-col gap-0.5 items-center ${
                     category === c.value
-                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
                       : 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:border-black/20 dark:hover:border-white/20'
                   }`}
                 >
-                  <span className="text-sm font-semibold">{c.label}</span>
-                  <span className="text-[10px] text-inherit opacity-60">{c.desc}</span>
+                  <span className="text-lg">{c.emoji}</span>
+                  <span className="text-xs font-semibold">{c.label}</span>
                 </button>
               ))}
             </div>
           </div>
+
+          {/* 서브카테고리 (subcategories가 있는 카테고리만) */}
+          {activeCat?.subcategories && (
+            <div className="flex flex-col gap-2">
+              <label className="text-stone-600 dark:text-white/60 text-sm font-medium">
+                세부 분류 <span className="text-stone-400 dark:text-white/30 font-normal">(선택)</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSubcategory('')}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                    !subcategory
+                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                      : 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:border-black/20 dark:hover:border-white/20'
+                  }`}
+                >
+                  선택 안 함
+                </button>
+                {activeCat.subcategories.map((sub) => (
+                  <button
+                    key={sub}
+                    type="button"
+                    onClick={() => setSubcategory(sub)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                      subcategory === sub
+                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                        : 'border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:border-black/20 dark:hover:border-white/20'
+                    }`}
+                  >
+                    {sub}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* 제목 */}
           <div className="flex flex-col gap-2">
