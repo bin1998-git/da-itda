@@ -11,7 +11,7 @@ export default async function ChatRoomPage({
   const db = supabaseServer();
 
   const [{ data: room }, { data: messages }] = await Promise.all([
-    db.from('chat_rooms').select('id, name').eq('id', roomId).single(),
+    db.from('chat_rooms').select('id, name, category').eq('id', roomId).single(),
     db
       .from('chat_room_messages')
       .select('id, sender_id, content, created_at')
@@ -51,6 +51,7 @@ export default async function ChatRoomPage({
       <ChatRoomClient
         roomId={room.id}
         roomName={room.name}
+        category={room.category}
         initialMessages={messages ?? []}
         profileMap={profileMap}
         initialMemberCount={memberCount ?? 0}

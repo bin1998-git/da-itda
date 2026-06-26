@@ -35,6 +35,7 @@ export default async function CategoryChatPage({
           .select('room_id, content, created_at')
           .in('room_id', roomIds)
           .order('created_at', { ascending: false })
+          .limit(roomIds.length * 3)
       : Promise.resolve({ data: [] }),
   ]);
 

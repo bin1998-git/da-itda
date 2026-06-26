@@ -21,6 +21,7 @@ interface Profile {
 interface Props {
   roomId: string;
   roomName: string;
+  category?: string | null;
   initialMessages: Message[];
   profileMap: Record<string, Profile>;
   initialMemberCount: number;
@@ -50,6 +51,7 @@ function isSameMinute(a: string, b: string) {
 export default function ChatRoomClient({
   roomId,
   roomName,
+  category,
   initialMessages,
   profileMap: initialProfileMap,
   initialMemberCount,
@@ -62,6 +64,7 @@ export default function ChatRoomClient({
   const [content, setContent] = useState('');
   const [sending, setSending] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [memberCount, setMemberCount] = useState(initialMemberCount);
   const [memberChecked, setMemberChecked] = useState(false);
@@ -134,7 +137,8 @@ export default function ChatRoomClient({
   };
 
   const leave = async () => {
-    if (!user) return;
+    if (!user || leaving) return;
+    setLeaving(true);
     const { error } = await supabase
       .from('chat_room_members')
       .delete()
@@ -144,18 +148,19 @@ export default function ChatRoomClient({
       setIsMember(false);
       setMemberCount((c) => Math.max(0, c - 1));
     }
+    setLeaving(false);
   };
 
   const send = async () => {
     if (!user) { router.push('/auth/login'); return; }
     if (!content.trim() || sending || !isMember) return;
     setSending(true);
-    await supabase.from('chat_room_messages').insert({
+    const { error } = await supabase.from('chat_room_messages').insert({
       room_id: roomId,
       sender_id: user.id,
       content: content.trim(),
     });
-    setContent('');
+    if (!error) setContent('');
     setSending(false);
   };
 
@@ -163,7 +168,7 @@ export default function ChatRoomClient({
     <div className="flex flex-col h-[calc(100vh-64px)]">
       {/* 헤더 */}
       <div className="px-4 py-3 border-b border-black/5 dark:border-white/5 bg-[#EDE8E2]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-sm flex items-center gap-3">
-        <Link href="/chat" className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition text-sm">
+        <Link href={category ? `/chat/category/${category}` : '/chat'} className="text-stone-400 dark:text-white/30 hover:text-stone-600 dark:hover:text-white/60 transition text-sm">
           ←
         </Link>
         <div className="flex-1 min-w-0">
@@ -171,11 +176,10 @@ export default function ChatRoomClient({
           <p className="text-stone-400 dark:text-white/30 text-xs">👥 {memberCount}명</p>
         </div>
         {memberChecked && user && isMember && (
-          <button
-            onClick={leave}
-            className="text-xs px-3 py-1.5 rounded-lg text-stone-400 dark:text-white/30 hover:text-rose-400 hover:bg-rose-500/8 transition border border-black/8 dark:border-white/8"
+          <button onClick={leave} disabled={leaving}
+            className="text-xs px-3 py-1.5 rounded-lg text-stone-400 dark:text-white/30 hover:text-rose-400 hover:bg-rose-500/8 transition border border-black/8 dark:border-white/8 disabled:opacity-50"
           >
-            나가기
+            {leaving ? '나가는 중...' : '나가기'}
           </button>
         )}
       </div>

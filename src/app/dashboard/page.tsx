@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import AddressInput from '@/components/ui/AddressInput';
 import Pagination from '@/components/ui/Pagination';
+import { COMMUNITY_CATEGORY_MAP } from '@/types/community';
 
 const POSTS_PER_PAGE = 10;
 const MEDIA_PER_PAGE = 10;
@@ -219,13 +220,10 @@ export default function DashboardPage() {
       if (!user) return;
       setTabLoading(true);
 
-      // 참여한 방
-      Promise.resolve(
-        supabase
-          .from('chat_room_members')
-          .select('room_id, chat_rooms(id, name, category, creator_id)')
-          .eq('user_id', user.id)
-      )
+      const joinedPromise = supabase
+        .from('chat_room_members')
+        .select('room_id, chat_rooms(id, name, category, creator_id)')
+        .eq('user_id', user.id)
         .then(async ({ data }) => {
           const rooms = (data ?? []).map((d: any) => d.chat_rooms).filter(Boolean) as {
             id: string; name: string; category: string | null; creator_id: string | null;
@@ -237,6 +235,7 @@ export default function DashboardPage() {
                 .select('room_id, content, created_at')
                 .in('room_id', roomIds)
                 .order('created_at', { ascending: false })
+                .limit(roomIds.length * 3)
             : { data: [] };
           const lastMap: Record<string, { content: string; created_at: string }> = {};
           (msgs ?? []).forEach((m: any) => { if (!lastMap[m.room_id]) lastMap[m.room_id] = m; });
@@ -245,17 +244,13 @@ export default function DashboardPage() {
             lastMessage: lastMap[r.id]?.content ?? null,
             lastMessageAt: lastMap[r.id]?.created_at ?? null,
           })));
-        })
-        .catch(() => setTabLoading(false));
+        });
 
-      // 내가 만든 방
-      Promise.resolve(
-        supabase
-          .from('chat_rooms')
-          .select('id, name, category, creator_id')
-          .eq('creator_id', user.id)
-          .order('created_at', { ascending: false })
-      )
+      const createdPromise = supabase
+        .from('chat_rooms')
+        .select('id, name, category, creator_id')
+        .eq('creator_id', user.id)
+        .order('created_at', { ascending: false })
         .then(async ({ data }) => {
           const rooms = data ?? [];
           const roomIds = rooms.map((r) => r.id);
@@ -265,6 +260,7 @@ export default function DashboardPage() {
                 .select('room_id, content, created_at')
                 .in('room_id', roomIds)
                 .order('created_at', { ascending: false })
+                .limit(roomIds.length * 3)
             : { data: [] };
           const lastMap: Record<string, { content: string; created_at: string }> = {};
           (msgs ?? []).forEach((m: any) => { if (!lastMap[m.room_id]) lastMap[m.room_id] = m; });
@@ -273,9 +269,9 @@ export default function DashboardPage() {
             lastMessage: lastMap[r.id]?.content ?? null,
             lastMessageAt: lastMap[r.id]?.created_at ?? null,
           })));
-          setTabLoading(false);
-        })
-        .catch(() => setTabLoading(false));
+        });
+
+      Promise.all([joinedPromise, createdPromise]).finally(() => setTabLoading(false));
     }
   }, [tab, user, enrichPosts, enrichMedia]);
 
@@ -858,26 +854,36 @@ export default function DashboardPage() {
                   <p className="text-stone-400 dark:text-white/30 text-sm">
                     {chatSubTab === 'joined' ? '참여한 채팅방이 없습니다.' : '만든 채팅방이 없습니다.'}
                   </p>
-                  <a href="/chat" className="mt-2 inline-block text-emerald-400/60 hover:text-emerald-400 text-xs transition">채팅 허브 가기 →</a>
+                  <Link href="/chat" className="mt-2 inline-block text-emerald-400/60 hover:text-emerald-400 text-xs transition">채팅 허브 가기 →</Link>
                 </div>
               );
               return (
                 <div className="flex flex-col gap-2">
                   {list.map((room) => (
-                    <a key={room.id} href={`/chat/room/${room.id}`}
+                    <Link key={room.id} href={`/chat/room/${room.id}`}
                       className="flex items-center gap-4 p-4 rounded-xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/4 dark:hover:bg-white/4 transition group"
                     >
                       <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-500 font-bold text-sm shrink-0">
                         {room.name[0]}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-stone-700 dark:text-white/70 text-sm font-semibold truncate">{room.name}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-stone-700 dark:text-white/70 text-sm font-semibold truncate">{room.name}</p>
+                          {room.category && (() => {
+                            const catInfo = COMMUNITY_CATEGORY_MAP[room.category];
+                            return catInfo ? (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/5 text-stone-500 dark:text-white/40 shrink-0">
+                                {catInfo.emoji} {catInfo.label}
+                              </span>
+                            ) : null;
+                          })()}
+                        </div>
                         <p className="text-stone-400 dark:text-white/30 text-xs truncate mt-0.5">
                           {room.lastMessage ?? '아직 메시지가 없습니다'}
                         </p>
                       </div>
                       <span className="text-stone-300 dark:text-white/20 text-sm group-hover:translate-x-0.5 transition-transform">›</span>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               );
