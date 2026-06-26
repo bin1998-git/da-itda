@@ -45,7 +45,9 @@ function BoardWriteContent() {
   const uploadFiles = async (): Promise<string[]> => {
     const uploaded: string[] = [];
     for (const file of newFiles) {
-      const path = `${Date.now()}_${file.name}`;
+      const ext = file.name.split('.').pop() ?? 'bin';
+      const safeName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = user ? `${user.id}/${safeName}` : safeName;
       const { error: upErr } = await supabase.storage.from('board-files').upload(path, file);
       if (upErr) throw new Error('파일 업로드 실패: ' + upErr.message);
       const { data } = supabase.storage.from('board-files').getPublicUrl(path);
