@@ -2,50 +2,10 @@ import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
 import CategoryFilter from '@/components/ui/CategoryFilter';
 import Pagination from '@/components/ui/Pagination';
+import ProductCard from '@/components/ui/ProductCard';
 import { Product } from '@/types/market';
 
 const PAGE_SIZE = 12;
-
-const CATEGORY_EMOJI: Record<string, string> = {
-  food: '🥩', kitchen: '🍳', snack: '🍪', drink: '🧃',
-};
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR');
-}
-
-function ProductCard({ product }: { product: Product }) {
-  return (
-    <Link href={`/market/${product.id}`} className="group block">
-      <div className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 overflow-hidden hover:border-amber-500/30 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-200">
-        {/* 이미지 영역 */}
-        <div className="aspect-square bg-gradient-to-br from-amber-500/10 to-orange-500/5 flex items-center justify-center text-6xl">
-          {product.images?.[0]
-            ? <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover" />
-            : <span>{CATEGORY_EMOJI[product.category] ?? '📦'}</span>
-          }
-        </div>
-        {/* 상품 정보 */}
-        <div className="p-4 flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-semibold text-amber-400/70 tracking-wider uppercase">
-              {product.sellers?.store_name ?? '판매자'}
-            </span>
-            {product.stock <= 5 && product.stock > 0 && (
-              <span className="text-[10px] text-rose-400 font-medium">잔여 {product.stock}개</span>
-            )}
-          </div>
-          <p className="text-stone-900 dark:text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-100 transition">
-            {product.title}
-          </p>
-          <p className="text-amber-400 font-bold text-base mt-0.5">
-            {formatPrice(product.price)}원
-          </p>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 export default async function MarketPage({
   searchParams,
