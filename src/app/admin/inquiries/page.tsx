@@ -4,6 +4,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import Pagination from '@/components/ui/Pagination';
+
+const PAGE_SIZE = 10;
 
 interface Inquiry {
   id: string;
@@ -41,6 +44,7 @@ export default function AdminInquiriesPage() {
   const [answerMap, setAnswerMap] = useState<Record<string, string>>({});
   const [processing, setProcessing] = useState<string | null>(null);
   const [expanded, setExpanded]   = useState<string | null>(null);
+  const [page, setPage]           = useState(1);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -129,7 +133,7 @@ export default function AdminInquiriesPage() {
           {(['pending', 'answered', 'all'] as const).map((f) => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
+              onClick={() => { setFilter(f); setPage(1); }}
               className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
                 filter === f
                   ? f === 'pending'
@@ -152,7 +156,7 @@ export default function AdminInquiriesPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {inquiries.map((q) => (
+            {inquiries.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((q) => (
               <div
                 key={q.id}
                 className={`rounded-2xl border bg-black/[0.02] dark:bg-white/[0.02] overflow-hidden ${
@@ -247,6 +251,7 @@ export default function AdminInquiriesPage() {
             ))}
           </div>
         )}
+        <Pagination currentPage={page} totalPages={Math.ceil(inquiries.length / PAGE_SIZE)} onPageChange={setPage} />
       </div>
     </main>
   );

@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+
+function formatPhone(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length < 4) return d;
+  if (d.length < 8) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+}
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -540,7 +547,7 @@ export default function DashboardPage() {
                 <input
                   type={type}
                   value={profile[key]}
-                  onChange={(e) => { setProfile((p) => ({ ...p, [key]: e.target.value })); setSaveMsg(null); }}
+                  onChange={(e) => { const val = key === 'phone' ? formatPhone(e.target.value) : e.target.value; setProfile((p) => ({ ...p, [key]: val })); setSaveMsg(null); }}
                   placeholder={placeholder}
                   className="px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:border-amber-500/50 transition text-sm"
                 />

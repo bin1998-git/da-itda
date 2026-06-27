@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
+function formatPhone(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length < 4) return d;
+  if (d.length < 8) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+}
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -118,6 +125,7 @@ export default function OrdersPage() {
 
   // 취소 확인 중인 주문
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [tab, setTab]   = useState<'all' | 'active' | 'delivered' | 'cancelled'>('all');
   const [page, setPage] = useState(1);
 
   const load = async (uid: string) => {
@@ -219,10 +227,49 @@ export default function OrdersPage() {
             </Link>
           </div>
         ) : (() => {
-          const totalPages = Math.ceil(orders.length / PAGE_SIZE);
-          const paged = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+          const TABS = [
+            { key: 'all',       label: '전체',   count: orders.length },
+            { key: 'active',    label: '진행중',  count: orders.filter(o => !['delivered','cancelled'].includes(o.status)).length },
+            { key: 'delivered', label: '배송완료', count: orders.filter(o => o.status === 'delivered').length },
+            { key: 'cancelled', label: '취소',   count: orders.filter(o => o.status === 'cancelled').length },
+          ] as const;
+          const filtered = tab === 'all'       ? orders
+                         : tab === 'active'    ? orders.filter(o => !['delivered','cancelled'].includes(o.status))
+                         : tab === 'delivered' ? orders.filter(o => o.status === 'delivered')
+                         :                       orders.filter(o => o.status === 'cancelled');
+          const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+          const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
           return (
           <>
+          {/* 탭 필터 */}
+          <div className="flex gap-1 mb-6 p-1 bg-black/4 dark:bg-white/4 rounded-2xl">
+            {TABS.map(({ key, label, count }) => (
+              <button
+                key={key}
+                onClick={() => { setTab(key); setPage(1); }}
+                className={`flex-1 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
+                  tab === key
+                    ? 'bg-white dark:bg-white/10 text-stone-900 dark:text-white shadow-sm'
+                    : 'text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white/70'
+                }`}
+              >
+                {label}
+                {count > 0 && (
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                    tab === key
+                      ? key === 'cancelled' ? 'bg-rose-500/15 text-rose-400' : 'bg-amber-500/15 text-amber-500'
+                      : 'bg-black/8 dark:bg-white/8 text-stone-400 dark:text-white/40'
+                  }`}>{count}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {filtered.length === 0 ? (
+            <div className="rounded-2xl border border-black/6 dark:border-white/6 bg-black/[0.02] dark:bg-white/[0.02] p-12 text-center">
+              <p className="text-stone-400 dark:text-white/40 text-sm">해당 주문이 없습니다.</p>
+            </div>
+          ) : (
           <div className="flex flex-col gap-5">
             {paged.map((order) => {
               const st = STATUS[order.status] ?? STATUS.paid;
@@ -248,7 +295,7 @@ export default function OrdersPage() {
                   {/* 상품 목록 */}
                   <div className="px-5 py-4 flex flex-col gap-3 border-b border-black/6 dark:border-white/6">
                     {order.items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-3">
+                      <div key={item.id} className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-lg shrink-0 overflow-hidden">
                           {item.image_url
                             ? <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
@@ -257,6 +304,14 @@ export default function OrdersPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-stone-700 dark:text-white/70 text-sm truncate">{item.title}</p>
                           <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">{item.price.toLocaleString('ko-KR')}원 × {item.quantity}개</p>
+                          {order.status === 'delivered' && item.product_id && (
+                            <Link
+                              href={`/market/${item.product_id}/review?orderId=${order.id}`}
+                              className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-amber-500 hover:text-amber-400 transition"
+                            >
+                              ★ 리뷰 쓰기
+                            </Link>
+                          )}
                         </div>
                         <p className="text-stone-600 dark:text-white/60 text-sm font-medium shrink-0">
                           {(item.price * item.quantity).toLocaleString('ko-KR')}원
@@ -295,7 +350,7 @@ export default function OrdersPage() {
                             <label className="text-stone-400 dark:text-white/30 text-[11px] mb-1 block">전화번호</label>
                             <input
                               value={shippingForm.phone}
-                              onChange={(e) => { setShippingForm((f) => ({ ...f, phone: e.target.value })); setShippingError(''); }}
+                              onChange={(e) => { setShippingForm((f) => ({ ...f, phone: formatPhone(e.target.value) })); setShippingError(''); }}
                               placeholder="010-0000-0000"
                               className="w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-xs focus:outline-none focus:border-amber-500/50 transition placeholder-stone-300 dark:placeholder-white/20"
                             />
@@ -411,6 +466,7 @@ export default function OrdersPage() {
               );
             })}
           </div>
+          )}
           <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           </>
           );

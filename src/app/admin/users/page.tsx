@@ -4,6 +4,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import Pagination from '@/components/ui/Pagination';
+
+const PAGE_SIZE = 15;
 
 interface Profile {
   id: string;
@@ -36,6 +39,7 @@ export default function AdminUsersPage() {
   const [processing, setProcessing] = useState<string | null>(null);
   const [search, setSearch]       = useState('');
   const [filter, setFilter]       = useState<'all' | 'admin' | 'banned'>('all');
+  const [page, setPage]           = useState(1);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,6 +87,8 @@ export default function AdminUsersPage() {
       isBanned(p);
     return matchSearch && matchFilter;
   });
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   if (isLoading || loading) {
     return (
@@ -111,14 +117,14 @@ export default function AdminUsersPage() {
             type="text"
             placeholder="이름 또는 아이디로 검색..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="flex-1 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/25 text-sm focus:outline-none focus:border-emerald-500/40 transition"
           />
           <div className="flex gap-2">
             {(['all', 'admin', 'banned'] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f)}
+                onClick={() => { setFilter(f); setPage(1); }}
                 className={`px-4 py-2 rounded-xl text-sm font-medium border transition ${
                   filter === f
                     ? f === 'admin'
@@ -143,7 +149,7 @@ export default function AdminUsersPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {filtered.map((p) => {
+            {paged.map((p) => {
               const banned = isBanned(p);
               const isSelf = p.id === user?.id;
               return (
@@ -235,6 +241,7 @@ export default function AdminUsersPage() {
             })}
           </div>
         )}
+        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
       </div>
     </main>
   );

@@ -25,7 +25,7 @@ const NAV_LINKS = [
       </svg>
     ),
     accent: 'text-amber-400',
-    activeBg: 'bg-amber-500/12 border-amber-500/20',
+    activeBg: 'bg-amber-500/12',
     dot: 'bg-amber-400',
   },
   {
@@ -39,7 +39,7 @@ const NAV_LINKS = [
       </svg>
     ),
     accent: 'text-rose-400',
-    activeBg: 'bg-rose-500/12 border-rose-500/20',
+    activeBg: 'bg-rose-500/12',
     dot: 'bg-rose-400',
   },
   {
@@ -52,7 +52,7 @@ const NAV_LINKS = [
       </svg>
     ),
     accent: 'text-emerald-400',
-    activeBg: 'bg-emerald-500/12 border-emerald-500/20',
+    activeBg: 'bg-emerald-500/12',
     dot: 'bg-emerald-400',
   },
   {
@@ -65,7 +65,7 @@ const NAV_LINKS = [
       </svg>
     ),
     accent: 'text-violet-400',
-    activeBg: 'bg-violet-500/12 border-violet-500/20',
+    activeBg: 'bg-violet-500/12',
     dot: 'bg-violet-400',
   },
   {
@@ -78,7 +78,7 @@ const NAV_LINKS = [
       </svg>
     ),
     accent: 'text-pink-400',
-    activeBg: 'bg-pink-500/12 border-pink-500/20',
+    activeBg: 'bg-pink-500/12',
     dot: 'bg-pink-400',
   },
 ];
@@ -157,20 +157,16 @@ export default function Navbar() {
                 key={href}
                 href={href}
                 title={label}
-                className={`relative flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
+                className={`relative flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 shrink-0 ${
                   active
                     ? `${accent} ${activeBg}`
-                    : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5 border-transparent'
+                    : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
                 <span className={active ? accent : 'text-stone-400 dark:text-white/30'}>
                   {icon}
                 </span>
-                <span className={`hidden lg:inline xl:hidden text-[13px] ${active ? accent : ''}`}>{label}</span>
-                <span className="hidden xl:flex flex-col leading-none gap-0.5">
-                  <span className={active ? accent : ''}>{label}</span>
-                  <span className={`text-[10px] font-normal ${active ? 'opacity-60' : 'text-stone-400 dark:text-white/25'}`}>{sub}</span>
-                </span>
+                <span className={`hidden lg:inline whitespace-nowrap text-[13px] ${active ? accent : ''}`}>{label}</span>
                 {active && <span className={`w-1.5 h-1.5 rounded-full ${dot} shrink-0`} />}
               </Link>
             );
@@ -179,20 +175,16 @@ export default function Navbar() {
           {/* 게시판 드롭다운 — CSS group-hover로 제어 (JS onMouseLeave gap 버그 방지) */}
           <div className="group/board relative pb-2 -mb-2">
             <button
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 border ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 ${
                 pathname.startsWith('/board') || pathname.startsWith('/inquiry')
-                  ? 'text-indigo-400 bg-indigo-500/12 border-indigo-500/20'
-                  : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5 border-transparent'
+                  ? 'text-indigo-400 bg-indigo-500/12'
+                  : 'text-stone-500 dark:text-white/45 hover:text-stone-800 dark:hover:text-white/80 hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6" />
               </svg>
-              <span className="hidden lg:inline xl:hidden text-[13px]">게시판</span>
-              <span className="hidden xl:flex flex-col leading-none gap-0.5">
-                <span>게시판</span>
-                <span className="text-[10px] font-normal text-stone-400 dark:text-white/25">공지·문의</span>
-              </span>
+              <span className="hidden lg:inline whitespace-nowrap text-[13px]">게시판</span>
               <svg className="w-2.5 h-2.5 ml-0.5 opacity-40 transition-transform duration-150 group-hover/board:rotate-180 group-hover/board:opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>

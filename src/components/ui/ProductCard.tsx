@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import { Product } from '@/types/market';
+import StarRating from './StarRating';
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  food: '🥩', kitchen: '🍳', snack: '🍪', drink: '🧃',
+  food: '🥩', kitchen: '🍳', snack: '🍪', drink: '🧃', etc: '📦',
 };
 
 function formatPrice(price: number) {
@@ -71,6 +72,10 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const isSoldOut = product.stock === 0;
+  const reviewCount = product.reviews?.length ?? 0;
+  const avgRating = reviewCount
+    ? product.reviews!.reduce((s, r) => s + r.rating, 0) / reviewCount
+    : 0;
 
   return (
     <Link href={`/market/${product.id}`} className="group block">
@@ -91,6 +96,13 @@ export default function ProductCard({ product }: { product: Product }) {
               </span>
             )
           }
+
+          {/* 해외직구 뱃지 — 좌상단 */}
+          {product.is_overseas && (
+            <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-500/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-wide shadow-sm">
+              🌐 해외직구
+            </div>
+          )}
 
           {/* 찜하기 버튼 — 우상단, hover 시 페이드인 */}
           <button
@@ -137,9 +149,21 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="text-stone-900 dark:text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors duration-300">
             {product.title}
           </p>
+          {reviewCount > 0 && (
+            <div className="flex items-center gap-1.5">
+              <StarRating rating={avgRating} size="sm" />
+              <span className="text-amber-500 text-xs font-semibold">{avgRating.toFixed(1)}</span>
+              <span className="text-stone-400 dark:text-white/30 text-xs">({reviewCount})</span>
+            </div>
+          )}
           <p className="text-amber-400 font-bold text-base mt-0.5">
             {formatPrice(product.price)}원
           </p>
+          {product.is_overseas && (
+            <p className="text-sky-400/80 text-[11px]">
+              + 해외배송비 {product.overseas_shipping_fee ? `${formatPrice(product.overseas_shipping_fee)}원` : '별도'}
+            </p>
+          )}
         </div>
       </div>
     </Link>

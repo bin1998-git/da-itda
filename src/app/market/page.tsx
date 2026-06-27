@@ -20,7 +20,7 @@ export default async function MarketPage({
 
   let query = db
     .from('products')
-    .select('*, sellers(store_name)', { count: 'exact' })
+    .select('*, sellers(store_name), reviews(rating)', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: false })
     .range(from, to);

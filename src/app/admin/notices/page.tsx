@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import Pagination from '@/components/ui/Pagination';
+
+const PAGE_SIZE = 10;
 
 interface Notice {
   id: string;
@@ -46,6 +49,7 @@ export default function AdminNoticesPage() {
 
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage]       = useState(1);
 
   // write/edit form
   const [mode, setMode] = useState<'list' | 'write' | 'edit'>('list');
@@ -255,7 +259,7 @@ export default function AdminNoticesPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {notices.map((n) => (
+            {notices.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((n) => (
               <div key={n.id} className={`rounded-xl border bg-black/[0.02] dark:bg-white/[0.02] p-4 flex items-center gap-3 ${n.is_pinned ? 'border-amber-500/20' : 'border-black/6 dark:border-white/6'}`}>
                 {n.is_pinned && <span className="text-sm shrink-0">📌</span>}
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${CAT_STYLE[n.category] ?? ''}`}>
@@ -294,6 +298,7 @@ export default function AdminNoticesPage() {
             ))}
           </div>
         )}
+        <Pagination currentPage={page} totalPages={Math.ceil(notices.length / PAGE_SIZE)} onPageChange={setPage} />
       </div>
     </main>
   );

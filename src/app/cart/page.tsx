@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
+function formatPhone(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length < 4) return d;
+  if (d.length < 8) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+}
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
@@ -9,6 +16,7 @@ import AddressInput from '@/components/ui/AddressInput';
 interface CartItem {
   id: string;
   quantity: number;
+  selected_color: string | null;
   products: { id: string; title: string; price: number; images: string[]; category: string } | null;
 }
 
@@ -82,7 +90,7 @@ export default function CartPage() {
 
     supabase
       .from('cart_items')
-      .select('id, quantity, products(id, title, price, images, category)')
+      .select('id, quantity, selected_color, products(id, title, price, images, category)')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -335,6 +343,9 @@ export default function CartPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-stone-900 dark:text-white text-sm font-medium truncate">{p.title}</p>
+                    {item.selected_color && (
+                      <span className="inline-block text-[11px] text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5 mt-0.5">{item.selected_color}</span>
+                    )}
                     <p className="text-amber-400 text-sm font-bold mt-0.5">
                       {(p.price * item.quantity).toLocaleString('ko-KR')}원
                     </p>
@@ -406,7 +417,7 @@ export default function CartPage() {
                   <input
                     type="tel"
                     value={shipping.phone}
-                    onChange={(e) => { setShipping((s) => ({ ...s, phone: e.target.value })); setShippingError(''); }}
+                    onChange={(e) => { setShipping((s) => ({ ...s, phone: formatPhone(e.target.value) })); setShippingError(''); }}
                     placeholder="010-0000-0000"
                     className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 text-sm focus:outline-none focus:border-amber-500/50 transition"
                   />

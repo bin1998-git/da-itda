@@ -50,6 +50,181 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+/* ─── TipTap / ProseMirror Editor ───────────────────────────────────────── */
+.ProseMirror {
+  outline: none;
+  min-height: 320px;
+  padding: 20px 24px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-1);
+  caret-color: #f59e0b;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--text-3);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+.ProseMirror h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text-1);
+  margin: 1.5rem 0 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid rgba(245, 158, 11, 0.25);
+  letter-spacing: -0.01em;
+}
+
+.ProseMirror h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-1);
+  margin: 1.25rem 0 0.4rem;
+}
+
+.ProseMirror strong {
+  font-weight: 800;
+  color: var(--text-1);
+}
+.ProseMirror em {
+  font-style: italic;
+  color: var(--text-1);
+}
+.ProseMirror s {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.ProseMirror ul {
+  list-style: none;
+  padding-left: 1.5rem;
+  margin: 0.6rem 0;
+}
+.ProseMirror ul li::before {
+  content: "•";
+  color: #f59e0b;
+  font-weight: 700;
+  display: inline-block;
+  width: 1rem;
+  margin-left: -1rem;
+}
+
+.ProseMirror ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0.6rem 0;
+}
+.ProseMirror ol li::marker { color: #f59e0b; font-weight: 600; }
+
+.ProseMirror blockquote {
+  border-left: 3px solid #f59e0b;
+  margin: 1rem 0;
+  padding: 0.6rem 1rem;
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-2);
+  font-style: italic;
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.ProseMirror p { margin: 0.3rem 0; }
+
+.ProseMirror img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 1rem 0;
+  display: block;
+  cursor: default;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.ProseMirror img.ProseMirror-selectednode {
+  border-color: #f59e0b;
+  outline: none;
+}
+
+/* ─── 상품 상세 설명 (뷰어 모드) ────────────────────────────────────────── */
+.product-desc {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-2);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.product-desc h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text-1);
+  margin: 2.5rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(245, 158, 11, 0.2);
+}
+
+.product-desc h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-1);
+  margin: 2rem 0 0.5rem;
+}
+
+.product-desc strong { font-weight: 700; color: var(--text-1); }
+.product-desc em { font-style: italic; }
+.product-desc s { text-decoration: line-through; opacity: 0.5; }
+
+.product-desc p {
+  margin: 0.75rem 0;
+}
+
+.product-desc ul {
+  list-style: none;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+.product-desc ul li { position: relative; margin: 0.4rem 0; }
+.product-desc ul li::before {
+  content: "•";
+  color: #f59e0b;
+  font-weight: 700;
+  position: absolute;
+  left: -1.25rem;
+}
+
+.product-desc ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+.product-desc ol li { margin: 0.4rem 0; }
+.product-desc ol li::marker { color: #f59e0b; font-weight: 600; }
+
+.product-desc blockquote {
+  border-left: 3px solid #f59e0b;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: 0 12px 12px 0;
+  color: var(--text-2);
+  font-style: italic;
+}
+
+.product-desc hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+.product-desc img { max-width: 100%; border-radius: 12px; margin: 1rem 0; }
+
 /* ─── Hero gradient (dark only) ──────────────────────────────────────────── */
 @keyframes hero-gradient {
   0%   { background-position: 0% 50%; }
@@ -104,10 +279,17 @@ body {
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
 
-/* ─── Smooth theme transition for all elements ───────────────────────────── */
-*, *::before, *::after {
+/* ─── Smooth theme transition (dark/light mode switch only) ──────────────── */
+body, main, header, nav, aside, section, article, div, span, p, h1, h2, h3, h4,
+input, textarea, select, label, li, ul, ol, table, td, th, svg, path, circle, rect {
   transition-property: background-color, border-color, color, fill, stroke;
   transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+/* 버튼/에디터는 별도 transition 처리 (즉각 피드백) */
+button, a, .ProseMirror, .ProseMirror * {
+  transition-property: background-color, border-color, opacity;
+  transition-duration: 60ms;
   transition-timing-function: ease;
 }
 

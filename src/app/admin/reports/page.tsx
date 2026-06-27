@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import Pagination from '@/components/ui/Pagination';
+
+const PAGE_SIZE = 10;
 
 interface Report {
   id: string;
@@ -57,6 +60,7 @@ export default function AdminReportsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'pending' | 'resolved' | 'dismissed' | 'all'>('pending');
   const [processing, setProcessing] = useState<string | null>(null);
+  const [page, setPage]       = useState(1);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -184,7 +188,7 @@ export default function AdminReportsPage() {
           {([['pending', '미처리'], ['all', '전체'], ['resolved', '처리완료'], ['dismissed', '무시']] as const).map(([key, label]) => (
             <button
               key={key}
-              onClick={() => setFilter(key)}
+              onClick={() => { setFilter(key); setPage(1); }}
               className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
                 filter === key
                   ? key === 'pending'
@@ -206,8 +210,9 @@ export default function AdminReportsPage() {
             </p>
           </div>
         ) : (
+          <>
           <div className="flex flex-col gap-3">
-            {reports.map((r) => {
+            {reports.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((r) => {
               const typeInfo = TYPE_LABEL[r.target_type];
               return (
                 <div key={r.id} className={`rounded-2xl border bg-black/[0.02] dark:bg-white/[0.02] p-5 ${r.status === 'pending' ? 'border-rose-500/15' : 'border-black/6 dark:border-white/6'}`}>
@@ -287,6 +292,8 @@ export default function AdminReportsPage() {
               );
             })}
           </div>
+          <Pagination currentPage={page} totalPages={Math.ceil(reports.length / PAGE_SIZE)} onPageChange={setPage} />
+          </>
         )}
       </div>
     </main>
