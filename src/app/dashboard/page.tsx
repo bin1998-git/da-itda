@@ -15,6 +15,7 @@ import { useAuthStore } from '@/store/authStore';
 import AddressInput from '@/components/ui/AddressInput';
 import Pagination from '@/components/ui/Pagination';
 import { COMMUNITY_CATEGORY_MAP } from '@/types/community';
+import SellerRevenueChart from '@/components/ui/SellerRevenueChart';
 
 const POSTS_PER_PAGE = 10;
 const MEDIA_PER_PAGE = 10;
@@ -1028,6 +1029,9 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
+
+              {/* 매출 그래프 */}
+              <SellerRevenueChart items={active} />
 
               {/* 주문 관리 */}
               {sellerOrders.length > 0 && (
