@@ -35,6 +35,7 @@ interface Product {
   storage_method: string | null;
   expiry_info: string | null;
   allergen_info: string | null;
+  original_price: number | null;
 }
 
 const CAT_LABEL: Record<string, string> = {
@@ -55,6 +56,7 @@ interface EditForm {
   title: string;
   description: string;
   price: string;
+  originalPrice: string;
   stock: string;
   category: Category;
   colors: string[];
@@ -72,7 +74,7 @@ interface EditForm {
 }
 
 const EMPTY_FORM: EditForm = {
-  title: '', description: '', price: '', stock: '', category: 'food',
+  title: '', description: '', price: '', originalPrice: '', stock: '', category: 'food',
   colors: [],
   delivery_type: '', delivery_days: null, is_overseas: false, overseas_shipping_fee: '',
   packaging_type: '', sales_unit: '',
@@ -111,7 +113,7 @@ export default function ManagePage() {
     const { data } = await supabase
       .from('products')
       .select(`
-        id, title, description, price, category, images, stock, is_active, created_at,
+        id, title, description, price, original_price, category, images, stock, is_active, created_at,
         colors, delivery_type, delivery_days, is_overseas, overseas_shipping_fee,
         packaging_type, sales_unit, weight, origin, storage_method, expiry_info, allergen_info
       `)
@@ -133,6 +135,7 @@ export default function ManagePage() {
       title: p.title,
       description: p.description ?? '',
       price: String(p.price),
+      originalPrice: p.original_price?.toString() ?? '',
       stock: String(p.stock),
       category: p.category,
       colors: p.colors ?? [],
@@ -228,6 +231,7 @@ export default function ManagePage() {
       title: editForm.title.trim(),
       description: editForm.description.trim() || null,
       price: Number(editForm.price),
+      original_price: editForm.originalPrice ? Number(editForm.originalPrice) : null,
       stock: Number(editForm.stock),
       category: editForm.category,
       images: finalImages,
@@ -254,6 +258,7 @@ export default function ManagePage() {
       ...editForm,
       images: finalImages,
       price: Number(editForm.price),
+      original_price: editForm.originalPrice ? Number(editForm.originalPrice) : null,
       stock: Number(editForm.stock),
       delivery_days: editForm.delivery_days,
       is_overseas: editForm.is_overseas,
@@ -428,7 +433,7 @@ export default function ManagePage() {
                       />
                     </div>
 
-                    {/* 가격 · 재고 */}
+                    {/* 가격 · 정가 · 재고 */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">가격 (원) *</label>
@@ -436,6 +441,16 @@ export default function ManagePage() {
                           type="number"
                           value={editForm.price}
                           onChange={(e) => setEditForm((f) => ({ ...f, price: e.target.value }))}
+                          className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">정가 (선택)</label>
+                        <input
+                          type="number"
+                          placeholder="할인 전 정가"
+                          value={editForm.originalPrice}
+                          onChange={(e) => setEditForm((f) => ({ ...f, originalPrice: e.target.value }))}
                           className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-amber-500/50 transition"
                         />
                       </div>

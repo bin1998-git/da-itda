@@ -4,12 +4,17 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import ColorSelectorCart from '@/components/ui/ColorSelectorCart';
 import WishlistButton from '@/components/ui/WishlistButton';
+import RestockAlertButton from '@/components/ui/RestockAlertButton';
+import ShareButton from '@/components/ui/ShareButton';
 import ReportButton from '@/components/ui/ReportButton';
 import AdminContentActions from '@/components/ui/AdminContentActions';
 import ProductImageGallery from '@/components/ui/ProductImageGallery';
 import StarRating from '@/components/ui/StarRating';
 import ReviewSection from '@/components/ui/ReviewSection';
 import ProductDetailTabs from '@/components/ui/ProductDetailTabs';
+import ViewTracker from '@/components/ui/ViewTracker';
+import RecentlyViewedProducts from '@/components/ui/RecentlyViewedProducts';
+import RelatedProducts from '@/components/ui/RelatedProducts';
 import { Product, Review } from '@/types/market';
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -44,6 +49,11 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const p = product as Product;
+
+  const { data: related } = await db.from('products')
+    .select('id, title, price, original_price, images, category, sellers(store_name), reviews(rating)')
+    .eq('category', p.category).eq('is_active', true).neq('id', p.id)
+    .order('created_at', { ascending: false }).limit(8);
   const reviewList = (reviews ?? []) as Review[];
   const avgRating = reviewList.length
     ? reviewList.reduce((s, r) => s + r.rating, 0) / reviewList.length
@@ -164,10 +174,22 @@ export default async function ProductDetailPage({
             {/* 가격 */}
             <div className="py-5 border-t border-b border-black/8 dark:border-white/8">
               <p className="text-stone-400 dark:text-white/30 text-xs mb-1">판매가</p>
-              <p className="text-3xl font-bold text-amber-400">
-                {formatPrice(p.price)}
-                <span className="text-lg text-stone-400 dark:text-white/40 font-normal ml-1">원</span>
-              </p>
+              {p.original_price && p.original_price > p.price ? (
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-stone-400 dark:text-white/30 text-lg line-through">{formatPrice(p.original_price)}원</span>
+                  <span className="bg-rose-500/90 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    {Math.round((1 - p.price / p.original_price) * 100)}% 할인
+                  </span>
+                  <p className="text-3xl font-bold text-amber-400">
+                    {formatPrice(p.price)}<span className="text-lg text-stone-400 dark:text-white/40 font-normal ml-1">원</span>
+                  </p>
+                </div>
+              ) : (
+                <p className="text-3xl font-bold text-amber-400">
+                  {formatPrice(p.price)}
+                  <span className="text-lg text-stone-400 dark:text-white/40 font-normal ml-1">원</span>
+                </p>
+              )}
             </div>
 
             {/* 재고 */}
@@ -186,7 +208,11 @@ export default async function ProductDetailPage({
                 <AddToCartButton productId={p.id} stock={p.stock} />
               )}
               <WishlistButton productId={p.id} />
+              <RestockAlertButton productId={p.id} stock={p.stock} />
             </div>
+
+            {/* 공유 */}
+            <ShareButton title={p.title} price={p.price} />
 
             {/* 신고 / 관리자 */}
             <div className="flex items-center gap-3 pt-1">
@@ -274,7 +300,18 @@ export default async function ProductDetailPage({
 
           </ProductDetailTabs>
         </div>
+
+        {/* 연관 상품 */}
+        {related && related.length > 0 && (
+          <RelatedProducts products={related as never} />
+        )}
+
+        {/* 최근 본 상품 */}
+        <RecentlyViewedProducts excludeId={p.id} />
       </div>
+
+      {/* 방문 기록 */}
+      <ViewTracker productId={p.id} />
     </main>
   );
 }

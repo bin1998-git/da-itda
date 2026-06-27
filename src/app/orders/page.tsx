@@ -24,6 +24,7 @@ interface OrderItem {
   quantity: number;
   image_url: string | null;
   product_id: string | null;
+  selected_color: string | null;
 }
 
 interface Order {
@@ -127,6 +128,9 @@ export default function OrdersPage() {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [tab, setTab]   = useState<'all' | 'active' | 'delivered' | 'cancelled'>('all');
   const [page, setPage] = useState(1);
+  // 재구매
+  const [rebuyingId, setRebuyingId] = useState<string | null>(null);
+  const [reboughtId, setReboughtId] = useState<string | null>(null);
 
   const load = async (uid: string) => {
     const { data: orderRows } = await supabase
@@ -139,7 +143,7 @@ export default function OrdersPage() {
 
     const { data: itemRows } = await supabase
       .from('order_items')
-      .select('id, order_id, title, price, quantity, image_url, product_id')
+      .select('id, order_id, title, price, quantity, image_url, product_id, selected_color')
       .in('order_id', orderRows.map((o) => o.id));
 
     const itemMap: Record<string, OrderItem[]> = {};
@@ -196,6 +200,27 @@ export default function OrdersPage() {
     } : o));
     setSavingShipping(false);
     setEditingOrderId(null);
+  };
+
+  const rebuyOrder = async (order: Order) => {
+    if (!user || rebuyingId) return;
+    setRebuyingId(order.id);
+    for (const item of order.items) {
+      if (!item.product_id) continue;
+      const query = supabase.from('cart_items').select('id, quantity')
+        .eq('user_id', user.id).eq('product_id', item.product_id);
+      const { data: existing } = item.selected_color
+        ? await query.eq('selected_color', item.selected_color).maybeSingle()
+        : await query.is('selected_color', null).maybeSingle();
+      if (existing) {
+        await supabase.from('cart_items').update({ quantity: existing.quantity + item.quantity }).eq('id', existing.id);
+      } else {
+        await supabase.from('cart_items').insert({ user_id: user.id, product_id: item.product_id, quantity: item.quantity, selected_color: item.selected_color ?? null });
+      }
+    }
+    setRebuyingId(null);
+    setReboughtId(order.id);
+    setTimeout(() => setReboughtId(null), 1500);
   };
 
   if (isLoading || loading) {
@@ -431,6 +456,19 @@ export default function OrdersPage() {
                           {order.total_amount.toLocaleString('ko-KR')}원
                         </p>
                       </div>
+
+                      {/* 재구매 버튼 */}
+                      <button
+                        onClick={() => rebuyOrder(order)}
+                        disabled={rebuyingId === order.id}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition shrink-0 ${
+                          reboughtId === order.id
+                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                            : 'border border-black/10 dark:border-white/10 text-stone-400 dark:text-white/40 hover:text-amber-500 hover:border-amber-500/30 hover:bg-amber-500/5'
+                        } disabled:opacity-50`}
+                      >
+                        {reboughtId === order.id ? '✓ 담겼어요' : rebuyingId === order.id ? '담는 중...' : '장바구니에 다시 담기'}
+                      </button>
 
                       {/* 취소 버튼 (결제완료 상태만) */}
                       {canModify && (

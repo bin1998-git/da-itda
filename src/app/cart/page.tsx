@@ -17,7 +17,15 @@ interface CartItem {
   id: string;
   quantity: number;
   selected_color: string | null;
-  products: { id: string; title: string; price: number; images: string[]; category: string } | null;
+  products: {
+    id: string;
+    title: string;
+    price: number;
+    images: string[];
+    category: string;
+    colors?: string[] | null;
+    color_stocks?: Record<string, number> | null;
+  } | null;
 }
 
 interface Coupon {
@@ -90,7 +98,7 @@ export default function CartPage() {
 
     supabase
       .from('cart_items')
-      .select('id, quantity, selected_color, products(id, title, price, images, category)')
+      .select('id, quantity, selected_color, products(id, title, price, images, category, colors, color_stocks)')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -98,6 +106,23 @@ export default function CartPage() {
         setFetching(false);
       });
   }, [user, isLoading]);
+
+  const handleColorChange = async (itemId: string, productId: string, newColor: string) => {
+    const existing = items.find(
+      (i) => i.products?.id === productId && i.selected_color === newColor && i.id !== itemId,
+    );
+    if (existing) {
+      const merged = Math.min(existing.quantity + items.find((i) => i.id === itemId)!.quantity, 999);
+      await supabase.from('cart_items').update({ quantity: merged }).eq('id', existing.id);
+      await supabase.from('cart_items').delete().eq('id', itemId);
+      setItems((prev) =>
+        prev.filter((i) => i.id !== itemId).map((i) => i.id === existing.id ? { ...i, quantity: merged } : i),
+      );
+    } else {
+      await supabase.from('cart_items').update({ selected_color: newColor }).eq('id', itemId);
+      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, selected_color: newColor } : i));
+    }
+  };
 
   const removeItem = async (id: string) => {
     await supabase.from('cart_items').delete().eq('id', id);
@@ -228,6 +253,7 @@ export default function CartPage() {
           price: i.products!.price,
           quantity: i.quantity,
           image_url: i.products!.images?.[0] ?? null,
+          selected_color: i.selected_color ?? null,
         }));
       if (orderItems.length > 0) {
         await supabase.from('order_items').insert(orderItems);
@@ -330,41 +356,104 @@ export default function CartPage() {
         ) : (
           <div className="flex flex-col gap-4">
 
-            {/* 상품 목록 */}
-            {items.map((item) => {
-              if (!item.products) return null;
-              const p = item.products;
+            {/* 상품 목록 — 같은 상품(다른 색상)은 하나의 카드로 묶어 표시 */}
+            {Object.values(
+              items.reduce((acc, item) => {
+                const pid = item.products?.id ?? item.id;
+                if (!acc[pid]) acc[pid] = [];
+                acc[pid].push(item);
+                return acc;
+              }, {} as Record<string, CartItem[]>),
+            ).map((group) => {
+              const p = group[0].products;
+              if (!p) return null;
+              const groupTotal = group.reduce((s, i) => s + p.price * i.quantity, 0);
+              const isMultiColor = group.length > 1;
+
               return (
-                <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3">
-                  <div className="w-16 h-16 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
-                    {p.images?.[0]
-                      ? <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
-                      : '📦'}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-stone-900 dark:text-white text-sm font-medium truncate">{p.title}</p>
-                    {item.selected_color && (
-                      <span className="inline-block text-[11px] text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5 mt-0.5">{item.selected_color}</span>
+                <div key={p.id} className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 overflow-hidden">
+                  {/* 상품 헤더 */}
+                  <div className="flex items-center gap-4 p-4">
+                    <div className="w-14 h-14 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
+                      {p.images?.[0]
+                        ? <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
+                        : '📦'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/market/${p.id}`} className="text-stone-900 dark:text-white text-sm font-semibold hover:text-amber-500 dark:hover:text-amber-400 transition truncate block">
+                        {p.title}
+                      </Link>
+                      <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">
+                        {p.price.toLocaleString('ko-KR')}원 / 개
+                      </p>
+                    </div>
+                    {isMultiColor && (
+                      <p className="text-amber-400 font-bold text-sm shrink-0">
+                        {groupTotal.toLocaleString('ko-KR')}원
+                      </p>
                     )}
-                    <p className="text-amber-400 text-sm font-bold mt-0.5">
-                      {(p.price * item.quantity).toLocaleString('ko-KR')}원
-                    </p>
-                    <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">
-                      {p.price.toLocaleString('ko-KR')}원 × {item.quantity}개
-                    </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button onClick={() => updateQty(item.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-lg bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 hover:bg-black/15 dark:hover:bg-white/15 transition font-bold text-sm"
-                    >−</button>
-                    <span className="text-stone-900 dark:text-white text-sm w-4 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-lg bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 hover:bg-black/15 dark:hover:bg-white/15 transition font-bold text-sm"
-                    >+</button>
+
+                  {/* 색상별 서브행 */}
+                  <div className={`flex flex-col ${isMultiColor ? 'border-t border-black/6 dark:border-white/6 divide-y divide-black/6 dark:divide-white/6' : ''}`}>
+                    {group.map((item) => (
+                      <div key={item.id} className={`flex items-center gap-3 px-4 ${isMultiColor ? 'py-3' : 'pb-4'}`}>
+                        {/* 색상 뱃지 + 변경 드롭다운 */}
+                        <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+                          {item.selected_color ? (
+                            <>
+                              <span className="text-[11px] text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5 font-medium">
+                                {item.selected_color}
+                              </span>
+                              {p.colors && p.colors.length > 1 && (
+                                <select
+                                  value={item.selected_color}
+                                  onChange={(e) => handleColorChange(item.id, p.id, e.target.value)}
+                                  className="text-[11px] px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-500 dark:text-white/50 focus:outline-none focus:border-amber-500/50 transition appearance-none cursor-pointer"
+                                >
+                                  {p.colors.map((color) => {
+                                    const isSoldOut = !!(p.color_stocks && (p.color_stocks[color] ?? -1) === 0);
+                                    return (
+                                      <option key={color} value={color} disabled={isSoldOut && color !== item.selected_color}>
+                                        {color}{isSoldOut ? ' (품절)' : ''}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                              )}
+                            </>
+                          ) : (
+                            !isMultiColor && (
+                              <p className="text-amber-400 text-sm font-bold">
+                                {(p.price * item.quantity).toLocaleString('ko-KR')}원
+                              </p>
+                            )
+                          )}
+                        </div>
+
+                        {/* 수량 조절 */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button onClick={() => updateQty(item.id, item.quantity - 1)}
+                            className="w-6 h-6 rounded-md bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 hover:bg-black/15 dark:hover:bg-white/15 transition font-bold text-xs"
+                          >−</button>
+                          <span className="text-stone-900 dark:text-white text-sm w-5 text-center">{item.quantity}</span>
+                          <button onClick={() => updateQty(item.id, item.quantity + 1)}
+                            className="w-6 h-6 rounded-md bg-black/8 dark:bg-white/8 text-stone-600 dark:text-white/60 hover:bg-black/15 dark:hover:bg-white/15 transition font-bold text-xs"
+                          >+</button>
+                        </div>
+
+                        {/* 단가 */}
+                        <p className="text-stone-500 dark:text-white/40 text-xs shrink-0 w-16 text-right">
+                          {(p.price * item.quantity).toLocaleString('ko-KR')}원
+                        </p>
+
+                        {/* 삭제 */}
+                        <button onClick={() => removeItem(item.id)}
+                          className="text-stone-300 dark:text-white/20 hover:text-rose-400 transition text-xs shrink-0 px-1.5 py-1 rounded hover:bg-rose-500/8"
+                        >삭제</button>
+                      </div>
+                    ))}
                   </div>
-                  <button onClick={() => removeItem(item.id)}
-                    className="text-stone-300 dark:text-white/20 hover:text-rose-400 transition text-xs shrink-0 px-2 py-1 rounded hover:bg-rose-500/8"
-                  >삭제</button>
                 </div>
               );
             })}

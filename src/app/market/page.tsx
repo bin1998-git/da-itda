@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
 import CategoryFilter from '@/components/ui/CategoryFilter';
 import Pagination from '@/components/ui/Pagination';
 import ProductCard from '@/components/ui/ProductCard';
+import SortSelector from '@/components/ui/SortSelector';
 import { Product } from '@/types/market';
 
 const PAGE_SIZE = 12;
@@ -10,9 +12,9 @@ const PAGE_SIZE = 12;
 export default async function MarketPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; sort?: string }>;
 }) {
-  const { category, page: pageStr } = await searchParams;
+  const { category, page: pageStr, sort } = await searchParams;
   const page = Math.max(1, Number(pageStr) || 1);
   const from = (page - 1) * PAGE_SIZE;
   const to   = from + PAGE_SIZE - 1;
@@ -22,16 +24,29 @@ export default async function MarketPage({
     .from('products')
     .select('*, sellers(store_name), reviews(rating)', { count: 'exact' })
     .eq('is_active', true)
-    .order('created_at', { ascending: false })
     .range(from, to);
 
   if (category && category !== 'all') {
     query = query.eq('category', category);
   }
 
+  // 정렬
+  if (sort === 'price_asc') {
+    query = query.order('price', { ascending: true });
+  } else if (sort === 'price_desc') {
+    query = query.order('price', { ascending: false });
+  } else {
+    // latest (기본) 및 popular (리뷰 집계 어려우므로 최신순과 동일)
+    query = query.order('created_at', { ascending: false });
+  }
+
   const { data: products, count, error } = await query;
   const items = (products ?? []) as Product[];
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
+
+  const extraParams: Record<string, string> = {};
+  if (category && category !== 'all') extraParams.category = category;
+  if (sort && sort !== 'latest') extraParams.sort = sort;
 
   return (
     <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
@@ -58,8 +73,13 @@ export default async function MarketPage({
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
-        {/* 카테고리 필터 */}
-        <CategoryFilter current={category ?? 'all'} />
+        {/* 카테고리 필터 + 정렬 */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <CategoryFilter current={category ?? 'all'} />
+          <Suspense fallback={null}>
+            <SortSelector />
+          </Suspense>
+        </div>
 
         {/* 상품 그리드 */}
         {error || items.length === 0 ? (
@@ -93,7 +113,7 @@ export default async function MarketPage({
               currentPage={page}
               totalPages={totalPages}
               hrefBase="/market"
-              extraParams={category && category !== 'all' ? { category } : {}}
+              extraParams={extraParams}
             />
           </>
         )}

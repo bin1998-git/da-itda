@@ -43,6 +43,7 @@ export default function SellPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [colorInput, setColorInput] = useState('');
+  const [originalPrice, setOriginalPrice] = useState('');
   // 상세정보
   const [weight, setWeight] = useState('');
   const [origin, setOrigin] = useState('');
@@ -166,6 +167,7 @@ export default function SellPage() {
       title:          title.trim(),
       description:    desc.trim() || null,
       price:          Number(price),
+      original_price: originalPrice ? Number(originalPrice) : null,
       category,
       stock:          Number(stock),
       images:         uploadedUrls,
@@ -333,6 +335,17 @@ export default function SellPage() {
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     required
+                    min={100}
+                    className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">정가 (선택)</label>
+                  <input
+                    type="number"
+                    placeholder="20000"
+                    value={originalPrice}
+                    onChange={(e) => setOriginalPrice(e.target.value)}
                     min={100}
                     className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition"
                   />

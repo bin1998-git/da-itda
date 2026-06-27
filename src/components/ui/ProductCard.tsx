@@ -156,9 +156,19 @@ export default function ProductCard({ product }: { product: Product }) {
               <span className="text-stone-400 dark:text-white/30 text-xs">({reviewCount})</span>
             </div>
           )}
-          <p className="text-amber-400 font-bold text-base mt-0.5">
-            {formatPrice(product.price)}원
-          </p>
+          {product.original_price && product.original_price > product.price ? (
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="text-stone-400 dark:text-white/30 text-xs line-through">{formatPrice(product.original_price)}원</span>
+              <span className="bg-rose-500/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                {Math.round((1 - product.price / product.original_price) * 100)}%
+              </span>
+              <span className="text-amber-400 font-bold text-base">{formatPrice(product.price)}원</span>
+            </div>
+          ) : (
+            <p className="text-amber-400 font-bold text-base mt-0.5">
+              {formatPrice(product.price)}원
+            </p>
+          )}
           {product.is_overseas && (
             <p className="text-sky-400/80 text-[11px]">
               + 해외배송비 {product.overseas_shipping_fee ? `${formatPrice(product.overseas_shipping_fee)}원` : '별도'}

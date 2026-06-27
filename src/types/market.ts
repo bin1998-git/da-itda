@@ -21,6 +21,7 @@ export interface Review {
   seller_reply_at: string | null;
   updated_at: string | null;
   created_at: string;
+  images?: string[] | null;
   profiles?: { nickname: string | null; avatar_url: string | null };
 }
 
@@ -33,6 +34,8 @@ export interface Product {
   category: Category;
   images: string[];
   colors?: string[];
+  color_stocks?: Record<string, number>;
+  original_price?: number | null;
   stock: number;
   is_active: boolean;
   created_at: string;

@@ -248,6 +248,23 @@ export default function ReviewSection({ productId, sellerId, reviews: initialRev
                     <p className="text-sm text-stone-600 dark:text-white/60 leading-relaxed mb-4">{review.content}</p>
                   )}
 
+                  {/* 리뷰 이미지 */}
+                  {review.images && review.images.length > 0 && (
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+                      {review.images.map((src, imgIdx) => (
+                        <a
+                          key={imgIdx}
+                          href={src}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-black/8 dark:border-white/8 hover:opacity-80 transition"
+                        >
+                          <img src={src} alt={`리뷰 사진 ${imgIdx + 1}`} className="w-full h-full object-cover" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
                   {/* 판매자 답글 */}
                   {review.seller_reply && (
                     <div className="mt-3 mb-4 ml-3 pl-4 border-l-2 border-amber-500/30 bg-amber-500/5 rounded-r-xl py-3 pr-3">

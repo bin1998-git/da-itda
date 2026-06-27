@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -11,52 +11,64 @@ interface Props {
   stock: number;
   colors?: string[];
   selectedColor?: string | null;
+  onColorError?: () => void;
 }
 
-export default function AddToCartButton({ productId, stock, colors, selectedColor }: Props) {
+export default function AddToCartButton({ productId, stock, colors, selectedColor, onColorError }: Props) {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [cartError, setCartError] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   const hasColors = colors && colors.length > 0;
   const needsColor = hasColors && !selectedColor;
 
   const handleAddToCart = async () => {
     if (!user) { router.push('/auth/login'); return; }
-    if (needsColor) return;
+    if (needsColor) { onColorError?.(); return; }
+    if (loading || done) return;
+
     setLoading(true);
+    setCartError(false);
 
-    // 색상이 있으면 (product_id + selected_color) 기준으로 누적, 없으면 product_id만
-    const matchQuery = supabase
-      .from('cart_items')
-      .select('quantity')
-      .eq('user_id', user.id)
-      .eq('product_id', productId);
+    try {
+      const matchQuery = supabase
+        .from('cart_items')
+        .select('id, quantity')
+        .eq('user_id', user.id)
+        .eq('product_id', productId);
 
-    const { data: existing } = selectedColor
-      ? await matchQuery.eq('selected_color', selectedColor).maybeSingle()
-      : await matchQuery.is('selected_color', null).maybeSingle();
+      const { data: existing } = selectedColor
+        ? await matchQuery.eq('selected_color', selectedColor).maybeSingle()
+        : await matchQuery.is('selected_color', null).maybeSingle();
 
-    const newQty = Math.min((existing?.quantity ?? 0) + qty, stock);
+      const newQty = Math.min((existing?.quantity ?? 0) + qty, stock);
 
-    const upsertData: Record<string, unknown> = {
-      user_id: user.id,
-      product_id: productId,
-      quantity: newQty,
-      selected_color: selectedColor ?? null,
-    };
+      const { error } = existing
+        ? await supabase.from('cart_items').update({ quantity: newQty }).eq('id', existing.id)
+        : await supabase.from('cart_items').insert({
+            user_id: user.id,
+            product_id: productId,
+            quantity: newQty,
+            selected_color: selectedColor ?? null,
+          });
 
-    const { error } = await supabase.from('cart_items').upsert(
-      upsertData,
-      { onConflict: selectedColor ? 'user_id,product_id,selected_color' : 'user_id,product_id' }
-    );
+      if (error) throw error;
 
-    setLoading(false);
-    if (!error) {
       setDone(true);
-      setTimeout(() => setDone(false), 1800);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setDone(false), 1800);
+    } catch {
+      setCartError(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCartError(false), 2000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,16 +102,16 @@ export default function AddToCartButton({ productId, stock, colors, selectedColo
       {/* 담기 버튼 */}
       <button
         onClick={handleAddToCart}
-        disabled={loading || needsColor}
+        disabled={loading || done}
         className={`w-full py-4 rounded-2xl font-bold text-base transition-all duration-200 ${
           done
             ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-            : needsColor
-            ? 'bg-black/8 dark:bg-white/8 text-stone-400 dark:text-white/40 cursor-not-allowed'
+            : cartError
+            ? 'bg-rose-500/15 border border-rose-500/40 text-rose-400'
             : 'bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20'
-        } disabled:opacity-70`}
+        } disabled:opacity-80 disabled:cursor-not-allowed`}
       >
-        {loading ? '처리 중...' : done ? '✓ 담겼어요!' : needsColor ? '색상을 선택해주세요' : '장바구니 담기'}
+        {loading ? '처리 중...' : done ? '✓ 담겼어요!' : cartError ? '오류가 발생했어요' : '장바구니 담기'}
       </button>
 
       {/* 성공 후 장바구니 바로가기 */}

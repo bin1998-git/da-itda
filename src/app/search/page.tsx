@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
+import SearchBar from '@/components/ui/SearchBar';
 
 interface Result {
   type: 'product' | 'media' | 'post';
@@ -126,6 +127,11 @@ function SearchInner() {
     <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20">
       <div className="max-w-2xl mx-auto px-6 py-12">
         <h1 className="text-2xl font-bold text-stone-900 dark:text-white mb-6">통합 검색</h1>
+
+        {/* 상품 자동완성 검색바 */}
+        <div className="mb-4">
+          <SearchBar />
+        </div>
 
         {/* 검색창 */}
         <div className="flex gap-2 mb-8">

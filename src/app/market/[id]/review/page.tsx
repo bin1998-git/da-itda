@@ -5,8 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
-import StarRating from '@/components/ui/StarRating';
-
 const LABEL = ['', '별로예요', '아쉬워요', '괜찮아요', '좋아요', '최고예요!'];
 
 type LoadState = 'loading' | 'not-purchased' | 'not-delivered' | 'ok';
@@ -25,6 +23,10 @@ export default function ReviewPage() {
   const [hover, setHover]     = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // 이미지 업로드 상태
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -71,15 +73,51 @@ export default function ReviewPage() {
     })();
   }, [user, isLoading, productId, router]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newFiles = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    const combined = [...imageFiles, ...newFiles].slice(0, 3);
+    setImageFiles(combined);
+    setImagePreviews(combined.map((f) => URL.createObjectURL(f)));
+  };
+
+  const removeImage = (idx: number) => {
+    URL.revokeObjectURL(imagePreviews[idx]);
+    const newFiles = imageFiles.filter((_, i) => i !== idx);
+    setImageFiles(newFiles);
+    setImagePreviews(newFiles.map((f) => URL.createObjectURL(f)));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || rating === 0) return;
     setSubmitting(true);
     setError('');
 
+    // 이미지 업로드
+    const uploadedUrls: string[] = [];
+    const BUCKET = 'product-images'; // reviews 버킷 없으면 product-images 사용
+    for (const file of imageFiles) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `reviews/${user.id}/${Date.now()}_${safeName}`;
+      const { error: uploadErr } = await supabase.storage.from(BUCKET).upload(path, file);
+      if (!uploadErr) {
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        uploadedUrls.push(data.publicUrl);
+      }
+    }
+
+    const images = uploadedUrls.length > 0 ? uploadedUrls : undefined;
+
     if (existingReview) {
+      const updatePayload: Record<string, unknown> = {
+        rating,
+        content: content.trim() || null,
+        updated_at: new Date().toISOString(),
+      };
+      if (images) updatePayload.images = images;
       const { error: err } = await supabase.from('reviews')
-        .update({ rating, content: content.trim() || null, updated_at: new Date().toISOString() })
+        .update(updatePayload)
         .eq('id', existingReview.id);
       if (err) { setError(err.message); setSubmitting(false); return; }
     } else {
@@ -88,6 +126,7 @@ export default function ReviewPage() {
         user_id: user.id,
         rating,
         content: content.trim() || null,
+        ...(images ? { images } : {}),
       });
       if (err) { setError(err.message); setSubmitting(false); return; }
     }
@@ -194,6 +233,42 @@ export default function ReviewPage() {
               className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-amber-500/50 transition resize-none text-sm"
             />
             <p className="text-right text-xs text-stone-400 dark:text-white/30 mt-1">{content.length}/1000</p>
+          </div>
+
+          {/* 이미지 첨부 */}
+          <div>
+            <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">
+              사진 첨부 <span className="text-stone-400 dark:text-white/30 normal-case font-normal">(선택, 최대 3장)</span>
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {imagePreviews.map((src, idx) => (
+                <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-black/10 dark:border-white/10 group shrink-0">
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              {imagePreviews.length < 3 && (
+                <label className="w-20 h-20 rounded-xl border-2 border-dashed border-black/15 dark:border-white/15 cursor-pointer hover:border-amber-500/50 hover:bg-amber-500/5 transition flex flex-col items-center justify-center gap-1 shrink-0">
+                  <svg className="w-5 h-5 text-stone-400 dark:text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                  <span className="text-[10px] text-stone-400 dark:text-white/30">사진 추가</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
           </div>
 
           {error && <p className="text-rose-400 text-sm">{error}</p>}

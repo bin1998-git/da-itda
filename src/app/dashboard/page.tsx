@@ -19,7 +19,7 @@ import { COMMUNITY_CATEGORY_MAP } from '@/types/community';
 const POSTS_PER_PAGE = 10;
 const MEDIA_PER_PAGE = 10;
 
-type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist' | 'chat';
+type Tab = 'overview' | 'profile' | 'posts' | 'media' | 'likes' | 'wishlist' | 'chat' | 'seller';
 type LikesSubTab = 'media' | 'posts';
 
 interface Post {
@@ -59,7 +59,21 @@ const CAT: Record<string, { label: string; cls: string }> = {
   general:  { label: '자유',   cls: 'bg-black/8 dark:bg-white/8 text-stone-500 dark:text-white/45 border-black/10 dark:border-white/10' },
 };
 
-const TABS: { id: Tab; label: string }[] = [
+interface SellerOrder {
+  order_id: string;
+  status: string;
+  created_at: string;
+  buyer_name: string | null;
+  items: { title: string; quantity: number; selected_color: string | null }[];
+}
+
+const STATUS_OPTIONS = [
+  { value: 'preparing', label: '배송준비' },
+  { value: 'shipping',  label: '배송중' },
+  { value: 'delivered', label: '배송완료' },
+];
+
+const TABS: { id: Tab; label: string; sellerOnly?: boolean }[] = [
   { id: 'overview',  label: '개요' },
   { id: 'profile',   label: '프로필 수정' },
   { id: 'posts',     label: '내 게시글' },
@@ -67,6 +81,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'likes',     label: '찜 목록' },
   { id: 'wishlist',  label: '위시리스트' },
   { id: 'chat',      label: '채팅방' },
+  { id: 'seller',    label: '판매 정산', sellerOnly: true },
 ];
 
 const fmt = (d: string) =>
@@ -106,6 +121,21 @@ export default function DashboardPage() {
   const [myChatRooms, setMyChatRooms] = useState<ChatRoomItem[]>([]);
   const [createdChatRooms, setCreatedChatRooms] = useState<ChatRoomItem[]>([]);
   const [chatSubTab, setChatSubTab] = useState<'joined' | 'created'>('joined');
+
+  // seller dashboard
+  interface SellerOrderItem {
+    product_id: string;
+    selected_color: string | null;
+    quantity: number;
+    price_at_time: number;
+    product_title: string;
+    product_image: string | null;
+    order_status: string;
+    order_created_at: string;
+  }
+  const [sellerItems, setSellerItems] = useState<SellerOrderItem[]>([]);
+  const [sellerOrders, setSellerOrders] = useState<SellerOrder[]>([]);
+  const [orderStatusUpdating, setOrderStatusUpdating] = useState<string | null>(null);
 
   // auth guard
   useEffect(() => {
@@ -280,6 +310,57 @@ export default function DashboardPage() {
 
       Promise.all([joinedPromise, createdPromise]).finally(() => setTabLoading(false));
     }
+
+    if (tab === 'seller') {
+      setTabLoading(true);
+      // 상품별 집계용
+      supabase
+        .from('order_items')
+        .select('product_id, selected_color, quantity, price_at_time, products!inner(title, images, seller_id), orders(status, created_at)')
+        .eq('products.seller_id', user.id)
+        .then(({ data }) => {
+          const rows = (data ?? []) as any[];
+          setSellerItems(rows.map((r) => ({
+            product_id:       r.product_id,
+            selected_color:   r.selected_color ?? null,
+            quantity:         r.quantity,
+            price_at_time:    r.price_at_time,
+            product_title:    r.products?.title ?? '',
+            product_image:    r.products?.images?.[0] ?? null,
+            order_status:     r.orders?.status ?? '',
+            order_created_at: r.orders?.created_at ?? '',
+          })));
+        });
+
+      // 주문별 관리용
+      supabase.from('order_items')
+        .select('order_id, title, quantity, selected_color, products!inner(seller_id), orders!inner(id, status, created_at, shipping_name)')
+        .eq('products.seller_id', user.id)
+        .neq('orders.status', 'cancelled')
+        .then(({ data }) => {
+          const rows = (data ?? []) as any[];
+          const orderMap: Record<string, SellerOrder> = {};
+          rows.forEach((r) => {
+            const oid = r.order_id;
+            if (!orderMap[oid]) {
+              orderMap[oid] = {
+                order_id:   oid,
+                status:     r.orders?.status ?? '',
+                created_at: r.orders?.created_at ?? '',
+                buyer_name: r.orders?.shipping_name ?? null,
+                items: [],
+              };
+            }
+            orderMap[oid].items.push({
+              title:          r.title,
+              quantity:       r.quantity,
+              selected_color: r.selected_color ?? null,
+            });
+          });
+          setSellerOrders(Object.values(orderMap).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+          setTabLoading(false);
+        });
+    }
   }, [tab, user, enrichPosts, enrichMedia]);
 
   const saveProfile = async () => {
@@ -371,7 +452,11 @@ export default function DashboardPage() {
       {/* ── 탭 네비 ── */}
       <div className="border-b border-black/[0.06] dark:border-white/[0.06] sticky top-[60px] z-20 bg-[#EDE8E2]/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex overflow-x-auto no-scrollbar">
-          {TABS.filter(({ id }) => !isAdmin || (id !== 'likes' && id !== 'wishlist')).map(({ id, label }) => (
+          {TABS.filter(({ id, sellerOnly }) => {
+            if (sellerOnly && !isSeller) return false;
+            if (isAdmin && (id === 'likes' || id === 'wishlist')) return false;
+            return true;
+          }).map(({ id, label }) => (
             <button key={id} onClick={() => { setTab(id); setPostsPage(1); setMediaPage(1); }}
               className={`px-5 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                 tab === id ? 'text-amber-400 border-amber-400' : 'text-stone-400 dark:text-white/40 border-transparent hover:text-stone-700 dark:hover:text-white/70'
@@ -898,6 +983,138 @@ export default function DashboardPage() {
             })()}
           </div>
         )}
+
+        {/* ────────────── 판매 정산 탭 ────────────── */}
+        {tab === 'seller' && (() => {
+          const active = sellerItems.filter((i) => i.order_status !== 'cancelled');
+          const totalRevenue = active.reduce((s, i) => s + i.price_at_time * i.quantity, 0);
+          const totalQty     = active.reduce((s, i) => s + i.quantity, 0);
+
+          const byProduct: Record<string, { title: string; image: string | null; revenue: number; qty: number; colors: Record<string, number> }> = {};
+          active.forEach((i) => {
+            if (!byProduct[i.product_id]) {
+              byProduct[i.product_id] = { title: i.product_title, image: i.product_image, revenue: 0, qty: 0, colors: {} };
+            }
+            byProduct[i.product_id].revenue += i.price_at_time * i.quantity;
+            byProduct[i.product_id].qty     += i.quantity;
+            if (i.selected_color) {
+              byProduct[i.product_id].colors[i.selected_color] = (byProduct[i.product_id].colors[i.selected_color] ?? 0) + i.quantity;
+            }
+          });
+          const productList = Object.entries(byProduct).sort((a, b) => b[1].revenue - a[1].revenue);
+
+          const updateOrderStatus = async (orderId: string, status: string) => {
+            setOrderStatusUpdating(orderId);
+            await supabase.from('orders').update({ status }).eq('id', orderId);
+            setSellerOrders((prev) => prev.map((o) => o.order_id === orderId ? { ...o, status } : o));
+            setOrderStatusUpdating(null);
+          };
+
+          return (
+            <div className="space-y-6">
+              <p className="text-stone-400 dark:text-white/25 text-xs font-semibold tracking-widest uppercase">판매 정산 현황</p>
+
+              {/* 요약 카드 */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: '총 수익', value: `${totalRevenue.toLocaleString('ko-KR')}원`, icon: '💰' },
+                  { label: '총 판매량', value: `${totalQty}개`, icon: '📦' },
+                  { label: '판매 상품 수', value: `${productList.length}종`, icon: '🏷️' },
+                ].map(({ label, value, icon }) => (
+                  <div key={label} className="p-4 rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 text-center">
+                    <p className="text-2xl mb-1">{icon}</p>
+                    <p className="text-stone-900 dark:text-white font-bold text-sm">{value}</p>
+                    <p className="text-stone-400 dark:text-white/30 text-[11px] mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* 주문 관리 */}
+              {sellerOrders.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-stone-500 dark:text-white/40 text-xs font-semibold">주문 관리</p>
+                  {sellerOrders.map((order) => (
+                    <div key={order.order_id} className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 overflow-hidden">
+                      <div className="flex items-center justify-between p-4 border-b border-black/6 dark:border-white/6">
+                        <div>
+                          <p className="text-stone-900 dark:text-white text-sm font-semibold">
+                            {order.buyer_name ?? '구매자'} 주문
+                          </p>
+                          <p className="text-stone-400 dark:text-white/30 text-[11px] mt-0.5 font-mono">#{order.order_id.slice(0, 8).toUpperCase()}</p>
+                          <p className="text-stone-400 dark:text-white/30 text-[11px]">{fmt(order.created_at)}</p>
+                        </div>
+                        <select
+                          value={order.status}
+                          disabled={orderStatusUpdating === order.order_id}
+                          onChange={(e) => updateOrderStatus(order.order_id, e.target.value)}
+                          className="px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-700 dark:text-white/70 text-sm focus:outline-none focus:border-amber-500/50 transition appearance-none cursor-pointer disabled:opacity-50"
+                        >
+                          {STATUS_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="px-4 py-3 flex flex-col gap-1">
+                        {order.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-xs text-stone-500 dark:text-white/45">
+                            <span>{item.title}</span>
+                            {item.selected_color && (
+                              <span className="text-amber-500 font-medium bg-amber-500/10 px-1.5 py-0.5 rounded-full">{item.selected_color}</span>
+                            )}
+                            <span className="text-stone-400 dark:text-white/30">× {item.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 상품별 판매 현황 */}
+              {productList.length === 0 ? (
+                <div className="py-16 text-center">
+                  <p className="text-4xl mb-3">📊</p>
+                  <p className="text-stone-400 dark:text-white/30 text-sm">아직 판매 내역이 없습니다</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-stone-500 dark:text-white/40 text-xs font-semibold">상품별 판매 현황</p>
+                  {productList.map(([pid, info]) => {
+                    const colorEntries = Object.entries(info.colors).sort((a, b) => b[1] - a[1]);
+                    return (
+                      <div key={pid} className="rounded-2xl border border-black/8 dark:border-white/8 bg-black/3 dark:bg-white/3 overflow-hidden">
+                        <div className="flex items-center gap-3 p-4">
+                          <div className="w-12 h-12 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                            {info.image ? <img src={info.image} alt={info.title} className="w-full h-full object-cover" /> : '📦'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-stone-900 dark:text-white text-sm font-semibold truncate">{info.title}</p>
+                            <p className="text-stone-400 dark:text-white/30 text-xs mt-0.5">{info.qty}개 판매</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-amber-400 font-bold text-sm">{info.revenue.toLocaleString('ko-KR')}원</p>
+                            <p className="text-stone-400 dark:text-white/30 text-[11px] mt-0.5">
+                              {totalRevenue > 0 ? Math.round((info.revenue / totalRevenue) * 100) : 0}%
+                            </p>
+                          </div>
+                        </div>
+                        {colorEntries.length > 0 && (
+                          <div className="border-t border-black/6 dark:border-white/6 px-4 py-3 flex flex-wrap gap-2">
+                            {colorEntries.map(([color, qty]) => (
+                              <span key={color} className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-medium">
+                                <span>{color}</span><span className="text-amber-400/60">·</span><span>{qty}개</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
       </div>
     </main>
