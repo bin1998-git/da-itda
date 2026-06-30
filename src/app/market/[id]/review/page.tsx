@@ -16,7 +16,7 @@ export default function ReviewPage() {
   const isLoading = useAuthStore((s) => s.isLoading);
 
   const [loadState, setLoadState] = useState<LoadState>('loading');
-  const [product, setProduct] = useState<{ title: string; images: string[] } | null>(null);
+  const [product, setProduct] = useState<{ title: string; images: string[]; seller_id: string } | null>(null);
   const [existingReview, setExistingReview] = useState<{ id: string; rating: number; content: string | null } | null>(null);
   const [rating, setRating]   = useState(5);
   const [content, setContent] = useState('');
@@ -35,8 +35,8 @@ export default function ReviewPage() {
     (async () => {
       // 상품 정보
       const { data: prod } = await supabase
-        .from('products').select('title, images').eq('id', productId).single();
-      setProduct(prod as { title: string; images: string[] });
+        .from('products').select('title, images, seller_id').eq('id', productId).single();
+      setProduct(prod as { title: string; images: string[]; seller_id: string });
 
       // 기존 리뷰
       const { data: existing } = await supabase
@@ -129,6 +129,15 @@ export default function ReviewPage() {
         ...(images ? { images } : {}),
       });
       if (err) { setError(err.message); setSubmitting(false); return; }
+
+      if (product?.seller_id && product.seller_id !== user.id) {
+        supabase.from('notifications').insert({
+          user_id: product.seller_id,
+          type: 'review',
+          title: `'${product.title}'에 새 리뷰가 달렸습니다 ⭐`,
+          link: '/dashboard?tab=seller',
+        }).then(() => {});
+      }
     }
 
     router.push(`/market/${productId}?tab=review`);

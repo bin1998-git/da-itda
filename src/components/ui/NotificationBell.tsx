@@ -17,7 +17,8 @@ interface Notification {
 
 const TYPE_ICON: Record<string, string> = {
   like_post: '❤️', like_media: '❤️', comment: '💬', order: '📦',
-  inquiry_answered: '💬', default: '🔔',
+  inquiry_answered: '💬', review: '⭐', restock: '🔔', order_cancelled: '❌',
+  default: '🔔',
 };
 
 const fmt = (d: string) => {

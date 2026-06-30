@@ -164,6 +164,30 @@ export default function OrdersPage() {
 
   const cancelOrder = async (orderId: string) => {
     await supabase.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
+
+    const { data: items } = await supabase
+      .from('order_items')
+      .select('products!inner(seller_id)')
+      .eq('order_id', orderId);
+
+    if (items && items.length > 0) {
+      const sellerIds = [
+        ...new Set(
+          (items as unknown as { products: { seller_id: string } }[])
+            .map((i) => i.products?.seller_id)
+            .filter(Boolean)
+        ),
+      ];
+      sellerIds.forEach((sellerId) => {
+        supabase.from('notifications').insert({
+          user_id: sellerId,
+          type: 'order_cancelled',
+          title: '주문이 취소되었습니다 ❌',
+          link: '/dashboard?tab=seller',
+        }).then(() => {});
+      });
+    }
+
     setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, status: 'cancelled' } : o));
     setCancellingId(null);
   };

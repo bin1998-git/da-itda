@@ -66,7 +66,7 @@ export default async function MediaDetailPage({
             <h1 className="text-2xl font-bold text-stone-900 dark:text-white flex-1">{p.title}</h1>
             <div className="flex items-center gap-3">
               <ReportButton targetType="media" targetId={p.id} />
-              <LikeButton postId={p.id} initialCount={likeCount ?? 0} initialLiked={false} />
+              <LikeButton postId={p.id} initialCount={likeCount ?? 0} initialLiked={false} authorId={p.user_id} />
             </div>
           </div>
           <AdminContentActions contentType="media" contentId={p.id} redirectTo="/media" />

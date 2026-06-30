@@ -65,6 +65,7 @@ interface SellerOrder {
   status: string;
   created_at: string;
   buyer_name: string | null;
+  buyer_user_id: string;
   items: { title: string; quantity: number; selected_color: string | null }[];
 }
 
@@ -335,7 +336,7 @@ export default function DashboardPage() {
 
       // 주문별 관리용
       supabase.from('order_items')
-        .select('order_id, title, quantity, selected_color, products!inner(seller_id), orders!inner(id, status, created_at, shipping_name)')
+        .select('order_id, title, quantity, selected_color, products!inner(seller_id), orders!inner(id, status, created_at, shipping_name, user_id)')
         .eq('products.seller_id', user.id)
         .neq('orders.status', 'cancelled')
         .then(({ data }) => {
@@ -345,10 +346,11 @@ export default function DashboardPage() {
             const oid = r.order_id;
             if (!orderMap[oid]) {
               orderMap[oid] = {
-                order_id:   oid,
-                status:     r.orders?.status ?? '',
-                created_at: r.orders?.created_at ?? '',
-                buyer_name: r.orders?.shipping_name ?? null,
+                order_id:      oid,
+                status:        r.orders?.status ?? '',
+                created_at:    r.orders?.created_at ?? '',
+                buyer_name:    r.orders?.shipping_name ?? null,
+                buyer_user_id: r.orders?.user_id ?? '',
                 items: [],
               };
             }
@@ -1007,6 +1009,24 @@ export default function DashboardPage() {
           const updateOrderStatus = async (orderId: string, status: string) => {
             setOrderStatusUpdating(orderId);
             await supabase.from('orders').update({ status }).eq('id', orderId);
+
+            const order = sellerOrders.find((o) => o.order_id === orderId);
+            if (order?.buyer_user_id) {
+              const statusMsg: Record<string, string> = {
+                preparing: '주문이 배송 준비 중입니다 📦',
+                shipping:  '주문이 배송 중입니다 🚚',
+                delivered: '주문이 배송 완료되었습니다 ✅',
+              };
+              if (statusMsg[status]) {
+                supabase.from('notifications').insert({
+                  user_id: order.buyer_user_id,
+                  type: 'order',
+                  title: statusMsg[status],
+                  link: '/orders',
+                }).then(() => {});
+              }
+            }
+
             setSellerOrders((prev) => prev.map((o) => o.order_id === orderId ? { ...o, status } : o));
             setOrderStatusUpdating(null);
           };

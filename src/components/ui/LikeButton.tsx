@@ -9,9 +9,10 @@ interface Props {
   postId: string;
   initialCount: number;
   initialLiked: boolean;
+  authorId?: string;
 }
 
-export default function LikeButton({ postId, initialCount, initialLiked }: Props) {
+export default function LikeButton({ postId, initialCount, initialLiked, authorId }: Props) {
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [liked, setLiked] = useState(initialLiked);
@@ -34,6 +35,14 @@ export default function LikeButton({ postId, initialCount, initialLiked }: Props
       await supabase.from('media_likes').insert({ user_id: user.id, post_id: postId });
       setLiked(true);
       setCount((c) => c + 1);
+      if (authorId && authorId !== user.id) {
+        supabase.from('notifications').insert({
+          user_id: authorId,
+          type: 'like_media',
+          title: '회원님의 영상을 좋아합니다 ❤️',
+          link: `/media/${postId}`,
+        }).then(() => {});
+      }
     }
     setLoading(false);
   };
