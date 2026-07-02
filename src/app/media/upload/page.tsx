@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import ProductTagSelector from '@/components/ui/ProductTagSelector';
 
 const TAG_SUGGESTIONS = ['한식', '양식', '중식', '일식', '베이킹', '디저트', '다이어트', '간식', '파티', '빠른요리'];
 
@@ -19,6 +20,7 @@ export default function MediaUploadPage() {
     tags: [] as string[],
   });
   const [tagInput, setTagInput] = useState('');
+  const [productTagIds, setProductTagIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -58,20 +60,27 @@ export default function MediaUploadPage() {
     setLoading(true);
     setError('');
 
-    const { error: err } = await supabase.from('media_posts').insert({
+    const { data: newPost, error: err } = await supabase.from('media_posts').insert({
       user_id: user.id,
       title: form.title,
       description: form.description || null,
       video_url: form.video_url,
       thumbnail_url: form.thumbnail_url || null,
       tags: form.tags,
-    });
+    }).select('id').single();
 
     setLoading(false);
-    if (err) {
-      setError(err.message);
+    if (err || !newPost) {
+      setError(err?.message ?? '업로드 실패');
       return;
     }
+
+    if (productTagIds.length > 0) {
+      await supabase.from('media_product_tags').insert(
+        productTagIds.map((pid) => ({ media_post_id: newPost.id, product_id: pid }))
+      );
+    }
+
     router.push('/media');
   };
 
@@ -128,6 +137,17 @@ export default function MediaUploadPage() {
               rows={4}
               className="px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white placeholder-stone-300 dark:placeholder-white/20 focus:outline-none focus:border-rose-500/50 transition resize-none"
             />
+          </div>
+
+          {/* 상품 태그 */}
+          <div>
+            <label className="text-stone-500 dark:text-white/50 text-xs font-semibold tracking-wider uppercase block mb-2">
+              재료 상품 태그 <span className="text-stone-400 dark:text-white/30 normal-case font-normal">(선택, 최대 5개)</span>
+            </label>
+            <p className="text-xs text-stone-400 dark:text-white/40 mb-3">
+              이 레시피에 사용된 재료를 마켓에서 검색해 태그하면, 시청자가 바로 구매할 수 있어요.
+            </p>
+            <ProductTagSelector selectedIds={productTagIds} onChange={setProductTagIds} />
           </div>
 
           {/* 태그 */}
