@@ -64,23 +64,28 @@ src/
 ## 🗄️ DB 스키마
 
 ```sql
-profiles          -- 사용자 프로필 (auth.users 확장)
-modules           -- 서비스 모듈 레지스트리 (commerce/media/community)
-higgsfield_assets -- 힉스필드 영상 자산 관리
-sellers           -- 판매자 정보
-products          -- 상품 (카테고리, 가격, 재고)
-cart_items        -- 장바구니 (user-product 매핑)
-media_posts       -- 레시피 영상 (썸네일, 조회수)
-media_likes       -- 영상 좋아요 (user-post 매핑)
-posts             -- 커뮤니티 게시글 (카테고리, 조회수)
-post_likes        -- 게시글 좋아요
-comments          -- 댓글 (게시글 연결)
-coupons           -- 쿠폰 (할인타입, 만료일, 한도)
-coupon_uses       -- 쿠폰 사용 이력 (1인 1회)
-orders            -- 주문 내역 (상태, 결제금액, 쿠폰)
-order_items       -- 주문 상품 (snapshot)
-product_likes     -- 상품 위시리스트
-notifications     -- 알림 (좋아요/댓글/주문)
+profiles            -- 사용자 프로필 (auth.users 확장, creator_cash 컬럼 포함)
+sellers             -- 판매자 정보
+products            -- 상품 (카테고리, 가격, 재고, color_stocks)
+cart_items          -- 장바구니 (user-product-color 매핑)
+media_posts         -- 레시피 영상 (썸네일, 조회수)
+media_likes         -- 영상 좋아요
+media_product_tags  -- 영상-상품 태그 연결
+posts               -- 커뮤니티 게시글 (카테고리, 조회수)
+post_likes          -- 게시글 좋아요
+comments            -- 댓글 (게시글 연결)
+reviews             -- 상품 리뷰 (별점 1-5, 1인 1회)
+coupons             -- 쿠폰 (할인타입, 만료일, 한도)
+coupon_uses         -- 쿠폰 사용 이력
+orders              -- 주문 (상태, 결제금액, 쿠폰, referral_media_id)
+order_items         -- 주문 상품 snapshot (selected_color 포함)
+product_likes       -- 상품 위시리스트
+notifications       -- 알림 (좋아요/댓글/주문/알림신청)
+restock_alerts      -- 재입고 알림 신청
+creator_earnings    -- 크리에이터 수익 내역 (5% 커미션 자동 적립)
+cash_withdrawals    -- 출금 신청 (최소 5,000원)
+reports             -- 신고 (게시글/영상/댓글)
+inquiries           -- 1:1 문의
 ```
 
 모든 테이블 RLS(Row Level Security) 적용
@@ -132,6 +137,11 @@ npm run dev
 | 12 | 마이페이지 (대시보드 전면 개편) — 개요·프로필수정·내게시글·내영상·찜목록 탭, 실DB 집계 스탯 | 2026-06-24 |
 | 13 | 쿠폰 시스템 — coupons/coupon_uses DB, 이벤트 쿠폰 다운로드, 장바구니 할인 적용, 인증 버그 수정 | 2026-06-24 |
 | 14 | 판매자 상품 관리·주문 내역·상품 위시리스트·알림 시스템 (벨 아이콘+드롭다운+실시간 구독) | 2026-06-25 |
+| 15 | 페이지네이션·관리자(신고·공지·문의)·다크/라이트 모드 전체·로고 리디자인·파비콘 | 2026-06-25 |
+| 16 | 상품 색상 태그 UX·색상별 재고·리뷰·평점·RichTextEditor·TipTap | 2026-06-27 |
+| 17 | 최근 본 상품·연관 상품·장바구니 색상 묶음·판매자 정산 대시보드·채팅룸·1:1 문의 | 2026-06-28 |
+| 18 | 실시간 알림 트리거 9종 — 재입고·주문상태·미디어좋아요·리뷰·주문취소·댓글·게시글좋아요·주문완료·문의답변 | 2026-06-30 |
+| 19 | 크리에이터 수익화 — 영상 상품 태그, 구매 시 5% 커미션 자동 적립, 출금 신청, /creator 대시보드 | 2026-07-02 |
 
 ---
 
@@ -148,11 +158,11 @@ npm run dev
 
 ## 🚀 다음에 진행해야 할 액션 플랜
 
-- [x] Phase 9: 식품 마켓 (Commerce)
-- [x] Phase 10: 푸드 미디어
-- [x] Phase 11: 커뮤니티
-- [x] Phase 12: 마이페이지 — 개요·프로필수정·내게시글·내영상·찜목록
-- [x] Phase 13: 쿠폰 시스템 + 대시보드 실데이터 연동
-- [x] Phase 14: 판매자 상품 관리, 주문 내역, 상품 위시리스트, 알림 시스템
-- [ ] **Phase 15: Vercel 배포** — 환경변수 설정, 도메인 연결, Supabase redirect URL 추가
-- [ ] **Phase 16: 결제 연동** (포트원 v2 or Stripe)
+- [x] Phase 9~14: 마켓·미디어·커뮤니티·마이페이지·쿠폰·판매자·알림
+- [x] Phase 15: 관리자·다크모드·페이지네이션
+- [x] Phase 16: 색상 UX·리뷰·평점
+- [x] Phase 17: 최근 본 상품·연관 상품·채팅·문의
+- [x] Phase 18: 실시간 알림 트리거 9종
+- [x] Phase 19: 크리에이터 수익화 (영상 태그 → 커미션 → 출금)
+- [ ] **Phase 20: 상품 Q&A** — 구매자 질문 + 판매자 답변, Q&A 탭, 대시보드 답변 관리 (설계 완료: `docs/superpowers/specs/2026-07-02-product-qna-design.md`)
+- [ ] **Phase 21: 토스페이먼츠 v2 결제 연동** — 실제 카드/계좌이체 결제창
