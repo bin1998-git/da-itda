@@ -5,6 +5,7 @@ import VideoPlayer from '@/components/ui/VideoPlayer';
 import LikeButton from '@/components/ui/LikeButton';
 import ReportButton from '@/components/ui/ReportButton';
 import AdminContentActions from '@/components/ui/AdminContentActions';
+import MediaProductSection, { TaggedProduct } from '@/components/ui/MediaProductSection';
 import { MediaPost } from '@/types/media';
 
 export default async function MediaDetailPage({
@@ -15,7 +16,7 @@ export default async function MediaDetailPage({
   const { id } = await params;
   const db = supabaseServer();
 
-  const [{ data: post }, { count: likeCount }] = await Promise.all([
+  const [{ data: post }, { count: likeCount }, { data: taggedRows }] = await Promise.all([
     db
       .from('media_posts')
       .select('*')
@@ -25,11 +26,19 @@ export default async function MediaDetailPage({
       .from('media_likes')
       .select('*', { count: 'exact', head: true })
       .eq('post_id', id),
+    db
+      .from('media_product_tags')
+      .select('products(id, title, price, images)')
+      .eq('media_post_id', id),
   ]);
 
   if (!post) notFound();
 
   const p = post as MediaPost;
+
+  const taggedProducts = (taggedRows ?? [])
+    .map((r) => (r as unknown as { products: TaggedProduct }).products)
+    .filter(Boolean);
 
   // 조회수 증가 (비동기, 결과 무시)
   db.rpc('increment_views', { post_id: id }).then(() => {});
@@ -86,6 +95,8 @@ export default async function MediaDetailPage({
               {p.description}
             </p>
           )}
+
+          <MediaProductSection products={taggedProducts} mediaPostId={p.id} />
         </div>
 
         {/* 다른 영상 추천 — 링크로 이동 */}
