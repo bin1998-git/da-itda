@@ -42,7 +42,7 @@ export default async function ProductDetailPage({
       .select('*, sellers(store_name, store_desc)')
       .eq('id', id).eq('is_active', true).single(),
     db.from('reviews')
-      .select('*, profiles(nickname, avatar_url)')
+      .select('*')
       .eq('product_id', id).order('created_at', { ascending: false })
       .order('helpful_count', { ascending: false }),
     db.from('product_qna')
@@ -60,6 +60,14 @@ export default async function ProductDetailPage({
     .order('created_at', { ascending: false }).limit(8);
   const reviewList = (reviews ?? []) as Review[];
   const qnaList = (qnas ?? []) as Qna[];
+
+  if (reviewList.length > 0) {
+    const reviewerIds = [...new Set(reviewList.map((r) => r.user_id))];
+    const { data: reviewerProfiles } = await db
+      .from('profiles').select('id, username, avatar_url').in('id', reviewerIds);
+    const profileMap = Object.fromEntries((reviewerProfiles ?? []).map((p) => [p.id, p]));
+    reviewList.forEach((r) => { r.profiles = profileMap[r.user_id]; });
+  }
   const avgRating = reviewList.length
     ? reviewList.reduce((s, r) => s + r.rating, 0) / reviewList.length
     : 0;

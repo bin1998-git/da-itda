@@ -218,7 +218,7 @@ export default function ReviewSection({ productId, sellerId, reviews: initialRev
             {sorted.map((review) => {
               const isOwn   = user?.id === review.user_id;
               const helped  = myHelpful.has(review.id);
-              const name    = review.profiles?.nickname ?? '익명';
+              const name    = review.profiles?.username ?? '익명';
               const isReplyMode = replyTarget === review.id;
 
               return (

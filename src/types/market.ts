@@ -22,7 +22,7 @@ export interface Review {
   updated_at: string | null;
   created_at: string;
   images?: string[] | null;
-  profiles?: { nickname: string | null; avatar_url: string | null };
+  profiles?: { username: string | null; avatar_url: string | null };
 }
 
 export interface Qna {
