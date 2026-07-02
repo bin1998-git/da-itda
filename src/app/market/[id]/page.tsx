@@ -46,7 +46,7 @@ export default async function ProductDetailPage({
       .eq('product_id', id).order('created_at', { ascending: false })
       .order('helpful_count', { ascending: false }),
     db.from('product_qna')
-      .select('*, profiles(nickname, avatar_url)')
+      .select('*, profiles!product_qna_user_id_fkey(username, avatar_url)')
       .eq('product_id', id).order('created_at', { ascending: false }),
   ]);
 

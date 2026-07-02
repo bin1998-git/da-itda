@@ -40,7 +40,7 @@ export default function ProductQnaSection({ productId, sellerId, qnas: initialQn
       user_id: user.id,
       seller_id: sellerId,
       question: q,
-    }).select('*, profiles(nickname, avatar_url)').single();
+    }).select('*, profiles!product_qna_user_id_fkey(username, avatar_url)').single();
     if (!error && data) {
       setQnas((prev) => [data as Qna, ...prev]);
       setQuestion('');
@@ -118,7 +118,7 @@ export default function ProductQnaSection({ productId, sellerId, qnas: initialQn
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-stone-500 dark:text-white/40 bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full">Q</span>
-                    <span className="text-sm font-medium text-stone-800 dark:text-white/80">{qna.profiles?.nickname ?? '익명'}</span>
+                    <span className="text-sm font-medium text-stone-800 dark:text-white/80">{qna.profiles?.username ?? '익명'}</span>
                     <span className="text-[11px] text-stone-400 dark:text-white/30">{timeAgo(qna.created_at)}</span>
                   </div>
                   {!qna.answer && (

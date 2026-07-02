@@ -34,7 +34,7 @@ export interface Qna {
   answer: string | null;
   answered_at: string | null;
   created_at: string;
-  profiles?: { nickname: string | null; avatar_url: string | null };
+  profiles?: { username: string | null; avatar_url: string | null };
 }
 
 export interface Product {
