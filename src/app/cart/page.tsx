@@ -227,6 +227,7 @@ export default function CartPage() {
     }
 
     // 주문 생성
+    const referralMediaId = localStorage.getItem('referral_media_id') ?? null;
     const { data: order } = await supabase
       .from('orders')
       .insert({
@@ -239,6 +240,7 @@ export default function CartPage() {
         shipping_phone: shipping.phone.trim(),
         shipping_address: shipping.address.trim(),
         shipping_detail: shipping.detail.trim() || null,
+        referral_media_id: referralMediaId,
       })
       .select('id')
       .single();
@@ -269,6 +271,7 @@ export default function CartPage() {
     }
 
     await supabase.from('cart_items').delete().eq('user_id', user.id);
+    localStorage.removeItem('referral_media_id');
     setItems([]);
     setCoupon(null);
     setCouponInput('');
