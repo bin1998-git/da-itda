@@ -25,6 +25,18 @@ export interface Review {
   profiles?: { nickname: string | null; avatar_url: string | null };
 }
 
+export interface Qna {
+  id: string;
+  product_id: string;
+  user_id: string;
+  seller_id: string | null;
+  question: string;
+  answer: string | null;
+  answered_at: string | null;
+  created_at: string;
+  profiles?: { nickname: string | null; avatar_url: string | null };
+}
+
 export interface Product {
   id: string;
   seller_id: string;
