@@ -12,10 +12,11 @@ import ProductImageGallery from '@/components/ui/ProductImageGallery';
 import StarRating from '@/components/ui/StarRating';
 import ReviewSection from '@/components/ui/ReviewSection';
 import ProductDetailTabs from '@/components/ui/ProductDetailTabs';
+import ProductQnaSection from '@/components/ui/ProductQnaSection';
 import ViewTracker from '@/components/ui/ViewTracker';
 import RecentlyViewedProducts from '@/components/ui/RecentlyViewedProducts';
 import RelatedProducts from '@/components/ui/RelatedProducts';
-import { Product, Review } from '@/types/market';
+import { Product, Review, Qna } from '@/types/market';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   food: '🥩', kitchen: '🍳', snack: '🍪', drink: '🧃', etc: '📦',
@@ -36,7 +37,7 @@ export default async function ProductDetailPage({
   const { id } = await params;
   const db = supabaseServer();
 
-  const [{ data: product }, { data: reviews }] = await Promise.all([
+  const [{ data: product }, { data: reviews }, { data: qnas }] = await Promise.all([
     db.from('products')
       .select('*, sellers(store_name, store_desc)')
       .eq('id', id).eq('is_active', true).single(),
@@ -44,6 +45,9 @@ export default async function ProductDetailPage({
       .select('*, profiles(nickname, avatar_url)')
       .eq('product_id', id).order('created_at', { ascending: false })
       .order('helpful_count', { ascending: false }),
+    db.from('product_qna')
+      .select('*, profiles(nickname, avatar_url)')
+      .eq('product_id', id).order('created_at', { ascending: false }),
   ]);
 
   if (!product) notFound();
@@ -55,6 +59,7 @@ export default async function ProductDetailPage({
     .eq('category', p.category).eq('is_active', true).neq('id', p.id)
     .order('created_at', { ascending: false }).limit(8);
   const reviewList = (reviews ?? []) as Review[];
+  const qnaList = (qnas ?? []) as Qna[];
   const avgRating = reviewList.length
     ? reviewList.reduce((s, r) => s + r.rating, 0) / reviewList.length
     : 0;
@@ -88,7 +93,7 @@ export default async function ProductDetailPage({
     { id: 'desc',  label: '상품설명' },
     { id: 'info',  label: '상세정보' },
     { id: 'review',label: '후기', count: reviewList.length },
-    { id: 'qna',   label: '문의' },
+    { id: 'qna',   label: '문의', count: qnaList.length },
   ];
 
   return (
@@ -281,22 +286,11 @@ export default async function ProductDetailPage({
             />
 
             {/* [3] 문의 */}
-            <div className="py-8 text-center">
-              <div className="inline-flex flex-col items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-                  </svg>
-                </div>
-                <p className="text-stone-600 dark:text-white/60 text-sm">상품에 대해 궁금한 점이 있으신가요?</p>
-                <Link
-                  href="/inquiry/write"
-                  className="px-6 py-3 rounded-full bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition"
-                >
-                  1:1 문의하기
-                </Link>
-              </div>
-            </div>
+            <ProductQnaSection
+              productId={id}
+              sellerId={p.seller_id}
+              qnas={qnaList}
+            />
 
           </ProductDetailTabs>
         </div>
