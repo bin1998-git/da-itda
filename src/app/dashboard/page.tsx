@@ -141,6 +141,11 @@ export default function DashboardPage() {
   const [sellerItems, setSellerItems] = useState<SellerOrderItem[]>([]);
   const [sellerOrders, setSellerOrders] = useState<SellerOrder[]>([]);
   const [orderStatusUpdating, setOrderStatusUpdating] = useState<string | null>(null);
+  const [refundTarget, setRefundTarget] = useState<string | null>(null);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refunding, setRefunding]       = useState(false);
+  const [refundError, setRefundError]   = useState('');
 
   // auth guard
   useEffect(() => {
@@ -1014,6 +1019,40 @@ export default function DashboardPage() {
           });
           const productList = Object.entries(byProduct).sort((a, b) => b[1].revenue - a[1].revenue);
 
+          const openRefund = (orderId: string, maxAmount: number) => {
+            setRefundTarget(orderId);
+            setRefundAmount(String(maxAmount));
+            setRefundReason('');
+          };
+
+          const submitRefund = async () => {
+            if (!refundTarget) return;
+            const amount = Number(refundAmount);
+            if (!amount || amount <= 0) return;
+            setRefunding(true);
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch('/api/payments/cancel', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session?.access_token ?? ''}`,
+              },
+              body: JSON.stringify({ orderId: refundTarget, amount, reason: refundReason }),
+            });
+            const result = await res.json();
+            if (res.ok) {
+              setSellerOrders((prev) => prev.map((o) =>
+                o.order_id === refundTarget
+                  ? { ...o, refunded_amount: o.refunded_amount + amount, status: result.fullyRefunded ? 'cancelled' : o.status }
+                  : o
+              ));
+              setRefundTarget(null);
+            } else {
+              setRefundError(result.error ?? '환불에 실패했습니다.');
+            }
+            setRefunding(false);
+          };
+
           const updateOrderStatus = async (orderId: string, status: string) => {
             setOrderStatusUpdating(orderId);
             await supabase.from('orders').update({ status }).eq('id', orderId);
@@ -1075,17 +1114,32 @@ export default function DashboardPage() {
                           <p className="text-stone-400 dark:text-white/30 text-[11px] mt-0.5 font-mono">#{order.order_id.slice(0, 8).toUpperCase()}</p>
                           <p className="text-stone-400 dark:text-white/30 text-[11px]">{fmt(order.created_at)}</p>
                         </div>
-                        <select
-                          value={order.status}
-                          disabled={orderStatusUpdating === order.order_id}
-                          onChange={(e) => updateOrderStatus(order.order_id, e.target.value)}
-                          className="px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-700 dark:text-white/70 text-sm focus:outline-none focus:border-amber-500/50 transition appearance-none cursor-pointer disabled:opacity-50"
-                        >
-                          {STATUS_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={order.status}
+                            disabled={orderStatusUpdating === order.order_id}
+                            onChange={(e) => updateOrderStatus(order.order_id, e.target.value)}
+                            className="px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-700 dark:text-white/70 text-sm focus:outline-none focus:border-amber-500/50 transition appearance-none cursor-pointer disabled:opacity-50"
+                          >
+                            {STATUS_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                          {order.total_amount - order.refunded_amount > 0 && (
+                            <button
+                              onClick={() => openRefund(order.order_id, order.total_amount - order.refunded_amount)}
+                              className="px-3 py-2 rounded-lg border border-rose-500/25 text-rose-400/80 text-xs font-medium hover:text-rose-500 hover:border-rose-500/50 hover:bg-rose-500/5 transition"
+                            >
+                              환불
+                            </button>
+                          )}
+                        </div>
                       </div>
+                      {order.refunded_amount > 0 && (
+                        <p className="px-4 pb-2 text-[11px] text-rose-400/70">
+                          {order.refunded_amount.toLocaleString('ko-KR')}원 환불됨
+                        </p>
+                      )}
                       <div className="px-4 py-3 flex flex-col gap-1">
                         {order.items.map((item, idx) => (
                           <div key={idx} className="flex items-center gap-2 text-xs text-stone-500 dark:text-white/45">
@@ -1101,6 +1155,49 @@ export default function DashboardPage() {
                   ))}
                 </div>
               )}
+
+              {/* 환불 모달 */}
+              {refundTarget && (() => {
+                const target = sellerOrders.find((o) => o.order_id === refundTarget);
+                const maxAmount = target ? target.total_amount - target.refunded_amount : 0;
+                return (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm px-4" onClick={() => setRefundTarget(null)}>
+                    <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#1a1a1a] border border-black/10 dark:border-white/10 shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
+                      <h3 className="text-base font-bold text-stone-900 dark:text-white mb-1">환불하기</h3>
+                      <p className="text-xs text-stone-400 dark:text-white/40 mb-4">환불 가능 금액: {maxAmount.toLocaleString('ko-KR')}원</p>
+                      <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">환불 금액</label>
+                      <input
+                        type="number"
+                        value={refundAmount}
+                        max={maxAmount}
+                        onChange={(e) => setRefundAmount(e.target.value)}
+                        className="w-full mb-3 px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-rose-500/50 transition"
+                      />
+                      <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">사유</label>
+                      <textarea
+                        value={refundReason}
+                        onChange={(e) => setRefundReason(e.target.value)}
+                        rows={2}
+                        placeholder="품절, 단순변심 등"
+                        className="w-full mb-4 px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-rose-500/50 transition resize-none"
+                      />
+                      {refundError && <p className="text-rose-400 text-xs mb-3">{refundError}</p>}
+                      <div className="flex gap-2">
+                        <button onClick={() => setRefundTarget(null)} className="flex-1 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-sm text-stone-500 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition">
+                          취소
+                        </button>
+                        <button
+                          onClick={submitRefund}
+                          disabled={refunding || !refundAmount || Number(refundAmount) > maxAmount}
+                          className="flex-1 py-2.5 rounded-xl bg-rose-500 text-white text-sm font-semibold hover:bg-rose-400 transition disabled:opacity-40"
+                        >
+                          {refunding ? '처리 중...' : '환불하기'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* 상품별 판매 현황 */}
               {productList.length === 0 ? (
