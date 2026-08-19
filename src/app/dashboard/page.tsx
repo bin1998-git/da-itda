@@ -78,6 +78,16 @@ const STATUS_OPTIONS = [
   { value: 'delivered', label: '배송완료' },
 ];
 
+const REFUND_REASONS = [
+  '단순변심',
+  '상품 품절',
+  '상품 불량·파손',
+  '오배송',
+  '배송 지연',
+  '고객 요청(주문취소)',
+  '기타',
+];
+
 const TABS: { id: Tab; label: string; sellerOnly?: boolean }[] = [
   { id: 'overview',  label: '개요' },
   { id: 'profile',   label: '프로필 수정' },
@@ -143,6 +153,7 @@ export default function DashboardPage() {
   const [orderStatusUpdating, setOrderStatusUpdating] = useState<string | null>(null);
   const [refundTarget, setRefundTarget] = useState<string | null>(null);
   const [refundAmount, setRefundAmount] = useState('');
+  const [refundReasonOption, setRefundReasonOption] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [refunding, setRefunding]       = useState(false);
   const [refundError, setRefundError]   = useState('');
@@ -1022,6 +1033,7 @@ export default function DashboardPage() {
           const openRefund = (orderId: string, maxAmount: number) => {
             setRefundTarget(orderId);
             setRefundAmount(String(maxAmount));
+            setRefundReasonOption('');
             setRefundReason('');
           };
 
@@ -1174,13 +1186,29 @@ export default function DashboardPage() {
                         className="w-full mb-3 px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-rose-500/50 transition"
                       />
                       <label className="text-stone-400 dark:text-white/35 text-xs mb-1.5 block">사유</label>
-                      <textarea
-                        value={refundReason}
-                        onChange={(e) => setRefundReason(e.target.value)}
-                        rows={2}
-                        placeholder="품절, 단순변심 등"
-                        className="w-full mb-4 px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-rose-500/50 transition resize-none"
-                      />
+                      <select
+                        value={refundReasonOption}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setRefundReasonOption(v);
+                          setRefundReason(v === '기타' ? '' : v);
+                        }}
+                        className={`w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm focus:outline-none focus:border-rose-500/50 transition appearance-none cursor-pointer ${refundReasonOption === '기타' ? 'mb-2' : 'mb-4'}`}
+                      >
+                        <option value="" disabled>사유를 선택해주세요</option>
+                        {REFUND_REASONS.map((r) => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                      {refundReasonOption === '기타' && (
+                        <input
+                          type="text"
+                          value={refundReason}
+                          onChange={(e) => setRefundReason(e.target.value)}
+                          placeholder="사유를 입력해주세요"
+                          className="w-full mb-4 px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-stone-900 dark:text-white text-sm placeholder-stone-400 dark:placeholder-white/30 focus:outline-none focus:border-rose-500/50 transition"
+                        />
+                      )}
                       {refundError && <p className="text-rose-400 text-xs mb-3">{refundError}</p>}
                       <div className="flex gap-2">
                         <button onClick={() => setRefundTarget(null)} className="flex-1 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-sm text-stone-500 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition">
@@ -1188,7 +1216,7 @@ export default function DashboardPage() {
                         </button>
                         <button
                           onClick={submitRefund}
-                          disabled={refunding || !refundAmount || Number(refundAmount) > maxAmount}
+                          disabled={refunding || !refundAmount || Number(refundAmount) > maxAmount || !refundReason.trim()}
                           className="flex-1 py-2.5 rounded-xl bg-rose-500 text-white text-sm font-semibold hover:bg-rose-400 transition disabled:opacity-40"
                         >
                           {refunding ? '처리 중...' : '환불하기'}
