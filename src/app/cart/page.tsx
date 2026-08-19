@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import AddressInput from '@/components/ui/AddressInput';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
 
 interface CartItem {
   id: string;
@@ -61,7 +62,6 @@ export default function CartPage() {
 
   const [mySaved, setMySaved] = useState<SavedCoupon[]>([]);
 
-  const [purchased, setPurchased]   = useState(false);
   const [purchasing, setPurchasing] = useState(false);
 
   // 배송 정보
@@ -219,20 +219,14 @@ export default function CartPage() {
     setShippingError('');
     setPurchasing(true);
 
-    if (coupon) {
-      await supabase.rpc('apply_coupon', { p_coupon_id: coupon.id });
-      const updated = mySaved.filter((s) => s.code !== coupon.code);
-      setMySaved(updated);
-      localStorage.setItem('saved_coupons', JSON.stringify(updated));
-    }
-
-    // 주문 생성
+    // 주문 생성 (결제 승인 전이므로 'pending'. 쿠폰 사용/재고 차감/알림은
+    // 결제 승인 후 /payments/success 에서 처리한다)
     const referralMediaId = localStorage.getItem('referral_media_id') ?? null;
-    const { data: order } = await supabase
+    const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         user_id: user.id,
-        status: 'paid',
+        status: 'pending',
         total_amount: total,
         discount_amount: discount,
         coupon_code: coupon?.code ?? null,
@@ -245,38 +239,44 @@ export default function CartPage() {
       .select('id')
       .single();
 
-    if (order) {
-      const orderItems = items
-        .filter((i) => i.products)
-        .map((i) => ({
-          order_id: order.id,
-          product_id: i.products!.id,
-          title: i.products!.title,
-          price: i.products!.price,
-          quantity: i.quantity,
-          image_url: i.products!.images?.[0] ?? null,
-          selected_color: i.selected_color ?? null,
-        }));
-      if (orderItems.length > 0) {
-        await supabase.from('order_items').insert(orderItems);
-      }
-      // 주문 완료 알림
-      await supabase.from('notifications').insert({
-        user_id: user.id,
-        type: 'order',
-        title: `주문이 완료됐습니다 (${total.toLocaleString('ko-KR')}원)`,
-        body: `${items.length}개 상품`,
-        link: '/orders',
-      });
+    if (orderError || !order) {
+      setShippingError('주문 생성에 실패했습니다. 다시 시도해주세요.');
+      setPurchasing(false);
+      return;
     }
 
-    await supabase.from('cart_items').delete().eq('user_id', user.id);
-    localStorage.removeItem('referral_media_id');
-    setItems([]);
-    setCoupon(null);
-    setCouponInput('');
-    setPurchasing(false);
-    setPurchased(true);
+    const orderItems = items
+      .filter((i) => i.products)
+      .map((i) => ({
+        order_id: order.id,
+        product_id: i.products!.id,
+        title: i.products!.title,
+        price: i.products!.price,
+        quantity: i.quantity,
+        image_url: i.products!.images?.[0] ?? null,
+        selected_color: i.selected_color ?? null,
+      }));
+    if (orderItems.length > 0) {
+      await supabase.from('order_items').insert(orderItems);
+    }
+
+    const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!);
+    const first = items[0]?.products?.title ?? '다잇다 주문';
+    const orderName = items.length > 1 ? `${first} 외 ${items.length - 1}건` : first;
+
+    try {
+      await tossPayments.requestPayment('카드', {
+        amount: total,
+        orderId: order.id,
+        orderName,
+        customerName: shipping.name.trim(),
+        successUrl: `${window.location.origin}/payments/success`,
+        failUrl: `${window.location.origin}/payments/fail`,
+      });
+    } catch {
+      // 사용자가 결제창을 취소했거나 즉시 실패한 경우 — 장바구니로 그대로 복귀
+      setPurchasing(false);
+    }
   };
 
   /* ── 로딩 ── */
@@ -300,38 +300,6 @@ export default function CartPage() {
           >
             로그인하기
           </Link>
-        </div>
-      </main>
-    );
-  }
-
-  /* ── 구매 완료 ── */
-  if (purchased) {
-    return (
-      <main className="min-h-screen bg-[#EDE8E2] dark:bg-[#0a0a0a] pt-20 flex items-center justify-center">
-        <div className="text-center max-w-sm mx-auto px-6">
-          <span className="text-6xl block mb-6">🎉</span>
-          <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-2">주문이 완료됐습니다!</h2>
-          <p className="text-stone-400 dark:text-white/40 text-sm mb-8">결제가 정상 처리됐습니다. 이용해주셔서 감사합니다.</p>
-          <div className="flex flex-col gap-3">
-            <Link href="/orders"
-              className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-sm hover:bg-amber-400 transition text-center"
-            >
-              주문 내역 확인
-            </Link>
-            <div className="flex gap-3 justify-center">
-              <Link href="/market"
-                className="px-6 py-3 rounded-xl border border-black/15 dark:border-white/15 text-stone-700 dark:text-white/70 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
-              >
-                계속 쇼핑하기
-              </Link>
-              <Link href="/dashboard"
-                className="px-6 py-3 rounded-xl border border-black/15 dark:border-white/15 text-stone-700 dark:text-white/70 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
-              >
-                마이페이지
-              </Link>
-            </div>
-          </div>
         </div>
       </main>
     );
