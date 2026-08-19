@@ -5,9 +5,9 @@ export default async function RankingPage() {
   const db = supabaseServer();
 
   const [{ data: products }, { data: media }, { data: posts }] = await Promise.all([
-    db.from('products').select('id, title, price, category, view_count').order('view_count', { ascending: false }).limit(10),
-    db.from('media_posts').select('id, title, view_count, thumbnail_url').order('view_count', { ascending: false }).limit(10),
-    db.from('posts').select('id, title, view_count, category').order('view_count', { ascending: false }).limit(10),
+    db.from('products').select('id, title, price, category, views').order('views', { ascending: false }).limit(10),
+    db.from('media_posts').select('id, title, views, thumbnail_url').order('views', { ascending: false }).limit(10),
+    db.from('posts').select('id, title, views, category').order('views', { ascending: false }).limit(10),
   ]);
 
   const tabs = [
@@ -48,9 +48,9 @@ export default async function RankingPage() {
                       <span className="text-stone-700 dark:text-white/70 text-sm truncate group-hover:text-stone-900 dark:group-hover:text-white transition">
                         {item.title as string}
                       </span>
-                      {(item.view_count as number) > 0 && (
+                      {(item.views as number) > 0 && (
                         <span className="text-stone-300 dark:text-white/20 text-xs shrink-0 ml-auto">
-                          {(item.view_count as number).toLocaleString()}
+                          {(item.views as number).toLocaleString()}
                         </span>
                       )}
                     </Link>

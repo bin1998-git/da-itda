@@ -54,6 +54,9 @@ export default async function ProductDetailPage({
 
   const p = product as Product;
 
+  // 조회수 증가 (비동기, 결과 무시)
+  db.rpc('increment_product_views', { product_id: id }).then(() => {});
+
   const { data: related } = await db.from('products')
     .select('id, title, price, original_price, images, category, sellers(store_name), reviews(rating)')
     .eq('category', p.category).eq('is_active', true).neq('id', p.id)
