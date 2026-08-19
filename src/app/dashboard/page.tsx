@@ -66,6 +66,9 @@ interface SellerOrder {
   created_at: string;
   buyer_name: string | null;
   buyer_user_id: string;
+  payment_key: string | null;
+  total_amount: number;
+  refunded_amount: number;
   items: { title: string; quantity: number; selected_color: string | null }[];
 }
 
@@ -336,9 +339,11 @@ export default function DashboardPage() {
 
       // 주문별 관리용
       supabase.from('order_items')
-        .select('order_id, title, quantity, selected_color, products!inner(seller_id), orders!inner(id, status, created_at, shipping_name, user_id)')
+        .select('order_id, title, quantity, selected_color, products!inner(seller_id), orders!inner(id, status, created_at, shipping_name, user_id, payment_key, total_amount, refunded_amount)')
         .eq('products.seller_id', user.id)
         .neq('orders.status', 'cancelled')
+        .neq('orders.status', 'pending')
+        .neq('orders.status', 'failed')
         .then(({ data }) => {
           const rows = (data ?? []) as any[];
           const orderMap: Record<string, SellerOrder> = {};
@@ -346,11 +351,14 @@ export default function DashboardPage() {
             const oid = r.order_id;
             if (!orderMap[oid]) {
               orderMap[oid] = {
-                order_id:      oid,
-                status:        r.orders?.status ?? '',
-                created_at:    r.orders?.created_at ?? '',
-                buyer_name:    r.orders?.shipping_name ?? null,
-                buyer_user_id: r.orders?.user_id ?? '',
+                order_id:        oid,
+                status:          r.orders?.status ?? '',
+                created_at:      r.orders?.created_at ?? '',
+                buyer_name:      r.orders?.shipping_name ?? null,
+                buyer_user_id:   r.orders?.user_id ?? '',
+                payment_key:     r.orders?.payment_key ?? null,
+                total_amount:    r.orders?.total_amount ?? 0,
+                refunded_amount: r.orders?.refunded_amount ?? 0,
                 items: [],
               };
             }
